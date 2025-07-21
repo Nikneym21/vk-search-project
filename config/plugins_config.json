@@ -1,0 +1,86 @@
+{
+  "plugins": {
+    "VKSearchPlugin": {
+      "enabled": true,
+      "config": {
+        "api_version": "5.131",
+        "rate_limit": 3,
+        "max_requests_per_second": 3,
+        "timeout": 30,
+        "retry_attempts": 3,
+        "search_limit": 100
+      }
+    },
+    "DataManagerPlugin": {
+      "enabled": true,
+      "config": {
+        "database_path": "data/vk_search.db",
+        "auto_backup": true,
+        "backup_interval": 3600,
+        "max_backup_files": 10
+      }
+    },
+    "DatabasePlugin": {
+      "enabled": true,
+      "config": {
+        "data_dir": "data/results",
+        "backup_enabled": true,
+        "auto_save": true,
+        "max_file_size": "100MB"
+      }
+    },
+    "GoogleSheetsPlugin": {
+      "enabled": true,
+      "config": {
+        "service_account_path": "config/service_account.json",
+        "scopes": [
+          "https://www.googleapis.com/auth/spreadsheets",
+          "https://www.googleapis.com/auth/drive"
+        ],
+        "auto_backup": true,
+        "max_rows_per_request": 1000
+      }
+    },
+    "TextProcessingPlugin": {
+      "enabled": true,
+      "config": {
+        "remove_emojis": true,
+        "remove_hashtags": true,
+        "remove_urls": false,
+        "remove_mentions": true,
+        "normalize_whitespace": true,
+        "min_text_length": 3,
+        "max_text_length": 10000
+      }
+    },
+    "LinkComparatorPlugin": {
+      "enabled": true,
+      "config": {
+        "output_dir": "data/results",
+        "link_patterns": [
+          "https?://[^\\s<>\"]+",
+          "www\\.[^\\s<>\"]+",
+          "vk\\.com/[^\\s<>\"]+"
+        ],
+        "case_sensitive": false,
+        "ignore_duplicates": true
+      }
+    },
+    "TokenManagerPlugin": {
+      "enabled": true,
+      "config": {
+        "tokens_file": "config/tokens.json",
+        "backup_enabled": true,
+        "auto_validation": true,
+        "validation_interval": 3600
+      }
+    }
+  },
+  "global": {
+    "log_level": "INFO",
+    "log_file": "logs/app.log",
+    "max_log_size": "10MB",
+    "log_rotation": "1 day",
+    "event_history_size": 1000
+  }
+} 
