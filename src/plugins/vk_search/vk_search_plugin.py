@@ -26,8 +26,8 @@ class VKSearchPlugin(BasePlugin):
         # Конфигурация по умолчанию
         self.config = {
             "api_version": "5.131",
-            "request_delay": 0.5,
-            "max_requests_per_second": 3,
+            "request_delay": 0.1,  # Было 0.5
+            "max_requests_per_second": 10,  # Было 3
             "timeout": 30,
             "access_token": None
         }
@@ -226,6 +226,8 @@ class VKSearchPlugin(BasePlugin):
         """
         Асинхронный массовый поиск по нескольким запросам с фильтрацией дублей и обработкой постов
         """
+        import time
+        t0 = time.time()
         self.log_info(f"🚀 Начинаем асинхронный поиск для {len(queries)} запросов")
         all_posts = []
         for i in range(0, len(queries), batch_size):
@@ -237,9 +239,14 @@ class VKSearchPlugin(BasePlugin):
                     all_posts.extend(result)
                 elif isinstance(result, Exception):
                     self.log_error(f"Ошибка поиска: {result}")
+        t1 = time.time()
+        self.log_info(f"⏱️ Время на запросы: {t1-t0:.2f} сек")
+        t2 = time.time()
         unique_posts = self.filter_unique_posts(all_posts)
+        t3 = time.time()
         num_duplicates = len(all_posts) - len(unique_posts)
         self.log_info(f"✅ Найдено {len(unique_posts)} уникальных постов для всех запросов (до фильтрации: {len(all_posts)}, дублей: {num_duplicates})")
+        self.log_info(f"⏱️ Время на фильтрацию: {t3-t2:.2f} сек")
         return unique_posts
 
     async def _search_single_query(self, query: str, start_date, end_date, 
@@ -270,37 +277,50 @@ class VKSearchPlugin(BasePlugin):
                 'access_token': self.config["access_token"],
                 'v': self.config["api_version"]
             }
+            # Параллельная загрузка по offset
+            max_batches = 5
+            offsets = [i * 200 for i in range(max_batches)]
+            tasks = []
+            for offset in offsets:
+                params_copy = params.copy()
+                params_copy['offset'] = offset
+                tasks.append(self._fetch_vk_batch(params_copy, query))
+            results = await asyncio.gather(*tasks, return_exceptions=True)
             posts = []
-            offset = 0
-            max_requests = 25
-            for request_num in range(max_requests):
-                params['offset'] = offset
-                async with self.session.get("https://api.vk.com/method/newsfeed.search", params=params) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        if 'error' in data:
-                            self.log_error(f"API ошибка: {data['error']}")
-                            break
-                        items = data.get('response', {}).get('items', [])
-                        if not items:
-                            break
-                        for item in items:
-                            post = self._process_post(item, query)
-                            if post:
-                                posts.append(post)
-                        offset += len(items)
-                        await asyncio.sleep(self.config.get("request_delay", 0.5))
-                    else:
-                        self.log_error(f"HTTP ошибка: {response.status}")
-                        break
-            self.log_info(f"📊 Найдено {len(posts)} постов для '{query[:30]}...'")
-            return posts
+            for result in results:
+                if isinstance(result, list):
+                    posts.extend(result)
+                elif isinstance(result, Exception):
+                    self.log_error(f"Ошибка поиска по offset: {result}")
+            self.log_info(f"📊 Найдено {len(posts)} постов для '{query[:30]}...' (до фильтрации дублей)")
+            # Фильтрация дублей по (owner_id, post_id)
+            unique_posts = self.filter_unique_posts(posts)
+            self.log_info(f"📊 Уникальных постов для '{query[:30]}...': {len(unique_posts)}")
+            return unique_posts
         except Exception as e:
             self.log_error(f"Ошибка поиска '{query[:30]}...': {e}")
             return []
 
+    async def _fetch_vk_batch(self, params, query):
+        try:
+            async with self.session.get("https://api.vk.com/method/newsfeed.search", params=params) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    response_obj = data.get('response') if isinstance(data, dict) else None
+                    items = response_obj.get('items', []) if isinstance(response_obj, dict) else []
+                    return [self._process_post(item, query) for item in items if item]
+                else:
+                    self.log_error(f"HTTP ошибка: {response.status}")
+                    return []
+        except Exception as e:
+            self.log_error(f"Ошибка VK API: {e}")
+            return []
+
     def _process_post(self, item: Dict, query: str) -> Optional[Dict]:
-        """Обработка и нормализация поста под экспорт/анализ"""
+        if not isinstance(item, dict):
+            print("VKSearchPlugin: item is not a dict!", type(item), item)
+            self.log_error(f"VKSearchPlugin: item is not a dict! {type(item)} {item}")
+            return None
         try:
             owner_id = item.get('owner_id')
             post_id = item.get('id')

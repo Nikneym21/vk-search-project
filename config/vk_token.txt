@@ -1,5 +1,5 @@
-# Токен VK API
-# Получите токен на https://vkhost.github.io/
-# Вставьте ваш токен ниже (без кавычек):
-
-cf178d24cf178d24cf178d2478cc20885fccf17cf178d24a76a93ec84e185cb7e63c995 
+cf178d24cf178d24cf178d2478cc20885fccf17cf178d24a76a93ec84e185cb7e63c995
+ed0eb782ed0eb782ed0eb782c5ee39a151eed0eed0eb7828570e2f0186898072961d7f0
+ced7f221ced7f221ced7f22131cde0e533cced7ced7f221a6a9a583a60a2dd9d10228b2
+fabd120ffabd120ffabd120fd1f98a0526ffabdfabd120f92c345cd801baa829311b14d
+d9cba639d9cba639d9cba63959dafcb0f7dd9cbd9cba639b1b5f3353eb2bb27709437fd 

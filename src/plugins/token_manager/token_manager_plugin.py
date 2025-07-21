@@ -45,6 +45,7 @@ class TokenManagerPlugin(BasePlugin):
         
         # Загружаем токены
         self._load_tokens()
+        self._load_vk_tokens_from_txt()
         
         self.log_info("Плагин Token Manager инициализирован")
         self.emit_event(EventType.PLUGIN_LOADED, {"status": "initialized"})
@@ -194,6 +195,10 @@ class TokenManagerPlugin(BasePlugin):
         
         return tokens_list
     
+    def list_vk_tokens(self) -> list:
+        """Возвращает список всех VK токенов"""
+        return [t["token"] for s, t in self.tokens.items() if s.startswith("vk") and self._is_token_valid(s)]
+    
     def _validate_token(self, service: str, token: str) -> bool:
         """Проверяет валидность токена"""
         if not token or len(token) < 10:
@@ -311,3 +316,22 @@ class TokenManagerPlugin(BasePlugin):
     def get_required_config_keys(self) -> list:
         """Возвращает список обязательных ключей конфигурации"""
         return ["tokens_file"] 
+
+    def _load_vk_tokens_from_txt(self):
+        vk_txt_path = "config/vk_token.txt"
+        if not os.path.exists(vk_txt_path):
+            self.log_warning(f"Файл VK токенов не найден: {vk_txt_path}")
+            return
+        with open(vk_txt_path, "r", encoding="utf-8") as f:
+            lines = [line.strip() for line in f if line.strip() and not line.strip().startswith("#")]
+        for idx, token in enumerate(lines):
+            service = f"vk{'' if idx == 0 else idx+1}"
+            self.tokens[service] = {
+                "token": token,
+                "created_at": datetime.now().isoformat(),
+                "expires_at": None,
+                "description": "",
+                "last_used": None,
+                "usage_count": 0
+            }
+        self.log_info(f"Загружено VK токенов из vk_token.txt: {len(lines)}") 

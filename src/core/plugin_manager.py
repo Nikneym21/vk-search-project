@@ -30,6 +30,15 @@ class PluginManager:
         for plugin_dir in plugins_path.iterdir():
             if plugin_dir.is_dir() and not plugin_dir.name.startswith('_'):
                 self._load_plugin(plugin_dir)
+        # Явная загрузка LoggerPlugin
+        try:
+            from src.plugins.logger.logger_plugin import LoggerPlugin
+            logger_plugin = LoggerPlugin()
+            logger_plugin.initialize()
+            self.plugins['logger'] = logger_plugin
+            logger.info("LoggerPlugin загружен и инициализирован")
+        except Exception as e:
+            logger.error(f"LoggerPlugin не загружен: {e}")
     
     def _load_plugin(self, plugin_dir: Path) -> None:
         """Загружает отдельный плагин"""

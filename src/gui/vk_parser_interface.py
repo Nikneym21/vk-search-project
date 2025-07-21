@@ -18,112 +18,21 @@ import time
 import sys
 import concurrent.futures
 import pytz
-sys.path.append(os.path.expanduser("~/Desktop/Проекты/Скрипт таблиц"))
-from async_vk_integration import AsyncVKSearch
+from src.plugins.vk_search.vk_search_plugin import VKSearchPlugin
 from src.plugins.vk_search.vk_time_utils import to_vk_timestamp, from_vk_timestamp
+from src.plugins.token_manager.token_limiter import TokenLimiter
 
 
-class SimpleTokenManager:
-    """Упрощенный менеджер токенов без зависимостей"""
-    
-    def __init__(self):
-        self.tokens_file = "config/tokens.json"
-        self.tokens = {}
-        self._load_tokens()
-        print("SimpleTokenManager создан")
-    
-    def _load_tokens(self):
-        """Загружает токены из файла"""
-        try:
-            if os.path.exists(self.tokens_file):
-                with open(self.tokens_file, 'r', encoding='utf-8') as f:
-                    self.tokens = json.load(f)
-                print(f"Загружено {len(self.tokens)} токенов")
-            else:
-                self.tokens = {}
-                print("Файл токенов не найден, создан новый")
-        except Exception as e:
-            print(f"Ошибка загрузки токенов: {e}")
-            self.tokens = {}
-    
-    def _save_tokens(self):
-        """Сохраняет токены в файл"""
-        try:
-            os.makedirs(os.path.dirname(self.tokens_file), exist_ok=True)
-            with open(self.tokens_file, 'w', encoding='utf-8') as f:
-                json.dump(self.tokens, f, ensure_ascii=False, indent=2)
-            print("Токены сохранены")
-        except Exception as e:
-            print(f"Ошибка сохранения токенов: {e}")
-    
-    def add_token(self, service: str, token: str) -> bool:
-        """Добавляет токен"""
-        try:
-            self.tokens[service] = {
-                "token": token,
-                "created_at": datetime.now().isoformat(),
-                "service": service
-            }
-            self._save_tokens()
-            return True
-        except Exception as e:
-            print(f"Ошибка добавления токена: {e}")
-            return False
-    
-    def get_token(self, service: str) -> Optional[str]:
-        """Получает токен"""
-        try:
-            token_data = self.tokens.get(service)
-            if token_data:
-                return token_data.get("token")
-            return None
-        except Exception as e:
-            print(f"Ошибка получения токена: {e}")
-            return None
-    
-    def remove_token(self, service: str) -> bool:
-        """Удаляет токен"""
-        try:
-            if service in self.tokens:
-                del self.tokens[service]
-                self._save_tokens()
-                return True
-            return False
-        except Exception as e:
-            print(f"Ошибка удаления токена: {e}")
-            return False
-    
-    def list_tokens(self) -> List[Dict[str, Any]]:
-        """Возвращает список токенов"""
-        try:
-            return list(self.tokens.values())
-        except Exception as e:
-            print(f"Ошибка получения списка токенов: {e}")
-            return []
-    
-    def _is_token_valid(self, service: str) -> bool:
-        """Проверяет валидность токена"""
-        try:
-            token = self.get_token(service)
-            if not token:
-                return False
-            
-            # Простая проверка для VK
-            if service == "vk":
-                import requests
-                test_url = f"https://api.vk.com/method/users.get?access_token={token}&v=5.131"
-                response = requests.get(test_url, timeout=10)
-                return response.status_code == 200 and 'error' not in response.json()
-            
-            return True
-        except Exception as e:
-            print(f"Ошибка проверки токена: {e}")
-            return False
-    
-    def initialize(self):
-        """Инициализация (пустая для совместимости)"""
-        pass
-
+class TokenPool:
+    def __init__(self, tokens: list):
+        self.tokens = tokens
+        self.index = 0
+        self.lock = threading.Lock()
+    def get_token(self):
+        with self.lock:
+            token = self.tokens[self.index]
+            self.index = (self.index + 1) % len(self.tokens)
+            return token
 
 class VKParserInterface:
     def __init__(self, parent_frame, settings_adapter=None):
@@ -154,9 +63,20 @@ class VKParserInterface:
                 print("VK Parser: Плагин настроек не подключен")
         else:
             self.settings_adapter = settings_adapter
-        
-        # Инициализируем TokenManagerPlugin
-        self.token_manager = self._init_token_manager()
+            self.settings_plugin = getattr(settings_adapter, 'settings_plugin', None)
+        # Инициализируем PluginManager и TokenManagerPlugin
+        from src.core.plugin_manager import PluginManager
+        self.plugin_manager = PluginManager()
+        self.plugin_manager.load_plugins()
+        self.plugin_manager.initialize_plugins()
+        self.token_manager = self.plugin_manager.get_plugin('token_manager')
+        if not self.token_manager:
+            raise RuntimeError("TokenManagerPlugin не инициализирован через PluginManager")
+        self.token_limiter = TokenLimiter(self.token_manager.list_vk_tokens(), cooldown_seconds=60)
+        # Инициализируем VKSearchPlugin через PluginManager
+        self.vk_search_plugin = self.plugin_manager.get_plugin('vk_search')
+        if self.vk_search_plugin and hasattr(self.vk_search_plugin, 'initialize'):
+            self.vk_search_plugin.initialize()
         
         # Настройка интерфейса
         self.setup_ui()
@@ -178,8 +98,8 @@ class VKParserInterface:
         """Инициализирует упрощенный TokenManager"""
         try:
             # Создаем простой менеджер токенов без зависимостей
-            token_manager = SimpleTokenManager()
-            print("SimpleTokenManager инициализирован")
+            token_manager = self.settings_plugin.get_token_manager() # Используем плагин настроек
+            print("TokenManagerPlugin инициализирован")
             return token_manager
         except Exception as e:
             print(f"Ошибка инициализации TokenManager: {e}")
@@ -407,6 +327,10 @@ class VKParserInterface:
         # Строка прогресса поиска
         self.progress_label = ttk.Label(left_scrollable_frame, text="", font=("Arial", 9), foreground="blue")
         self.progress_label.grid(row=22, column=0, sticky="w", pady=(0, 5))
+        # Прогресс-бар поиска
+        self.progress_var = tk.DoubleVar(value=0)
+        self.progress_bar = ttk.Progressbar(left_scrollable_frame, variable=self.progress_var, maximum=100, length=350)
+        self.progress_bar.grid(row=23, column=0, sticky="ew", pady=(0, 10))
         
         # Правая панель - история и результаты (делаем уже)
         right_frame = ttk.Frame(self.paned_window)
@@ -652,17 +576,13 @@ class VKParserInterface:
             exact_match = self.exact_match_var.get()
             minus_words = self.minus_words_text.get("1.0", tk.END).strip().splitlines()
             minus_words = [w.strip() for w in minus_words if w.strip()]
-            token = self.token_var.get().strip()
+            # Получаем токен из лимитера
+            token = self.token_limiter.get_token()
             if not token:
-                messagebox.showerror("Ошибка", "Токен ВК не найден")
+                messagebox.showerror("Ошибка", "Нет доступных VK токенов (все на cooldown)")
                 return
-            def quote_for_exact(k):
-                k = k.strip().strip('"')
-                q = f'"{k}"' if exact_match else k
-                print(f"[VKParser] Фраза для точного вхождения (print): {q}")
-                print(f"[VKParser] Фраза для точного вхождения (repr): {repr(q)}")
-                return q
-            api_keywords = [quote_for_exact(k) for k in keywords]
+            # Для массового парсинга: каждый запрос — отдельная ключевая фраза
+            api_keywords = keywords
             # Преобразуем даты и время в timestamp через vk_time_utils
             try:
                 start_ts = to_vk_timestamp(start_date, start_time)
@@ -679,117 +599,173 @@ class VKParserInterface:
     def _run_async_search_thread(self, keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(self._async_search_and_display(keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time))
+        # Передаём token_limiter вместо token_pool
+        loop.run_until_complete(self._async_search_and_display(keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, self.token_limiter, start_date, start_time, end_date, end_time))
 
-    async def _async_search_and_display(self, keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time):
+    async def _async_search_and_display(self, keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token_limiter, start_date, start_time, end_date, end_time):
         try:
+            # Гарантируем, что сессия VKSearchPlugin инициализирована
+            if self.vk_search_plugin.session is None:
+                token = self.token_limiter.get_token()
+                if token:
+                    self.vk_search_plugin.config["access_token"] = token
+                self.vk_search_plugin.initialize()
             self._set_progress(f"Запуск поиска по {len(keywords)} запросам...")
+            self.progress_var.set(0)
+            self.progress_bar.update()
             start_time_all = time.time()
             results = []
-            async with AsyncVKSearch(token, max_concurrent=5) as vk_search:
-                total = len(api_keywords)
-                done = 0
-                batch_size = 1
-                all_posts = []
-                for i in range(0, total, batch_size):
-                    batch = api_keywords[i:i+batch_size]
-                    print(f"[VKParser] VK API запрос: фраза={batch}, start_ts={start_ts}, end_ts={end_ts}, exact_match={exact_match}, minus_words={minus_words}")
-                    # Не передаём start_ts и end_ts если они None
-                    if start_ts is None or end_ts is None:
-                        batch_results = await vk_search.search_multiple_queries(batch, None, None, exact_match, minus_words)
-                    else:
-                        batch_results = await vk_search.search_multiple_queries(batch, start_ts, end_ts, exact_match, minus_words)
-                    print(f"[VKParser] Ответ VK API для фразы {batch}: {batch_results}")
-                    all_posts.extend(batch_results)
-                    done += len(batch)
-                    elapsed = time.time() - start_time_all
-                    speed = done / elapsed if elapsed > 0 else 1
-                    remaining = total - done
-                    eta = int(remaining / speed) if speed > 0 else 0
-                    self._set_progress(f"Обработано {done} из {total}, осталось ~{eta} сек")
-                results = all_posts
+            total = len(api_keywords)
+            done = 0
+            batch_size = len(token_limiter.tokens)
+            all_posts = []
+            for i in range(0, total, batch_size):
+                batch = api_keywords[i:i+batch_size]
+                tokens = []
+                for _ in batch:
+                    token = token_limiter.get_token()
+                    if not token:
+                        break
+                    tokens.append(token)
+                if not tokens:
+                    self._set_progress("Нет доступных VK токенов, ожидание...")
+                    await asyncio.sleep(5)
+                    token_limiter.unblock_expired()
+                    continue
+                tasks = []
+                for keyword, token in zip(batch, tokens):
+                    self.vk_search_plugin.config["access_token"] = token
+                    tasks.append(self.vk_search_plugin.search_multiple_queries(
+                        [keyword], start_ts, end_ts, exact_match, minus_words
+                    ))
+                batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+                for result in batch_results:
+                    if isinstance(result, list):
+                        all_posts.extend(result)
+                    elif isinstance(result, Exception):
+                        err_str = str(result)
+                        if 'Too many requests' in err_str or 'error_code":6' in err_str or 'Captcha' in err_str:
+                            idx = batch_results.index(result)
+                            if idx < len(tokens):
+                                token_limiter.block_token(tokens[idx])
+                            self._set_progress(f"Токен временно заблокирован из-за лимита: {tokens[idx][:8]}... (60 сек)")
+                            await asyncio.sleep(1)
+                            continue
+                        else:
+                            raise result
+                done += len(batch)
+                elapsed = time.time() - start_time_all
+                speed = done / elapsed if elapsed > 0 else 1
+                remaining = total - done
+                eta = int(remaining / speed) if speed > 0 else 0
+                self._set_progress(f"Обработано {done} из {total}, осталось ~{eta} сек")
+                # Обновление прогресс-бара
+                progress = min(100, (done / total) * 100)
+                self.progress_var.set(progress)
+                self.progress_bar.update()
+            results = all_posts
+            self.progress_var.set(100)
+            self.progress_bar.update()
             self._set_progress(f"Поиск завершен. Найдено {len(results)} постов.")
             filtered = self._filter_and_format_results(results, keywords, exact_match, start_date, start_time, end_date, end_time)
             filename = f"search_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
             results_dir = os.path.join("data", "results")
             os.makedirs(results_dir, exist_ok=True)
             filepath = os.path.join(results_dir, filename)
-            if filtered:
+            data_manager = self.plugin_manager.get_plugin('data_manager')
+            if filtered and data_manager:
+                try:
+                    filepath = data_manager.save_results_to_csv(filtered, filename)
+                except Exception as e:
+                    messagebox.showerror("Ошибка", f"Ошибка экспорта через DataManagerPlugin: {str(e)}")
+            elif filtered:
+                # fallback на старый способ
                 with open(filepath, "w", newline='', encoding="utf-8") as f:
                     writer = csv.DictWriter(f, fieldnames=["link", "text", "type", "author", "author_link", "date", "likes", "comments", "reposts", "views"])
                     writer.writeheader()
                     writer.writerows(filtered)
-            self._add_search_history_entry(keywords, start_date, end_date, exact_match, minus_words, filepath, len(filtered))
-            self._display_results_from_csv(filepath)
+            if filepath:
+                self._add_search_history_entry(keywords, start_date, end_date, exact_match, minus_words, filepath, len(filtered))
+                if os.path.exists(filepath):
+                    self._display_results_from_csv(filepath)
+                else:
+                    messagebox.showerror("Ошибка", f"Файл результата не найден: {filepath}")
+            if not filepath:
+                messagebox.showerror("Ошибка", "Не удалось сохранить результаты поиска в файл.")
+            # Сброс прогресс-бара после завершения
+            self.progress_var.set(0)
+            self.progress_bar.update()
         except Exception as e:
+            self.progress_var.set(0)
+            self.progress_bar.update()
             self._set_progress("")
             messagebox.showerror("Ошибка", f"Ошибка асинхронного поиска: {str(e)}")
 
     def _filter_and_format_results(self, posts, keywords, exact_match, start_date, start_time, end_date, end_time):
-        # Фильтрация по ключевым фразам и времени (по Москве)
-        from datetime import datetime as dt
-        def parse_vk_date(ts):
-            try:
-                if ts is None:
-                    return None
-                return dt.fromtimestamp(int(ts))
-            except Exception:
-                return None
+        # Убираем None из списка постов
+        posts = [p for p in posts if p is not None]
         # Формируем диапазон дат и времени (по Москве)
         try:
             import pytz
             moscow_tz = pytz.timezone('Europe/Moscow')
-            start_dt = moscow_tz.localize(dt.strptime(f"{start_date} {start_time}", "%d.%m.%Y %H:%M"))
-            end_dt = moscow_tz.localize(dt.strptime(f"{end_date} {end_time}", "%d.%m.%Y %H:%M"))
+            start_dt = moscow_tz.localize(datetime.strptime(f"{start_date} {start_time}", "%d.%m.%Y %H:%M"))
+            end_dt = moscow_tz.localize(datetime.strptime(f"{end_date} {end_time}", "%d.%m.%Y %H:%M"))
         except Exception:
             start_dt = None
             end_dt = None
         unique_links = set()
         filtered = []
         for post in posts:
-            text = post.get("text", "")
-            # Фильтрация по ключевым фразам
+            text = post.get("text") or post.get("post_text") or ""
+            cleaned_text = self.text_processing_plugin.clean_text_completely(text)
+            # Фильтрация по ключевым фразам: ищем точное вхождение фразы в очищенном тексте поста
             if exact_match:
-                if not any(k in text for k in keywords):
+                cleaned_keywords = [self.text_processing_plugin.clean_text_completely(k).lower() for k in keywords]
+                if not any(k in cleaned_text.lower() for k in cleaned_keywords):
                     continue
             else:
-                if not any(k.lower() in text.lower() for k in keywords):
+                if not any(keyword in cleaned_text for keyword in keywords):
                     continue
-            # Фильтрация по времени (по Москве)
-            date_val = post.get("date")
-            if date_val is None or not str(date_val).isdigit():
-                continue
-            post_dt_utc = parse_vk_date(date_val)
-            if post_dt_utc:
+            # Корректное формирование даты
+            date_val = post.get("timestamp") or post.get("date") or 0
+            date_str = "Нет даты"
+            try:
+                post_dt_utc = from_vk_timestamp(int(date_val))
+                if isinstance(post_dt_utc, tuple):
+                    post_dt_utc = post_dt_utc[0]
+                if isinstance(post_dt_utc, str):
+                    try:
+                        post_dt_utc = datetime.fromisoformat(post_dt_utc)
+                    except Exception:
+                        # Пробуем формат дд.мм.гггг
+                        post_dt_utc = datetime.strptime(post_dt_utc, "%d.%m.%Y")
                 import pytz
                 moscow_tz = pytz.timezone('Europe/Moscow')
                 post_dt_msk = post_dt_utc.astimezone(moscow_tz)
-                if start_dt and end_dt:
-                    if not (start_dt <= post_dt_msk <= end_dt):
-                        continue
-            # Формируем ссылку
+                date_str = post_dt_msk.strftime("%d.%m.%Y %H:%M")
+            except Exception as e:
+                print("DEBUG date error:", e, date_val, type(post_dt_utc))
             owner_id = post.get("owner_id")
-            post_id = post.get("id")
-            link = f"https://vk.com/wall{owner_id}_{post_id}" if owner_id and post_id else ""
+            post_id = post.get("post_id") or post.get("id")
+            link = f"https://vk.com/wall{owner_id}_{post_id}" if owner_id and post_id else post.get("Ссылка", "")
+            # Удаляю повторное формирование date_str, использую только ранее вычисленный date_str
             if not link or link in unique_links:
                 continue
             unique_links.add(link)
-            # Формируем автора
-            author = post.get("from_id", "")
-            author_link = f"https://vk.com/id{author}" if author else ""
-            # Исправленная обработка даты
-            date_str = post_dt_msk.strftime("%d.%m.%Y %H:%M") if post_dt_utc else "Нет даты"
+            author = post.get("author") or post.get("from_id") or ""
+            author_link = f"https://vk.com/id{owner_id}" if owner_id else ""
+            # Удаляю повторное формирование date_str, использую только ранее вычисленный date_str
             filtered.append({
                 "link": link,
                 "text": text,
-                "type": post.get("post_type", ""),
+                "type": post.get("type") or post.get("post_type") or "post",
                 "author": author,
                 "author_link": author_link,
                 "date": date_str,
-                "likes": post.get("likes", {}).get("count", 0),
-                "comments": post.get("comments", {}).get("count", 0),
-                "reposts": post.get("reposts", {}).get("count", 0),
-                "views": post.get("views", {}).get("count", 0)
+                "likes": post.get("likes") if isinstance(post.get("likes"), int) else post.get("likes", 0),
+                "comments": post.get("comments") if isinstance(post.get("comments"), int) else post.get("comments", 0),
+                "reposts": post.get("shares") or post.get("reposts") or 0,
+                "views": post.get("views") or 0
             })
         return filtered
 
@@ -846,11 +822,12 @@ class VKParserInterface:
     def _display_results_from_csv(self, filepath):
         # Открыть CSV и отобразить в self.results_tree
         try:
+            fieldnames = ["link", "text", "type", "author", "author_link", "date", "likes", "comments", "reposts", "views"]
             with open(filepath, "r", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
                 self.results_tree.delete(*self.results_tree.get_children())
                 for row in reader:
-                    self.results_tree.insert("", "end", values=tuple(row.values()))
+                    self.results_tree.insert("", "end", values=tuple(row.get(f, "") for f in fieldnames))
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось отобразить результаты: {str(e)}")
     
@@ -1108,7 +1085,7 @@ class VKParserInterface:
             # Вставляем в поле ключевых фраз
             self.keywords_text.delete("1.0", tk.END)
             self.keywords_text.insert("1.0", "\n".join(cleaned_texts))
-
+            
             messagebox.showinfo("Успех", f"Загружено и очищено {len(cleaned_texts)} ключевых фраз из листов: {', '.join(processed_sheets)}")
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось загрузить данные: {str(e)}")

@@ -335,3 +335,34 @@ class DataManagerPlugin(BasePlugin):
     def get_required_config_keys(self) -> list:
         """Возвращает список обязательных ключей конфигурации"""
         return ["database_path", "export_path"] 
+
+    def save_results_to_csv(self, results: List[Dict[str, Any]], filename: str = None) -> str:
+        """Сохраняет переданные результаты в CSV и возвращает путь к файлу"""
+        if not results:
+            raise ValueError("Нет данных для сохранения")
+        if filename is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"results_{timestamp}.csv"
+        filepath = Path(self.config["export_path"]) / filename
+        # Определяем все возможные ключи
+        all_keys = set()
+        for result in results:
+            all_keys.update(result.keys())
+        fieldnames = sorted(list(all_keys))
+        try:
+            with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(results)
+        except Exception as e:
+            self.log_error(f"Ошибка сохранения в CSV: {e}")
+            print("Ошибка при экспорте:", e)
+            print("Пример данных:", results[0] if results else "Нет данных")
+            raise
+        self.log_info(f"Результаты сохранены в CSV: {filepath}")
+        self.emit_event(EventType.DATA_UPDATED, {
+            "filepath": str(filepath),
+            "records_count": len(results),
+            "format": "csv"
+        })
+        return str(filepath) 
