@@ -19,6 +19,13 @@ class MainInterface:
         self.settings_adapter = SettingsAdapter()
         self.settings_plugin = self.settings_adapter.create_settings_manager()
         
+        # Подключаем плагин к адаптеру если он создался
+        if self.settings_plugin:
+            self.settings_adapter.set_settings_plugin(self.settings_plugin)
+            print("Плагин настроек успешно подключен")
+        else:
+            print("Плагин настроек не подключен, используется fallback режим")
+        
         # Загружаем сохраненные настройки размеров
         self.load_window_settings()
         

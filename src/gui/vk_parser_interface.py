@@ -13,7 +13,19 @@ import emoji
 class VKParserInterface:
     def __init__(self, parent_frame, settings_adapter=None):
         self.parent_frame = parent_frame
-        self.settings_adapter = settings_adapter
+        
+        # Создаем адаптер настроек если не передан
+        if settings_adapter is None:
+            from .settings_adapter import SettingsAdapter
+            self.settings_adapter = SettingsAdapter()
+            self.settings_plugin = self.settings_adapter.create_settings_manager()
+            if self.settings_plugin:
+                self.settings_adapter.set_settings_plugin(self.settings_plugin)
+                print("VK Parser: Плагин настроек подключен")
+            else:
+                print("VK Parser: Плагин настроек не подключен")
+        else:
+            self.settings_adapter = settings_adapter
         
         # Инициализация переменных
         self.vk_api_wrapper = None

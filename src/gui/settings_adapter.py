@@ -6,24 +6,139 @@
 import tkinter as tk
 from typing import Dict, Any, Optional
 from loguru import logger
+import sys
+import os
+import json
+
+# Добавляем путь к src в sys.path для корректного импорта
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+# Простая версия плагина настроек без зависимости от BasePlugin
+class SimpleSettingsManager:
+    """Простой менеджер настроек без зависимости от BasePlugin"""
+    
+    def __init__(self):
+        self.data_dir = "data"
+        self.settings_cache = {}
+        self._ensure_data_dir()
+        logger.info("Простой менеджер настроек инициализирован")
+    
+    def _ensure_data_dir(self):
+        """Создает папку data если её нет"""
+        if not os.path.exists(self.data_dir):
+            os.makedirs(self.data_dir)
+    
+    def _get_settings_file(self, category: str) -> str:
+        """Получает путь к файлу настроек"""
+        return os.path.join(self.data_dir, f"{category}_settings.json")
+    
+    def get_setting(self, category: str, key: str, default: Any = None) -> Any:
+        """Получает настройку"""
+        if category not in self.settings_cache:
+            self._load_category(category)
+        
+        return self.settings_cache.get(category, {}).get(key, default)
+    
+    def set_setting(self, category: str, key: str, value: Any) -> bool:
+        """Устанавливает настройку"""
+        if category not in self.settings_cache:
+            self.settings_cache[category] = {}
+        
+        self.settings_cache[category][key] = value
+        return self._save_category(category)
+    
+    def _load_category(self, category: str) -> None:
+        """Загружает категорию настроек"""
+        file_path = self._get_settings_file(category)
+        if os.path.exists(file_path):
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    self.settings_cache[category] = json.load(f)
+            except Exception as e:
+                logger.error(f"Ошибка загрузки настроек {category}: {e}")
+                self.settings_cache[category] = {}
+        else:
+            self.settings_cache[category] = {}
+    
+    def _save_category(self, category: str) -> bool:
+        """Сохраняет категорию настроек"""
+        try:
+            file_path = self._get_settings_file(category)
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(self.settings_cache.get(category, {}), f, ensure_ascii=False, indent=2)
+            return True
+        except Exception as e:
+            logger.error(f"Ошибка сохранения настроек {category}: {e}")
+            return False
+    
+    def save_window_settings(self, settings: Dict[str, Any]) -> bool:
+        """Сохраняет настройки окна"""
+        return self.set_setting("window", "geometry", settings)
+    
+    def load_window_settings(self) -> Dict[str, Any]:
+        """Загружает настройки окна"""
+        return self.get_setting("window", "geometry", {})
+    
+    def save_parser_settings(self, settings: Dict[str, Any]) -> bool:
+        """Сохраняет настройки парсера"""
+        for key, value in settings.items():
+            self.set_setting("parser", key, value)
+        return True
+    
+    def load_parser_settings(self) -> Dict[str, Any]:
+        """Загружает настройки парсера"""
+        return self.get_setting("parser", "settings", {})
+    
+    def save_sheets_settings(self, settings: Dict[str, Any]) -> bool:
+        """Сохраняет настройки Google Sheets"""
+        for key, value in settings.items():
+            self.set_setting("sheets", key, value)
+        return True
+    
+    def load_sheets_settings(self) -> Dict[str, Any]:
+        """Загружает настройки Google Sheets"""
+        return self.get_setting("sheets", "settings", {})
+    
+    def reset_settings(self, category: Optional[str] = None) -> bool:
+        """Сбрасывает настройки"""
+        if category:
+            if category in self.settings_cache:
+                del self.settings_cache[category]
+            file_path = self._get_settings_file(category)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        else:
+            self.settings_cache.clear()
+            for file_name in os.listdir(self.data_dir):
+                if file_name.endswith("_settings.json"):
+                    os.remove(os.path.join(self.data_dir, file_name))
+        return True
+
 
 # Импортируем плагин настроек
 try:
-    from ..plugins.settings_manager.settings_manager_plugin import SettingsManagerPlugin
+    from src.plugins.settings_manager.settings_manager_plugin import SettingsManagerPlugin
     SETTINGS_PLUGIN_AVAILABLE = True
-except ImportError:
+    logger.info("Плагин настроек успешно импортирован")
+except ImportError as e:
     SETTINGS_PLUGIN_AVAILABLE = False
-    logger.warning("Плагин настроек недоступен")
+    logger.warning(f"Плагин настроек недоступен: {e}")
+    logger.info("Используется простой менеджер настроек")
 
 
 class SettingsAdapter:
     """Адаптер для работы с настройками в интерфейсах"""
     
-    def __init__(self, settings_plugin: Optional[SettingsManagerPlugin] = None):
+    def __init__(self, settings_plugin: Optional['SettingsManagerPlugin'] = None):
         self.settings_plugin = settings_plugin
         self._auto_save_enabled = True
         
-    def set_settings_plugin(self, plugin: SettingsManagerPlugin) -> None:
+        # Если плагин не передан, создаем простой менеджер
+        if not self.settings_plugin:
+            self.settings_plugin = SimpleSettingsManager()
+            logger.info("Используется простой менеджер настроек")
+    
+    def set_settings_plugin(self, plugin: 'SettingsManagerPlugin') -> None:
         """Устанавливает плагин настроек"""
         self.settings_plugin = plugin
         logger.info("Плагин настроек подключен к адаптеру")
@@ -159,17 +274,17 @@ class SettingsAdapter:
         except Exception as e:
             logger.error(f"Ошибка автосохранения текстового виджета {category}.{key}: {str(e)}")
     
-    def create_settings_manager(self) -> Optional[SettingsManagerPlugin]:
+    def create_settings_manager(self) -> Optional['SettingsManagerPlugin']:
         """Создает экземпляр плагина настроек"""
-        if not SETTINGS_PLUGIN_AVAILABLE:
-            logger.error("Плагин настроек недоступен")
-            return None
+        if SETTINGS_PLUGIN_AVAILABLE:
+            try:
+                plugin = SettingsManagerPlugin()
+                plugin.initialize()
+                self.set_settings_plugin(plugin)
+                return plugin
+            except Exception as e:
+                logger.error(f"Ошибка создания плагина настроек: {str(e)}")
         
-        try:
-            plugin = SettingsManagerPlugin()
-            plugin.initialize()
-            self.set_settings_plugin(plugin)
-            return plugin
-        except Exception as e:
-            logger.error(f"Ошибка создания плагина настроек: {str(e)}")
-            return None 
+        # Возвращаем простой менеджер как fallback
+        logger.info("Создается простой менеджер настроек")
+        return SimpleSettingsManager() 
