@@ -20,6 +20,7 @@ import concurrent.futures
 import pytz
 sys.path.append(os.path.expanduser("~/Desktop/Проекты/Скрипт таблиц"))
 from async_vk_integration import AsyncVKSearch
+from src.plugins.vk_search.vk_time_utils import to_vk_timestamp, from_vk_timestamp
 
 
 class SimpleTokenManager:
@@ -637,7 +638,7 @@ class VKParserInterface:
             print(f"Ошибка загрузки настроек: {str(e)}")
     
     def start_vk_search(self):
-        """Запуск асинхронного поиска в ВК (без фильтрации по дате, фильтрация по времени на клиенте)"""
+        """Запуск асинхронного поиска в ВК (теперь с преобразованием дат и времени через vk_time_utils)"""
         try:
             keywords = self.keywords_text.get("1.0", tk.END).strip().splitlines()
             keywords = [k.strip() for k in keywords if k.strip()]
@@ -662,9 +663,13 @@ class VKParserInterface:
                 print(f"[VKParser] Фраза для точного вхождения (repr): {repr(q)}")
                 return q
             api_keywords = [quote_for_exact(k) for k in keywords]
-            # Не передаём фильтрацию по дате в VK API
-            start_ts = None
-            end_ts = None
+            # Преобразуем даты и время в timestamp через vk_time_utils
+            try:
+                start_ts = to_vk_timestamp(start_date, start_time)
+                end_ts = to_vk_timestamp(end_date, end_time)
+            except Exception as e:
+                messagebox.showerror("Ошибка", f"Ошибка преобразования даты/времени: {e}")
+                return
             for item in self.results_tree.get_children():
                 self.results_tree.delete(item)
             threading.Thread(target=self._run_async_search_thread, args=(keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time), daemon=True).start()
@@ -1273,25 +1278,15 @@ class VKParserInterface:
             print(f"❌ Ошибка автоподключения Google Sheets: {e}") 
 
     def _get_utc_timestamps(self, start_date, start_time, end_date, end_time, only_date=False):
-        # Если only_date=True, возвращает timestamp начала и конца дня по Москве
-        from datetime import datetime as dt, time as dtime, timedelta
-        import pytz
+        # Упрощённая версия: используем to_vk_timestamp для преобразования
         try:
-            moscow_tz = pytz.timezone('Europe/Moscow')
             if only_date:
-                start_dt = dt.strptime(start_date, "%d.%m.%Y")
-                end_dt = dt.strptime(end_date, "%d.%m.%Y")
-                start_dt = moscow_tz.localize(dt.combine(start_dt, dtime(0, 0, 0)))
-                end_dt = moscow_tz.localize(dt.combine(end_dt, dtime(23, 59, 59)))
+                start_ts = to_vk_timestamp(start_date, "00:00")
+                end_ts = to_vk_timestamp(end_date, "23:59")
             else:
-                start_dt = moscow_tz.localize(dt.strptime(f"{start_date} {start_time}", "%d.%m.%Y %H:%M"))
-                end_dt = moscow_tz.localize(dt.strptime(f"{end_date} {end_time}", "%d.%m.%Y %H:%M"))
-            start_utc = start_dt.astimezone(pytz.utc)
-            end_utc = end_dt.astimezone(pytz.utc)
-            start_ts = int(start_utc.timestamp())
-            end_ts = int(end_utc.timestamp())
-            print(f"[VKParser] start_date: {start_date} (MSK) -> {start_dt} | UTC: {start_utc} | timestamp: {start_ts}")
-            print(f"[VKParser] end_date:   {end_date} (MSK) -> {end_dt} | UTC: {end_utc} | timestamp: {end_ts}")
+                start_ts = to_vk_timestamp(start_date, start_time)
+                end_ts = to_vk_timestamp(end_date, end_time)
+            print(f"[VKParser] start_ts: {start_ts}, end_ts: {end_ts}")
             return start_ts, end_ts
         except Exception as e:
             print(f"[VKParser] Ошибка преобразования времени: {e}")
