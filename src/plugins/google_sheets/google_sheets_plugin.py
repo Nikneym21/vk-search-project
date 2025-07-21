@@ -285,3 +285,87 @@ class GoogleSheetsPlugin(BasePlugin):
         except Exception as e:
             self.log_error(f"Ошибка получения статистики: {e}")
             return {"error": str(e)} 
+
+    def load_data_from_sheets(self, sheet_from: str, sheet_to: str, cell_range: str) -> Tuple[list, list]:
+        """Загружает данные из указанного диапазона листов и ячеек"""
+        try:
+            if not self.spreadsheet:
+                raise Exception("Таблица не открыта")
+
+            worksheets = self.spreadsheet.worksheets()
+            sheet_names = [ws.title for ws in worksheets]
+
+            # Сортируем листы по дате (если есть в названии)
+            def parse_date(date_str):
+                import re
+                date_pattern = r'(\d{1,2})[.-](\d{1,2})[.-](\d{4})'
+                match = re.search(date_pattern, date_str)
+                if match:
+                    day, month, year = match.groups()
+                    return datetime(int(year), int(month), int(day))
+                return None
+            dated_sheets = []
+            undated_sheets = []
+            for name in sheet_names:
+                d = parse_date(name)
+                if d:
+                    dated_sheets.append((name, d))
+                else:
+                    undated_sheets.append(name)
+            dated_sheets.sort(key=lambda x: x[1])
+            sorted_sheets = [s[0] for s in dated_sheets] + undated_sheets
+
+            # Индексы выбранных листов
+            try:
+                from_idx = sorted_sheets.index(sheet_from)
+                to_idx = sorted_sheets.index(sheet_to)
+            except ValueError as e:
+                raise Exception(f"Лист '{sheet_from}' или '{sheet_to}' не найден в таблице")
+            if from_idx <= to_idx:
+                sheets_to_process = sorted_sheets[from_idx:to_idx+1]
+            else:
+                sheets_to_process = sorted_sheets[to_idx:from_idx+1]
+
+            all_texts = []
+            processed_sheets = []
+            for sheet_name in sheets_to_process:
+                try:
+                    worksheet = self.spreadsheet.worksheet(sheet_name)
+                    data = worksheet.get(cell_range)
+                    if not data:
+                        continue
+                    df = pd.DataFrame(data)
+                    if len(df) > 0:
+                        first_row_has_text = any(str(cell).strip() for cell in df.iloc[0] if pd.notna(cell))
+                        if first_row_has_text:
+                            df.columns = df.iloc[0]
+                            df = df.iloc[1:]
+                        else:
+                            df.columns = [f'Column_{i}' for i in range(len(df.columns))]
+                    df = df.dropna(how='all')
+                    df = df.dropna(axis=1, how='all')
+                    text_columns = []
+                    for col in df.columns:
+                        col_str = str(col).lower()
+                        if any(k in col_str for k in ['текст', 'content', 'описание', 'text', 'сообщение', 'пост']):
+                            text_columns.append(col)
+                    if not text_columns:
+                        text_columns = list(df.columns)
+                    sheet_texts = []
+                    for col in text_columns:
+                        column_values = df[col].dropna()
+                        column_values = column_values[column_values.astype(str).str.strip() != '']
+                        for value in column_values:
+                            val = str(value).strip()
+                            if val:
+                                sheet_texts.append(val)
+                    if sheet_texts:
+                        all_texts.extend(sheet_texts)
+                        processed_sheets.append(sheet_name)
+                except Exception as e:
+                    print(f"Ошибка обработки листа '{sheet_name}': {e}")
+                    continue
+            return all_texts, processed_sheets
+        except Exception as e:
+            print(f"Ошибка загрузки данных из Google Sheets: {e}")
+            return [], [] 

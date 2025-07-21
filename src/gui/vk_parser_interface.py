@@ -364,7 +364,9 @@ class VKParserInterface:
         if self.settings_adapter:
             # Привязываем переменные к настройкам
             self.settings_adapter.bind_variable_to_setting(self.sheets_url_var, "sheets", "url")
-            self.settings_adapter.bind_variable_to_setting(self.cell_range_var, "sheets", "range")
+            self.settings_adapter.bind_variable_to_setting(self.cell_range_var, "sheets", "cell_range")
+            self.settings_adapter.bind_variable_to_setting(self.sheet_from_var, "sheets", "sheet_from")
+            self.settings_adapter.bind_variable_to_setting(self.sheet_to_var, "sheets", "sheet_to")
             self.settings_adapter.bind_variable_to_setting(self.exact_match_var, "parser", "exact_match")
             self.settings_adapter.bind_variable_to_setting(self.attachments_var, "parser", "attachments")
             
@@ -889,8 +891,39 @@ class VKParserInterface:
     def load_from_google_sheets(self):
         """Загрузка данных из Google Sheets и очистка через TextProcessingPlugin"""
         try:
-            # Здесь будет логика загрузки из Google Sheets
-            messagebox.showinfo("Информация", "Данные загружены и очищены из Google Sheets")
+            # Получаем параметры из интерфейса
+            spreadsheet_url = self.sheets_url_var.get().strip()
+            sheet_from = self.sheet_from_var.get().strip()
+            sheet_to = self.sheet_to_var.get().strip()
+            cell_range = self.cell_range_var.get().strip()
+
+            if not spreadsheet_url or not sheet_from or not sheet_to or not cell_range:
+                messagebox.showerror("Ошибка", "Пожалуйста, заполните все параметры для загрузки из Google Sheets.")
+                return
+
+            # Инициализируем подключение и открываем таблицу
+            if not self.google_sheets_plugin.initialize_connection():
+                messagebox.showerror("Ошибка", "Не удалось инициализировать подключение к Google Sheets.")
+                return
+            if not self.google_sheets_plugin.open_spreadsheet(spreadsheet_url):
+                messagebox.showerror("Ошибка", "Не удалось открыть таблицу по указанному URL.")
+                return
+
+            # Загружаем данные из диапазона листов
+            all_texts, processed_sheets = self.google_sheets_plugin.load_data_from_sheets(sheet_from, sheet_to, cell_range)
+            if not all_texts:
+                messagebox.showwarning("Внимание", "Не найдено ни одной ключевой фразы в указанном диапазоне.")
+                return
+
+            # Очищаем тексты через TextProcessingPlugin
+            cleaned_texts = [self.text_processing_plugin.clean_text_completely(t) for t in all_texts]
+            cleaned_texts = [t for t in cleaned_texts if t]  # Убираем пустые строки
+
+            # Вставляем в поле ключевых фраз
+            self.keywords_text.delete("1.0", tk.END)
+            self.keywords_text.insert("1.0", "\n".join(cleaned_texts))
+
+            messagebox.showinfo("Успех", f"Загружено и очищено {len(cleaned_texts)} ключевых фраз из листов: {', '.join(processed_sheets)}")
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось загрузить данные: {str(e)}")
     
