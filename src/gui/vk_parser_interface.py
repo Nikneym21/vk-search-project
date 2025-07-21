@@ -10,6 +10,8 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import emoji
 from typing import Optional, List, Dict, Any
+from src.plugins.google_sheets.google_sheets_plugin import GoogleSheetsPlugin
+from src.plugins.text_processing.text_processing_plugin import TextProcessingPlugin
 
 
 class SimpleTokenManager:
@@ -124,6 +126,12 @@ class VKParserInterface:
         self.vk_api_wrapper = None
         self.db = None
         
+        # Google Sheets plugin
+        self.google_sheets_plugin = self._init_google_sheets_plugin()
+        
+        # Text Processing plugin
+        self.text_processing_plugin = TextProcessingPlugin()
+        
         # Создаем адаптер настроек если не передан
         if settings_adapter is None:
             from .settings_adapter import SettingsAdapter
@@ -153,7 +161,9 @@ class VKParserInterface:
         self.root.after(500, self.auto_connect_tokens)
         # Автоматическая проверка токена при запуске
         self.root.after(1000, self.auto_check_token)
-    
+        # Автоматическое подключение Google Sheets
+        self.root.after(1200, self.auto_connect_google_sheets)
+
     def _init_token_manager(self):
         """Инициализирует упрощенный TokenManager"""
         try:
@@ -163,6 +173,16 @@ class VKParserInterface:
             return token_manager
         except Exception as e:
             print(f"Ошибка инициализации TokenManager: {e}")
+            return None
+
+    def _init_google_sheets_plugin(self):
+        try:
+            plugin = GoogleSheetsPlugin()
+            plugin.initialize()
+            print("GoogleSheetsPlugin инициализирован")
+            return plugin
+        except Exception as e:
+            print(f"Ошибка инициализации GoogleSheetsPlugin: {e}")
             return None
 
     def setup_ui(self):
@@ -205,59 +225,50 @@ class VKParserInterface:
         
         # Статус подключения к ВК
         self.connection_status = ttk.Label(left_scrollable_frame, text="Статус: Проверка подключения...", foreground="orange", font=("Arial", 9))
-        self.connection_status.grid(row=0, column=0, sticky="w", pady=(0, 10))
+        self.connection_status.grid(row=0, column=0, sticky="w", pady=(0, 2))
+        # Статус подключения к Google Sheets
+        self.gsheets_status = ttk.Label(left_scrollable_frame, text="Google Sheets: ...", foreground="orange", font=("Arial", 9))
+        self.gsheets_status.grid(row=1, column=0, sticky="w", pady=(0, 10))
         
-        # Кнопка поиска - унифицированный стиль
-        self.search_button = tk.Button(
-            left_scrollable_frame, 
-            text="НАЧАТЬ ПОИСК", 
+        # Кнопки "Начать поиск" и "Управление токенами" — компактные, ниже статусов
+        button_frame = ttk.Frame(left_scrollable_frame)
+        button_frame.grid(row=2, column=0, sticky="ew", pady=(10, 15), padx=5)
+        
+        self.search_button = ttk.Button(
+            button_frame,
+            text="НАЧАТЬ ПОИСК",
             command=self.start_vk_search,
-            font=("Arial", 10, "bold"),
-            bg="#28A745",
-            fg="white",
-            relief="raised",
-            bd=2,
-            padx=15,
-            pady=6,
-            cursor="hand2"
+            width=16
         )
-        self.search_button.grid(row=1, column=0, sticky="ew", pady=10, padx=5)
+        self.search_button.pack(side="left", fill="x", expand=True, padx=(0, 4), pady=2)
         
-        # Кнопка управления токенами
-        self.token_manager_button = tk.Button(
-            left_scrollable_frame, 
-            text="УПРАВЛЕНИЕ ТОКЕНАМИ", 
+        self.token_manager_button = ttk.Button(
+            button_frame,
+            text="УПРАВЛЕНИЕ ТОКЕНАМИ",
             command=self.open_token_manager,
-            font=("Arial", 9, "bold"),
-            bg="#6C757D",
-            fg="white",
-            relief="raised",
-            bd=2,
-            padx=10,
-            pady=4,
-            cursor="hand2"
+            width=18
         )
-        self.token_manager_button.grid(row=2, column=0, sticky="ew", pady=(0, 10), padx=5)
+        self.token_manager_button.pack(side="left", fill="x", expand=True, padx=(4, 0), pady=2)
         
         # Ключевые фразы
-        ttk.Label(left_scrollable_frame, text="Ключевые фразы:", font=("Arial", 11, "bold")).grid(row=2, column=0, sticky="w", pady=(10, 2))
-        ttk.Label(left_scrollable_frame, text="По одной ключевой фразе в строке.", font=("Arial", 9)).grid(row=3, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="Ключевые фразы:", font=("Arial", 11, "bold")).grid(row=3, column=0, sticky="w", pady=(10, 2))
+        ttk.Label(left_scrollable_frame, text="По одной ключевой фразе в строке.", font=("Arial", 9)).grid(row=4, column=0, sticky="w", pady=(0, 2))
         
         self.keywords_text = tk.Text(left_scrollable_frame, height=8, width=55)
-        self.keywords_text.grid(row=4, column=0, sticky="ew", pady=(0, 8))
+        self.keywords_text.grid(row=5, column=0, sticky="ew", pady=(0, 8))
         
         # Период поиска
-        ttk.Label(left_scrollable_frame, text="Период поиска новостей (обязательный параметр):", font=("Arial", 11, "bold")).grid(row=5, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="Период поиска новостей (обязательный параметр):", font=("Arial", 11, "bold")).grid(row=6, column=0, sticky="w", pady=(0, 2))
         
         # Правила
         rules_frame = ttk.Frame(left_scrollable_frame)
-        rules_frame.grid(row=6, column=0, sticky="w", pady=(0, 5))
+        rules_frame.grid(row=7, column=0, sticky="w", pady=(0, 5))
         ttk.Label(rules_frame, text="• поиск возможен по новостям не старше 3-х лет", font=("Arial", 9)).grid(row=0, column=0, sticky="w")
         ttk.Label(rules_frame, text="• максимальный период поиска - 1 год", font=("Arial", 9)).grid(row=1, column=0, sticky="w")
         
         # Даты и время
         dates_frame = ttk.Frame(left_scrollable_frame)
-        dates_frame.grid(row=7, column=0, sticky="w", pady=(0, 5))
+        dates_frame.grid(row=8, column=0, sticky="w", pady=(0, 5))
         
         # Первая дата с временем
         ttk.Label(dates_frame, text="С:", font=("Arial", 9)).grid(row=0, column=0, sticky="w")
@@ -285,43 +296,43 @@ class VKParserInterface:
         
         # Быстрый выбор периодов
         quick_dates_frame = ttk.Frame(left_scrollable_frame)
-        quick_dates_frame.grid(row=8, column=0, sticky="w", pady=(0, 8))
+        quick_dates_frame.grid(row=9, column=0, sticky="w", pady=(0, 8))
         ttk.Label(quick_dates_frame, text="За месяц, неделю, три дня, день", font=("Arial", 9)).grid(row=0, column=0, sticky="w")
         
         # Точное вхождение
         self.exact_match_var = tk.BooleanVar(value=True)
         exact_match_check = ttk.Checkbutton(left_scrollable_frame, text="Точное вхождение поисковой фразы", variable=self.exact_match_var)
-        exact_match_check.grid(row=9, column=0, sticky="w", pady=(0, 8))
+        exact_match_check.grid(row=10, column=0, sticky="w", pady=(0, 8))
         
         # Минус слова
-        ttk.Label(left_scrollable_frame, text="Минус слова:", font=("Arial", 11, "bold")).grid(row=10, column=0, sticky="w", pady=(0, 2))
-        ttk.Label(left_scrollable_frame, text="По одному минус слову/фразе в строке.", font=("Arial", 9)).grid(row=11, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="Минус слова:", font=("Arial", 11, "bold")).grid(row=11, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="По одному минус слову/фразе в строке.", font=("Arial", 9)).grid(row=12, column=0, sticky="w", pady=(0, 2))
         
         self.minus_words_text = tk.Text(left_scrollable_frame, height=3, width=55)
-        self.minus_words_text.grid(row=12, column=0, sticky="ew", pady=(0, 8))
+        self.minus_words_text.grid(row=13, column=0, sticky="ew", pady=(0, 8))
         
         # Вложения
-        ttk.Label(left_scrollable_frame, text="Вложения:", font=("Arial", 11, "bold")).grid(row=13, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="Вложения:", font=("Arial", 11, "bold")).grid(row=14, column=0, sticky="w", pady=(0, 2))
         self.attachments_var = tk.StringVar(value="Без разницы")
         attachments_combo = ttk.Combobox(left_scrollable_frame, textvariable=self.attachments_var, state="readonly", width=25)
         attachments_combo['values'] = ["Без разницы", "Фото", "Видео", "Без вложения"]
-        attachments_combo.grid(row=14, column=0, sticky="w", pady=(0, 10))
+        attachments_combo.grid(row=15, column=0, sticky="w", pady=(0, 10))
         
         # Кнопка загрузки из Google Sheets
-        ttk.Label(left_scrollable_frame, text="Автоматическая загрузка:", font=("Arial", 11, "bold")).grid(row=15, column=0, sticky="w", pady=(10, 2))
+        ttk.Label(left_scrollable_frame, text="Автоматическая загрузка:", font=("Arial", 11, "bold")).grid(row=16, column=0, sticky="w", pady=(10, 2))
         
         # Поле ввода ссылки на Google Sheets
-        ttk.Label(left_scrollable_frame, text="Ссылка на Google Sheets:", font=("Arial", 9)).grid(row=16, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="Ссылка на Google Sheets:", font=("Arial", 9)).grid(row=17, column=0, sticky="w", pady=(0, 2))
         self.sheets_url_var = tk.StringVar()
         sheets_url_entry = ttk.Entry(left_scrollable_frame, textvariable=self.sheets_url_var, width=55)
-        sheets_url_entry.grid(row=17, column=0, sticky="ew", pady=(0, 5))
+        sheets_url_entry.grid(row=18, column=0, sticky="ew", pady=(0, 5))
         
         # Привязываем событие изменения ссылки для автоматического сохранения
         self.sheets_url_var.trace("w", lambda *args: self.save_sheets_url())
         
         # Настройки диапазона
         range_frame = ttk.LabelFrame(left_scrollable_frame, text="Настройки диапазона", padding="5")
-        range_frame.grid(row=18, column=0, sticky="ew", pady=(0, 5))
+        range_frame.grid(row=19, column=0, sticky="ew", pady=(0, 5))
         
         # Диапазон листов по датам
         ttk.Label(range_frame, text="Диапазон листов:", font=("Arial", 9)).grid(row=0, column=0, sticky="w", pady=(0, 2))
@@ -387,7 +398,7 @@ class VKParserInterface:
                  font=("Arial", 8), foreground="gray").grid(row=3, column=0, columnspan=2, sticky="w", pady=(2, 0))
         
         sheets_frame = ttk.Frame(left_scrollable_frame)
-        sheets_frame.grid(row=19, column=0, sticky="w", pady=(0, 10))
+        sheets_frame.grid(row=20, column=0, sticky="w", pady=(0, 10))
         
         ttk.Button(sheets_frame, text="Загрузить из Google Sheets", 
                   command=self.load_from_google_sheets).pack(side="left", padx=(0, 5))
@@ -404,7 +415,7 @@ class VKParserInterface:
         
         # Статус загрузки
         self.sheets_status = ttk.Label(left_scrollable_frame, text="", font=("Arial", 9))
-        self.sheets_status.grid(row=20, column=0, sticky="w", pady=(0, 10))
+        self.sheets_status.grid(row=21, column=0, sticky="w", pady=(0, 10))
         
         # Правая панель - история и результаты (делаем уже)
         right_frame = ttk.Frame(self.paned_window)
@@ -849,44 +860,50 @@ class VKParserInterface:
     def update_sheets_list(self):
         """Обновление списка листов Google Sheets"""
         try:
-            # Здесь будет логика обновления списка листов
-            messagebox.showinfo("Информация", "Список листов обновлен")
+            url = self.sheets_url_var.get().strip()
+            if not url:
+                messagebox.showwarning("Внимание", "Сначала введите ссылку на Google Sheets!")
+                return
+            if not self.google_sheets_plugin:
+                messagebox.showerror("Ошибка", "Плагин Google Sheets недоступен")
+                return
+            # Открываем таблицу
+            if not self.google_sheets_plugin.open_spreadsheet(url):
+                messagebox.showerror("Ошибка", "Не удалось открыть таблицу по ссылке")
+                return
+            # Получаем список листов
+            worksheets = self.google_sheets_plugin.list_worksheets()
+            if not worksheets:
+                messagebox.showerror("Ошибка", "Не удалось получить список листов или таблица пуста")
+                return
+            # Обновляем значения в Combobox
+            self.sheet_from_combo.configure(values=worksheets)
+            self.sheet_to_combo.configure(values=worksheets)
+            # Сбрасываем выбранные значения
+            self.sheet_from_var.set(worksheets[0])
+            self.sheet_to_var.set(worksheets[-1])
+            messagebox.showinfo("Информация", f"Список листов обновлен: {', '.join(worksheets)}")
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось обновить список листов: {str(e)}")
     
     def load_from_google_sheets(self):
-        """Загрузка данных из Google Sheets"""
+        """Загрузка данных из Google Sheets и очистка через TextProcessingPlugin"""
         try:
             # Здесь будет логика загрузки из Google Sheets
-            messagebox.showinfo("Информация", "Данные загружены из Google Sheets")
+            messagebox.showinfo("Информация", "Данные загружены и очищены из Google Sheets")
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось загрузить данные: {str(e)}")
     
     def clean_emojis(self):
-        """Очистка эмодзи из текста"""
+        """Очистка эмодзи, хэштегов и пробелов из текста"""
         try:
-            # Получаем текст из поля ключевых слов
             text = self.keywords_text.get("1.0", tk.END)
-            cleaned_text = self.clean_text_completely(text)
+            cleaned_text = self.text_processing_plugin.clean_text_completely(text)
             self.keywords_text.delete("1.0", tk.END)
             self.keywords_text.insert("1.0", cleaned_text)
-            
-            messagebox.showinfo("Успех", "Эмодзи очищены")
+            messagebox.showinfo("Успех", "Текст очищен")
         except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось очистить эмодзи: {str(e)}")
-    
-    def clean_text_completely(self, text):
-        """Полная очистка текста от эмодзи и лишних символов"""
-        if not text:
-            return ""
-        
-        # Удаляем эмодзи
-        cleaned = emoji.replace_emojis(text, replace='')
-        
-        # Удаляем лишние пробелы и переносы строк
-        cleaned = ' '.join(cleaned.split())
-        
-        return cleaned
+            messagebox.showerror("Ошибка", f"Не удалось очистить текст: {str(e)}")
     
     def load_and_start_search(self):
         """Загрузка данных и запуск поиска"""
@@ -1042,3 +1059,23 @@ class VKParserInterface:
                             break
         except Exception as e:
             print(f"❌ Ошибка загрузки токена из файла: {e}") 
+
+    def auto_connect_google_sheets(self):
+        """Автоматическое подключение Google Sheets при запуске"""
+        try:
+            if not self.google_sheets_plugin:
+                print("❌ GoogleSheetsPlugin недоступен")
+                self.gsheets_status.config(text="Google Sheets: Плагин недоступен", foreground="red")
+                return
+            
+            # Пробуем инициализировать соединение
+            connected = self.google_sheets_plugin.initialize_connection()
+            if connected:
+                self.gsheets_status.config(text="Google Sheets: Подключено", foreground="green")
+                print("✅ Google Sheets API подключен")
+            else:
+                self.gsheets_status.config(text="Google Sheets: Ошибка подключения", foreground="red")
+                print("❌ Ошибка подключения к Google Sheets API")
+        except Exception as e:
+            self.gsheets_status.config(text="Google Sheets: Ошибка", foreground="red")
+            print(f"❌ Ошибка автоподключения Google Sheets: {e}") 

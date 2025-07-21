@@ -159,7 +159,7 @@ class LinkComparatorInterface:
     
     def compare_links(self):
         """Сравнение ссылок между таблицами"""
-        if self.table1_data is None or self.table2_data is not None:
+        if self.table1_data is None or self.table2_data is None:
             messagebox.showerror("Ошибка", "Загрузите обе таблицы")
             return
         
@@ -188,19 +188,21 @@ class LinkComparatorInterface:
     def extract_links(self, df, selected_column):
         """Извлечение ссылок из DataFrame"""
         links = set()
-        
         if selected_column == "all":
-            # Ищем ссылки во всех столбцах
             for column in df.columns:
                 for value in df[column].dropna():
                     found_links = self.find_links_in_text(str(value))
-                    links.update(found_links)
+                    for link in found_links:
+                        clean_link = link.strip().rstrip(',;')
+                        if clean_link:
+                            links.add(clean_link)
         else:
-            # Ищем ссылки в выбранном столбце
             for value in df[selected_column].dropna():
                 found_links = self.find_links_in_text(str(value))
-                links.update(found_links)
-        
+                for link in found_links:
+                    clean_link = link.strip().rstrip(',;')
+                    if clean_link:
+                        links.add(clean_link)
         return links
     
     def find_links_in_text(self, text):
