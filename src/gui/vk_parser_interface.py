@@ -230,25 +230,10 @@ class VKParserInterface:
         self.gsheets_status = ttk.Label(left_scrollable_frame, text="Google Sheets: ...", foreground="orange", font=("Arial", 9))
         self.gsheets_status.grid(row=1, column=0, sticky="w", pady=(0, 10))
         
-        # Кнопки "Начать поиск" и "Управление токенами" — компактные, ниже статусов
-        button_frame = ttk.Frame(left_scrollable_frame)
-        button_frame.grid(row=2, column=0, sticky="ew", pady=(10, 15), padx=5)
-        
-        self.search_button = ttk.Button(
-            button_frame,
-            text="НАЧАТЬ ПОИСК",
-            command=self.start_vk_search,
-            width=16
-        )
-        self.search_button.pack(side="left", fill="x", expand=True, padx=(0, 4), pady=2)
-        
-        self.token_manager_button = ttk.Button(
-            button_frame,
-            text="УПРАВЛЕНИЕ ТОКЕНАМИ",
-            command=self.open_token_manager,
-            width=18
-        )
-        self.token_manager_button.pack(side="left", fill="x", expand=True, padx=(4, 0), pady=2)
+        # Кнопка 'Начать поиск' в отдельном контейнере
+        search_frame = ttk.Frame(left_scrollable_frame)
+        search_frame.grid(row=2, column=0, sticky="w", pady=(10, 15), padx=5)
+        ttk.Button(search_frame, text="НАЧАТЬ ПОИСК", command=self.start_vk_search, width=24).pack(side="left", padx=(0, 5))
         
         # Ключевые фразы
         ttk.Label(left_scrollable_frame, text="Ключевые фразы:", font=("Arial", 11, "bold")).grid(row=3, column=0, sticky="w", pady=(10, 2))
