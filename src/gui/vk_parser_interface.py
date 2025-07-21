@@ -405,16 +405,6 @@ class VKParserInterface:
         ttk.Button(sheets_frame, text="Загрузить из Google Sheets", 
                   command=self.load_from_google_sheets).pack(side="left", padx=(0, 5))
         
-        ttk.Button(sheets_frame, text="Очистить эмодзи", 
-                  command=self.clean_emojis).pack(side="left")
-        
-        ttk.Button(sheets_frame, text="Загрузить и запустить", 
-                  command=self.load_and_start_search).pack(side="left", padx=(5, 0))
-        
-        # Кнопка тестирования без точного вхождения
-        ttk.Button(sheets_frame, text="Тест без точного вхождения", 
-                  command=self.test_search_without_exact).pack(side="left", padx=(5, 0))
-        
         # Статус загрузки
         self.sheets_status = ttk.Label(left_scrollable_frame, text="", font=("Arial", 9))
         self.sheets_status.grid(row=21, column=0, sticky="w", pady=(0, 10))
@@ -926,33 +916,6 @@ class VKParserInterface:
             messagebox.showinfo("Успех", f"Загружено и очищено {len(cleaned_texts)} ключевых фраз из листов: {', '.join(processed_sheets)}")
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось загрузить данные: {str(e)}")
-    
-    def clean_emojis(self):
-        """Очистка эмодзи, хэштегов и пробелов из текста"""
-        try:
-            text = self.keywords_text.get("1.0", tk.END)
-            cleaned_text = self.text_processing_plugin.clean_text_completely(text)
-            self.keywords_text.delete("1.0", tk.END)
-            self.keywords_text.insert("1.0", cleaned_text)
-            messagebox.showinfo("Успех", "Текст очищен")
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось очистить текст: {str(e)}")
-    
-    def load_and_start_search(self):
-        """Загрузка данных и запуск поиска"""
-        try:
-            # Здесь будет логика загрузки данных и запуска поиска
-            messagebox.showinfo("Информация", "Поиск запущен")
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось запустить поиск: {str(e)}")
-    
-    def test_search_without_exact(self):
-        """Тестирование поиска без точного вхождения"""
-        try:
-            # Здесь будет логика тестирования поиска
-            messagebox.showinfo("Информация", "Тест поиска без точного вхождения запущен")
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось запустить тест: {str(e)}")
     
     def save_sheets_url(self):
         """Сохранение URL Google Sheets"""
