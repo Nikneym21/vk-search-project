@@ -38,6 +38,23 @@ class MainInterface:
         
         # Привязываем событие закрытия окна
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        
+        # Автоматическое подключение токенов при запуске
+        self.root.after(2000, self.auto_connect_all_tokens)
+    
+    def auto_connect_all_tokens(self):
+        """Автоматическое подключение всех токенов в приложении"""
+        try:
+            print("🚀 Автоподключение токенов в приложении...")
+            
+            # Подключаем токены в VK Parser
+            if hasattr(self, 'vk_parser') and hasattr(self.vk_parser, 'auto_connect_tokens'):
+                self.vk_parser.auto_connect_tokens()
+            
+            print("✅ Автоподключение токенов завершено")
+            
+        except Exception as e:
+            print(f"❌ Ошибка автоподключения токенов: {e}")
     
     def setup_hotkeys(self):
         """Настройка горячих клавиш для macOS"""
@@ -118,7 +135,7 @@ class MainInterface:
         # Вкладка 2: Парсер ВК
         self.vk_parser_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.vk_parser_frame, text="Парсер ВК")
-        self.vk_parser_interface = VKParserInterface(self.vk_parser_frame, self.settings_adapter)
+        self.vk_parser = VKParserInterface(self.vk_parser_frame, self.settings_adapter)
     
     def on_window_resize(self, event):
         """Обработка изменения размера окна"""

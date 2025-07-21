@@ -9,10 +9,120 @@ import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import emoji
+from typing import Optional, List, Dict, Any
+
+
+class SimpleTokenManager:
+    """Упрощенный менеджер токенов без зависимостей"""
+    
+    def __init__(self):
+        self.tokens_file = "config/tokens.json"
+        self.tokens = {}
+        self._load_tokens()
+        print("SimpleTokenManager создан")
+    
+    def _load_tokens(self):
+        """Загружает токены из файла"""
+        try:
+            if os.path.exists(self.tokens_file):
+                with open(self.tokens_file, 'r', encoding='utf-8') as f:
+                    self.tokens = json.load(f)
+                print(f"Загружено {len(self.tokens)} токенов")
+            else:
+                self.tokens = {}
+                print("Файл токенов не найден, создан новый")
+        except Exception as e:
+            print(f"Ошибка загрузки токенов: {e}")
+            self.tokens = {}
+    
+    def _save_tokens(self):
+        """Сохраняет токены в файл"""
+        try:
+            os.makedirs(os.path.dirname(self.tokens_file), exist_ok=True)
+            with open(self.tokens_file, 'w', encoding='utf-8') as f:
+                json.dump(self.tokens, f, ensure_ascii=False, indent=2)
+            print("Токены сохранены")
+        except Exception as e:
+            print(f"Ошибка сохранения токенов: {e}")
+    
+    def add_token(self, service: str, token: str) -> bool:
+        """Добавляет токен"""
+        try:
+            self.tokens[service] = {
+                "token": token,
+                "created_at": datetime.now().isoformat(),
+                "service": service
+            }
+            self._save_tokens()
+            return True
+        except Exception as e:
+            print(f"Ошибка добавления токена: {e}")
+            return False
+    
+    def get_token(self, service: str) -> Optional[str]:
+        """Получает токен"""
+        try:
+            token_data = self.tokens.get(service)
+            if token_data:
+                return token_data.get("token")
+            return None
+        except Exception as e:
+            print(f"Ошибка получения токена: {e}")
+            return None
+    
+    def remove_token(self, service: str) -> bool:
+        """Удаляет токен"""
+        try:
+            if service in self.tokens:
+                del self.tokens[service]
+                self._save_tokens()
+                return True
+            return False
+        except Exception as e:
+            print(f"Ошибка удаления токена: {e}")
+            return False
+    
+    def list_tokens(self) -> List[Dict[str, Any]]:
+        """Возвращает список токенов"""
+        try:
+            return list(self.tokens.values())
+        except Exception as e:
+            print(f"Ошибка получения списка токенов: {e}")
+            return []
+    
+    def _is_token_valid(self, service: str) -> bool:
+        """Проверяет валидность токена"""
+        try:
+            token = self.get_token(service)
+            if not token:
+                return False
+            
+            # Простая проверка для VK
+            if service == "vk":
+                import requests
+                test_url = f"https://api.vk.com/method/users.get?access_token={token}&v=5.131"
+                response = requests.get(test_url, timeout=10)
+                return response.status_code == 200 and 'error' not in response.json()
+            
+            return True
+        except Exception as e:
+            print(f"Ошибка проверки токена: {e}")
+            return False
+    
+    def initialize(self):
+        """Инициализация (пустая для совместимости)"""
+        pass
+
 
 class VKParserInterface:
     def __init__(self, parent_frame, settings_adapter=None):
         self.parent_frame = parent_frame
+        self.root = parent_frame.winfo_toplevel()  # Получаем корневое окно
+        
+        # Инициализируем переменные
+        self.token_var = tk.StringVar()
+        self.vk_api_wrapper = None
+        self.db = None
         
         # Создаем адаптер настроек если не передан
         if settings_adapter is None:
@@ -27,9 +137,8 @@ class VKParserInterface:
         else:
             self.settings_adapter = settings_adapter
         
-        # Инициализация переменных
-        self.vk_api_wrapper = None
-        self.db = None
+        # Инициализируем TokenManagerPlugin
+        self.token_manager = self._init_token_manager()
         
         # Настройка интерфейса
         self.setup_ui()
@@ -39,7 +148,23 @@ class VKParserInterface:
         self.load_search_history()
         self.load_sheets_url()
         self.load_sheets_range_settings()
+        
+        # Автоматическое подключение токенов при запуске
+        self.root.after(500, self.auto_connect_tokens)
+        # Автоматическая проверка токена при запуске
+        self.root.after(1000, self.auto_check_token)
     
+    def _init_token_manager(self):
+        """Инициализирует упрощенный TokenManager"""
+        try:
+            # Создаем простой менеджер токенов без зависимостей
+            token_manager = SimpleTokenManager()
+            print("SimpleTokenManager инициализирован")
+            return token_manager
+        except Exception as e:
+            print(f"Ошибка инициализации TokenManager: {e}")
+            return None
+
     def setup_ui(self):
         """Настройка интерфейса для парсера ВК"""
         # Главный фрейм для парсера ВК
@@ -78,60 +203,15 @@ class VKParserInterface:
         left_frame.grid_rowconfigure(0, weight=1)
         left_frame.grid_columnconfigure(0, weight=1)
         
-        # Токен API ВК
-        ttk.Label(left_scrollable_frame, text="Токен API ВК:", font=("Arial", 11, "bold")).grid(row=0, column=0, sticky="w", pady=(0, 2))
-        ttk.Label(left_scrollable_frame, text="Получите токен на https://vkhost.github.io/", 
-                 foreground="blue", cursor="hand2", font=("Arial", 9)).grid(row=1, column=0, sticky="w", pady=(0, 2))
+        # Статус подключения к ВК
+        self.connection_status = ttk.Label(left_scrollable_frame, text="Статус: Проверка подключения...", foreground="orange", font=("Arial", 9))
+        self.connection_status.grid(row=0, column=0, sticky="w", pady=(0, 10))
         
-        self.token_var = tk.StringVar()
-        token_entry = ttk.Entry(left_scrollable_frame, textvariable=self.token_var, width=55)
-        token_entry.grid(row=2, column=0, sticky="ew", pady=(0, 2))
-        
-        # Кнопка тестирования подключения
-        ttk.Button(left_scrollable_frame, text="Тестировать подключение", 
-                  command=self.test_vk_connection).grid(row=3, column=0, sticky="w", pady=(0, 2))
-        
-        # Статус подключения
-        self.connection_status = ttk.Label(left_scrollable_frame, text="Статус: Не подключено", foreground="red", font=("Arial", 9))
-        self.connection_status.grid(row=4, column=0, sticky="w", pady=(0, 10))
-        
-        # Кнопка поиска - размещаем под статусом подключения
+        # Кнопка поиска - унифицированный стиль
         self.search_button = tk.Button(
             left_scrollable_frame, 
             text="НАЧАТЬ ПОИСК", 
             command=self.start_vk_search,
-            font=("Arial", 14, "bold"),
-            bg="#007AFF",
-            fg="white",
-            relief="raised",
-            bd=2,
-            padx=25,
-            pady=10,
-            cursor="hand2"
-        )
-        self.search_button.grid(row=5, column=0, sticky="ew", pady=10, padx=5)
-        
-        # Кнопка альтернативного поиска (для обхода блокировки VK)
-        self.alternative_search_button = tk.Button(
-            left_scrollable_frame, 
-            text="АЛЬТЕРНАТИВНЫЙ ПОИСК", 
-            command=self.start_alternative_search,
-            font=("Arial", 12, "bold"),
-            bg="#FF6B35",
-            fg="white",
-            relief="raised",
-            bd=2,
-            padx=20,
-            pady=8,
-            cursor="hand2"
-        )
-        self.alternative_search_button.grid(row=6, column=0, sticky="ew", pady=(0, 10), padx=5)
-        
-        # Кнопка управления токенами
-        self.token_manager_button = tk.Button(
-            left_scrollable_frame, 
-            text="УПРАВЛЕНИЕ ТОКЕНАМИ", 
-            command=self.open_token_manager,
             font=("Arial", 10, "bold"),
             bg="#28A745",
             fg="white",
@@ -141,27 +221,43 @@ class VKParserInterface:
             pady=6,
             cursor="hand2"
         )
-        self.token_manager_button.grid(row=7, column=0, sticky="ew", pady=(0, 10), padx=5)
+        self.search_button.grid(row=1, column=0, sticky="ew", pady=10, padx=5)
+        
+        # Кнопка управления токенами
+        self.token_manager_button = tk.Button(
+            left_scrollable_frame, 
+            text="УПРАВЛЕНИЕ ТОКЕНАМИ", 
+            command=self.open_token_manager,
+            font=("Arial", 9, "bold"),
+            bg="#6C757D",
+            fg="white",
+            relief="raised",
+            bd=2,
+            padx=10,
+            pady=4,
+            cursor="hand2"
+        )
+        self.token_manager_button.grid(row=2, column=0, sticky="ew", pady=(0, 10), padx=5)
         
         # Ключевые фразы
-        ttk.Label(left_scrollable_frame, text="Ключевые фразы:", font=("Arial", 11, "bold")).grid(row=8, column=0, sticky="w", pady=(10, 2))
-        ttk.Label(left_scrollable_frame, text="По одной ключевой фразе в строке.", font=("Arial", 9)).grid(row=9, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="Ключевые фразы:", font=("Arial", 11, "bold")).grid(row=2, column=0, sticky="w", pady=(10, 2))
+        ttk.Label(left_scrollable_frame, text="По одной ключевой фразе в строке.", font=("Arial", 9)).grid(row=3, column=0, sticky="w", pady=(0, 2))
         
         self.keywords_text = tk.Text(left_scrollable_frame, height=8, width=55)
-        self.keywords_text.grid(row=10, column=0, sticky="ew", pady=(0, 8))
+        self.keywords_text.grid(row=4, column=0, sticky="ew", pady=(0, 8))
         
         # Период поиска
-        ttk.Label(left_scrollable_frame, text="Период поиска новостей (обязательный параметр):", font=("Arial", 11, "bold")).grid(row=11, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="Период поиска новостей (обязательный параметр):", font=("Arial", 11, "bold")).grid(row=5, column=0, sticky="w", pady=(0, 2))
         
         # Правила
         rules_frame = ttk.Frame(left_scrollable_frame)
-        rules_frame.grid(row=12, column=0, sticky="w", pady=(0, 5))
+        rules_frame.grid(row=6, column=0, sticky="w", pady=(0, 5))
         ttk.Label(rules_frame, text="• поиск возможен по новостям не старше 3-х лет", font=("Arial", 9)).grid(row=0, column=0, sticky="w")
         ttk.Label(rules_frame, text="• максимальный период поиска - 1 год", font=("Arial", 9)).grid(row=1, column=0, sticky="w")
         
         # Даты и время
         dates_frame = ttk.Frame(left_scrollable_frame)
-        dates_frame.grid(row=13, column=0, sticky="w", pady=(0, 5))
+        dates_frame.grid(row=7, column=0, sticky="w", pady=(0, 5))
         
         # Первая дата с временем
         ttk.Label(dates_frame, text="С:", font=("Arial", 9)).grid(row=0, column=0, sticky="w")
@@ -189,43 +285,43 @@ class VKParserInterface:
         
         # Быстрый выбор периодов
         quick_dates_frame = ttk.Frame(left_scrollable_frame)
-        quick_dates_frame.grid(row=14, column=0, sticky="w", pady=(0, 8))
+        quick_dates_frame.grid(row=8, column=0, sticky="w", pady=(0, 8))
         ttk.Label(quick_dates_frame, text="За месяц, неделю, три дня, день", font=("Arial", 9)).grid(row=0, column=0, sticky="w")
         
         # Точное вхождение
         self.exact_match_var = tk.BooleanVar(value=True)
         exact_match_check = ttk.Checkbutton(left_scrollable_frame, text="Точное вхождение поисковой фразы", variable=self.exact_match_var)
-        exact_match_check.grid(row=15, column=0, sticky="w", pady=(0, 8))
+        exact_match_check.grid(row=9, column=0, sticky="w", pady=(0, 8))
         
         # Минус слова
-        ttk.Label(left_scrollable_frame, text="Минус слова:", font=("Arial", 11, "bold")).grid(row=16, column=0, sticky="w", pady=(0, 2))
-        ttk.Label(left_scrollable_frame, text="По одному минус слову/фразе в строке.", font=("Arial", 9)).grid(row=17, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="Минус слова:", font=("Arial", 11, "bold")).grid(row=10, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="По одному минус слову/фразе в строке.", font=("Arial", 9)).grid(row=11, column=0, sticky="w", pady=(0, 2))
         
         self.minus_words_text = tk.Text(left_scrollable_frame, height=3, width=55)
-        self.minus_words_text.grid(row=18, column=0, sticky="ew", pady=(0, 8))
+        self.minus_words_text.grid(row=12, column=0, sticky="ew", pady=(0, 8))
         
         # Вложения
-        ttk.Label(left_scrollable_frame, text="Вложения:", font=("Arial", 11, "bold")).grid(row=19, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="Вложения:", font=("Arial", 11, "bold")).grid(row=13, column=0, sticky="w", pady=(0, 2))
         self.attachments_var = tk.StringVar(value="Без разницы")
         attachments_combo = ttk.Combobox(left_scrollable_frame, textvariable=self.attachments_var, state="readonly", width=25)
         attachments_combo['values'] = ["Без разницы", "Фото", "Видео", "Без вложения"]
-        attachments_combo.grid(row=20, column=0, sticky="w", pady=(0, 10))
+        attachments_combo.grid(row=14, column=0, sticky="w", pady=(0, 10))
         
         # Кнопка загрузки из Google Sheets
-        ttk.Label(left_scrollable_frame, text="Автоматическая загрузка:", font=("Arial", 11, "bold")).grid(row=21, column=0, sticky="w", pady=(10, 2))
+        ttk.Label(left_scrollable_frame, text="Автоматическая загрузка:", font=("Arial", 11, "bold")).grid(row=15, column=0, sticky="w", pady=(10, 2))
         
         # Поле ввода ссылки на Google Sheets
-        ttk.Label(left_scrollable_frame, text="Ссылка на Google Sheets:", font=("Arial", 9)).grid(row=22, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(left_scrollable_frame, text="Ссылка на Google Sheets:", font=("Arial", 9)).grid(row=16, column=0, sticky="w", pady=(0, 2))
         self.sheets_url_var = tk.StringVar()
         sheets_url_entry = ttk.Entry(left_scrollable_frame, textvariable=self.sheets_url_var, width=55)
-        sheets_url_entry.grid(row=23, column=0, sticky="ew", pady=(0, 5))
+        sheets_url_entry.grid(row=17, column=0, sticky="ew", pady=(0, 5))
         
         # Привязываем событие изменения ссылки для автоматического сохранения
         self.sheets_url_var.trace("w", lambda *args: self.save_sheets_url())
         
         # Настройки диапазона
         range_frame = ttk.LabelFrame(left_scrollable_frame, text="Настройки диапазона", padding="5")
-        range_frame.grid(row=24, column=0, sticky="ew", pady=(0, 5))
+        range_frame.grid(row=18, column=0, sticky="ew", pady=(0, 5))
         
         # Диапазон листов по датам
         ttk.Label(range_frame, text="Диапазон листов:", font=("Arial", 9)).grid(row=0, column=0, sticky="w", pady=(0, 2))
@@ -253,24 +349,23 @@ class VKParserInterface:
         cell_range_entry = ttk.Entry(range_frame, textvariable=self.cell_range_var, width=20)
         cell_range_entry.grid(row=2, column=1, sticky="w", padx=(5, 0), pady=(5, 2))
         
-        # Привязываем автосохранение через адаптер настроек
+        # Привязываем настройки к автосохранению
         if self.settings_adapter:
             # Привязываем переменные к настройкам
+            self.settings_adapter.bind_variable_to_setting(self.sheets_url_var, "sheets", "url")
+            self.settings_adapter.bind_variable_to_setting(self.cell_range_var, "sheets", "range")
+            self.settings_adapter.bind_variable_to_setting(self.exact_match_var, "parser", "exact_match")
+            self.settings_adapter.bind_variable_to_setting(self.attachments_var, "parser", "attachments")
+            
+            # Привязываем текстовые виджеты к настройкам
+            self.settings_adapter.bind_text_widget_to_setting(self.keywords_text, "parser", "keywords")
+            self.settings_adapter.bind_text_widget_to_setting(self.minus_words_text, "parser", "minus_words")
+            
+            # Привязываем даты к настройкам
             self.settings_adapter.bind_variable_to_setting(self.start_date_var, "parser", "start_date")
             self.settings_adapter.bind_variable_to_setting(self.start_time_var, "parser", "start_time")
             self.settings_adapter.bind_variable_to_setting(self.end_date_var, "parser", "end_date")
             self.settings_adapter.bind_variable_to_setting(self.end_time_var, "parser", "end_time")
-            self.settings_adapter.bind_variable_to_setting(self.exact_match_var, "parser", "exact_match")
-            self.settings_adapter.bind_variable_to_setting(self.attachments_var, "parser", "attachments")
-            self.settings_adapter.bind_variable_to_setting(self.token_var, "parser", "vk_token")
-            self.settings_adapter.bind_variable_to_setting(self.cell_range_var, "sheets", "cell_range")
-            self.settings_adapter.bind_variable_to_setting(self.sheet_from_var, "sheets", "sheet_from")
-            self.settings_adapter.bind_variable_to_setting(self.sheet_to_var, "sheets", "sheet_to")
-            self.settings_adapter.bind_variable_to_setting(self.sheets_url_var, "sheets", "url")
-            
-            # Привязываем текстовые виджеты
-            self.settings_adapter.bind_text_widget_to_setting(self.keywords_text, "parser", "keywords")
-            self.settings_adapter.bind_text_widget_to_setting(self.minus_words_text, "parser", "minus_words")
         else:
             # Fallback к старому способу
             self.cell_range_var.trace("w", lambda *args: self.save_sheets_range_settings())
@@ -292,7 +387,7 @@ class VKParserInterface:
                  font=("Arial", 8), foreground="gray").grid(row=3, column=0, columnspan=2, sticky="w", pady=(2, 0))
         
         sheets_frame = ttk.Frame(left_scrollable_frame)
-        sheets_frame.grid(row=25, column=0, sticky="w", pady=(0, 10))
+        sheets_frame.grid(row=19, column=0, sticky="w", pady=(0, 10))
         
         ttk.Button(sheets_frame, text="Загрузить из Google Sheets", 
                   command=self.load_from_google_sheets).pack(side="left", padx=(0, 5))
@@ -309,7 +404,7 @@ class VKParserInterface:
         
         # Статус загрузки
         self.sheets_status = ttk.Label(left_scrollable_frame, text="", font=("Arial", 9))
-        self.sheets_status.grid(row=26, column=0, sticky="w", pady=(0, 10))
+        self.sheets_status.grid(row=20, column=0, sticky="w", pady=(0, 10))
         
         # Правая панель - история и результаты (делаем уже)
         right_frame = ttk.Frame(self.paned_window)
@@ -412,20 +507,76 @@ class VKParserInterface:
         self.parent_frame.grid_columnconfigure(0, weight=1)
     
     def load_saved_token(self):
-        """Загрузка сохраненного токена"""
+        """Загрузка сохраненного токена через TokenManagerPlugin"""
         try:
-            if self.settings_adapter:
-                token = self.settings_adapter.get_setting("parser", "vk_token", "")
+            if self.token_manager:
+                # Пытаемся загрузить токен через плагин
+                token = self.token_manager.get_token("vk")
                 if token:
                     self.token_var.set(token)
-            else:
-                # Fallback к старому способу
-                if os.path.exists("config/vk_token.txt"):
-                    with open("config/vk_token.txt", "r") as f:
-                        token = f.read().strip()
-                        self.token_var.set(token)
+                    print("Токен VK загружен через TokenManagerPlugin")
+                    return
+            
+            # Fallback к файлу если плагин недоступен
+            token_file = "config/vk_token.txt"
+            if os.path.exists(token_file):
+                with open(token_file, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    for line in lines:
+                        line = line.strip()
+                        if line and not line.startswith('#') and not line.startswith('//'):
+                            self.token_var.set(line)
+                            # Сохраняем в плагин если он доступен
+                            if self.token_manager:
+                                self.token_manager.add_token("vk", line)
+                            print("Токен VK загружен из файла")
+                            break
         except Exception as e:
-            print(f"Ошибка загрузки токена: {str(e)}")
+            print(f"Ошибка загрузки токена: {e}")
+    
+    def save_token_to_manager(self, token: str):
+        """Сохраняет токен в TokenManagerPlugin"""
+        try:
+            if self.token_manager:
+                self.token_manager.add_token("vk", token)
+                print("Токен VK сохранен в TokenManagerPlugin")
+                return True
+        except Exception as e:
+            print(f"Ошибка сохранения токена в плагин: {e}")
+        return False
+    
+    def auto_check_token(self):
+        """Автоматическая проверка токена при запуске"""
+        try:
+            token = self.token_var.get().strip()
+            if token:
+                # Проверяем токен
+                import requests
+                test_url = f"https://api.vk.com/method/users.get?access_token={token}&v=5.131"
+                response = requests.get(test_url, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if 'error' not in data:
+                        self.connection_status.config(text="Статус: Подключено", foreground="green")
+                        print("✅ VK API подключение успешно")
+                        return True
+                    else:
+                        self.connection_status.config(text="Статус: Неверный токен", foreground="red")
+                        print("❌ VK токен невалиден")
+                        return False
+                else:
+                    self.connection_status.config(text="Статус: Ошибка подключения", foreground="red")
+                    print("❌ Ошибка подключения к VK API")
+                    return False
+            else:
+                self.connection_status.config(text="Статус: Токен не найден", foreground="red")
+                print("❌ VK токен не найден")
+                return False
+        except Exception as e:
+            self.connection_status.config(text="Статус: Ошибка проверки", foreground="red")
+            print(f"❌ Ошибка проверки токена: {e}")
+            return False
     
     def load_search_history(self):
         """Загрузка истории поиска"""
@@ -484,57 +635,158 @@ class VKParserInterface:
         except Exception as e:
             print(f"Ошибка загрузки настроек: {str(e)}")
     
-    def test_vk_connection(self):
-        """Тестирование подключения к VK API"""
-        token = self.token_var.get().strip()
-        if not token:
-            messagebox.showerror("Ошибка", "Введите токен API ВК")
-            return
-        
-        try:
-            # Здесь будет тестирование подключения к VK API
-            # Пока что просто обновляем статус
-            self.connection_status.config(text="Статус: Подключено", foreground="green")
-            messagebox.showinfo("Успех", "Подключение к VK API установлено")
-        except Exception as e:
-            self.connection_status.config(text="Статус: Ошибка подключения", foreground="red")
-            messagebox.showerror("Ошибка", f"Не удалось подключиться к VK API: {str(e)}")
-    
     def start_vk_search(self):
-        """Запуск поиска в VK"""
-        token = self.token_var.get().strip()
-        query = self.search_query_var.get().strip()
-        
-        if not token:
-            messagebox.showerror("Ошибка", "Введите токен API ВК")
-            return
-        
-        if not query:
-            messagebox.showerror("Ошибка", "Введите поисковый запрос")
-            return
-        
+        """Запуск поиска в ВК"""
         try:
-            # Здесь будет логика поиска в VK
-            # Пока что просто показываем сообщение
-            messagebox.showinfo("Информация", "Поиск в VK запущен")
+            # Проверяем токен перед поиском
+            if not self.auto_check_token():
+                messagebox.showerror("Ошибка", "Проверьте токен ВК в файле config/vk_token.txt")
+                return
             
-            # Очищаем предыдущие результаты
-            for item in self.results_tree.get_children():
-                self.results_tree.delete(item)
+            # Получаем параметры поиска
+            keywords = self.keywords_text.get("1.0", tk.END).strip()
+            if not keywords:
+                messagebox.showerror("Ошибка", "Введите ключевые фразы")
+                return
             
-            # Добавляем тестовые результаты
-            self.results_tree.insert("", "end", values=("Тестовый результат", "https://vk.com/test", "2024-01-01"))
+            # Здесь будет логика поиска
+            messagebox.showinfo("Информация", "Поиск запущен")
             
         except Exception as e:
-            messagebox.showerror("Ошибка", f"Ошибка при поиске: {str(e)}")
-    
-    def start_alternative_search(self):
-        """Запуск альтернативного поиска"""
-        messagebox.showinfo("Информация", "Альтернативный поиск запущен")
+            messagebox.showerror("Ошибка", f"Ошибка запуска поиска: {str(e)}")
     
     def open_token_manager(self):
-        """Открытие менеджера токенов"""
-        messagebox.showinfo("Информация", "Менеджер токенов открыт")
+        """Открывает окно управления токенами"""
+        try:
+            if not self.token_manager:
+                messagebox.showerror("Ошибка", "TokenManagerPlugin недоступен")
+                return
+            
+            # Создаем окно управления токенами
+            token_window = tk.Toplevel(self.root)
+            token_window.title("Управление токенами")
+            token_window.geometry("500x400")
+            token_window.resizable(False, False)
+            
+            # Центрируем окно
+            token_window.transient(self.root)
+            token_window.grab_set()
+            
+            # Создаем интерфейс управления токенами
+            self._create_token_manager_ui(token_window)
+            
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Ошибка открытия менеджера токенов: {str(e)}")
+    
+    def _create_token_manager_ui(self, parent):
+        """Создает интерфейс управления токенами"""
+        # Главный фрейм
+        main_frame = ttk.Frame(parent, padding="10")
+        main_frame.pack(fill="both", expand=True)
+        
+        # Заголовок
+        ttk.Label(main_frame, text="Управление токенами", font=("Arial", 14, "bold")).pack(pady=(0, 20))
+        
+        # Список токенов
+        ttk.Label(main_frame, text="Доступные токены:", font=("Arial", 11, "bold")).pack(anchor="w")
+        
+        # Создаем Treeview для отображения токенов
+        columns = ("service", "status", "created")
+        token_tree = ttk.Treeview(main_frame, columns=columns, show="headings", height=8)
+        token_tree.heading("service", text="Сервис")
+        token_tree.heading("status", text="Статус")
+        token_tree.heading("created", text="Создан")
+        token_tree.column("service", width=150)
+        token_tree.column("status", width=100)
+        token_tree.column("created", width=150)
+        token_tree.pack(fill="both", expand=True, pady=(0, 10))
+        
+        # Загружаем токены
+        if self.token_manager:
+            tokens = self.token_manager.list_tokens()
+            for token_info in tokens:
+                service = token_info.get("service", "Unknown")
+                status = "Активен" if self.token_manager._is_token_valid(service) else "Неактивен"
+                created = token_info.get("created_at", "Неизвестно")
+                token_tree.insert("", "end", values=(service, status, created))
+        
+        # Кнопки управления
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill="x", pady=(10, 0))
+        
+        ttk.Button(button_frame, text="Добавить токен", 
+                  command=lambda: self._add_token_dialog(parent)).pack(side="left", padx=(0, 5))
+        ttk.Button(button_frame, text="Удалить токен", 
+                  command=lambda: self._remove_token_dialog(token_tree)).pack(side="left", padx=5)
+        ttk.Button(button_frame, text="Обновить", 
+                  command=lambda: self._refresh_token_list(token_tree)).pack(side="left", padx=5)
+        ttk.Button(button_frame, text="Закрыть", 
+                  command=parent.destroy).pack(side="right")
+    
+    def _add_token_dialog(self, parent):
+        """Диалог добавления токена"""
+        dialog = tk.Toplevel(parent)
+        dialog.title("Добавить токен")
+        dialog.geometry("400x200")
+        dialog.transient(parent)
+        dialog.grab_set()
+        
+        frame = ttk.Frame(dialog, padding="10")
+        frame.pack(fill="both", expand=True)
+        
+        ttk.Label(frame, text="Сервис:").grid(row=0, column=0, sticky="w", pady=5)
+        service_var = tk.StringVar(value="vk")
+        service_entry = ttk.Entry(frame, textvariable=service_var, width=30)
+        service_entry.grid(row=0, column=1, sticky="ew", padx=(10, 0), pady=5)
+        
+        ttk.Label(frame, text="Токен:").grid(row=1, column=0, sticky="w", pady=5)
+        token_var = tk.StringVar()
+        token_entry = ttk.Entry(frame, textvariable=token_var, width=30, show="*")
+        token_entry.grid(row=1, column=1, sticky="ew", padx=(10, 0), pady=5)
+        
+        def save_token():
+            service = service_var.get().strip()
+            token = token_var.get().strip()
+            if service and token:
+                if self.token_manager.add_token(service, token):
+                    messagebox.showinfo("Успех", f"Токен для {service} добавлен")
+                    dialog.destroy()
+                else:
+                    messagebox.showerror("Ошибка", "Не удалось добавить токен")
+            else:
+                messagebox.showerror("Ошибка", "Заполните все поля")
+        
+        ttk.Button(frame, text="Сохранить", command=save_token).grid(row=2, column=0, columnspan=2, pady=20)
+    
+    def _remove_token_dialog(self, token_tree):
+        """Диалог удаления токена"""
+        selection = token_tree.selection()
+        if not selection:
+            messagebox.showwarning("Предупреждение", "Выберите токен для удаления")
+            return
+        
+        item = token_tree.item(selection[0])
+        service = item['values'][0]
+        
+        if messagebox.askyesno("Подтверждение", f"Удалить токен для {service}?"):
+            if self.token_manager.remove_token(service):
+                messagebox.showinfo("Успех", f"Токен для {service} удален")
+                self._refresh_token_list(token_tree)
+            else:
+                messagebox.showerror("Ошибка", "Не удалось удалить токен")
+    
+    def _refresh_token_list(self, token_tree):
+        """Обновляет список токенов"""
+        for item in token_tree.get_children():
+            token_tree.delete(item)
+        
+        if self.token_manager:
+            tokens = self.token_manager.list_tokens()
+            for token_info in tokens:
+                service = token_info.get("service", "Unknown")
+                status = "Активен" if self.token_manager._is_token_valid(service) else "Неактивен"
+                created = token_info.get("created_at", "Неизвестно")
+                token_tree.insert("", "end", values=(service, status, created))
     
     def save_vk_results(self):
         """Сохранение результатов поиска"""
@@ -725,3 +977,68 @@ class VKParserInterface:
                 ))
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось отобразить результаты: {str(e)}") 
+
+    def auto_connect_tokens(self):
+        """Автоматическое подключение всех токенов при запуске"""
+        try:
+            print("🔄 Автоподключение токенов...")
+            
+            if not self.token_manager:
+                print("❌ TokenManager недоступен")
+                return
+            
+            # Подключаем VK токен
+            vk_token = self.token_manager.get_token("vk")
+            if vk_token:
+                self.token_var.set(vk_token)
+                print("✅ VK токен подключен")
+                
+                # Проверяем валидность
+                if self.token_manager._is_token_valid("vk"):
+                    self.connection_status.config(text="Статус: Подключено", foreground="green")
+                    print("✅ VK токен валиден")
+                else:
+                    self.connection_status.config(text="Статус: Неверный токен", foreground="red")
+                    print("❌ VK токен невалиден")
+            else:
+                # Пытаемся загрузить из файла
+                self._load_token_from_file()
+                print("📁 VK токен загружен из файла")
+            
+            # Подключаем Google Sheets токен
+            sheets_token = self.token_manager.get_token("google_sheets")
+            if sheets_token:
+                print("✅ Google Sheets токен подключен")
+            else:
+                print("ℹ️ Google Sheets токен не найден")
+            
+            # Подключаем другие токены если есть
+            all_tokens = self.token_manager.list_tokens()
+            for token_info in all_tokens:
+                service = token_info.get("service", "")
+                if service not in ["vk", "google_sheets"]:
+                    print(f"✅ Токен {service} подключен")
+            
+            print(f"🎯 Всего подключено токенов: {len(all_tokens)}")
+            
+        except Exception as e:
+            print(f"❌ Ошибка автоподключения токенов: {e}")
+    
+    def _load_token_from_file(self):
+        """Загружает токен из файла и сохраняет в менеджер"""
+        try:
+            token_file = "config/vk_token.txt"
+            if os.path.exists(token_file):
+                with open(token_file, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    for line in lines:
+                        line = line.strip()
+                        if line and not line.startswith('#') and not line.startswith('//'):
+                            self.token_var.set(line)
+                            # Сохраняем в менеджер
+                            if self.token_manager:
+                                self.token_manager.add_token("vk", line)
+                            print("📁 Токен загружен из файла и сохранен в менеджер")
+                            break
+        except Exception as e:
+            print(f"❌ Ошибка загрузки токена из файла: {e}") 
