@@ -20,6 +20,9 @@ from .link_comparator.link_comparator_plugin import LinkComparatorPlugin
 # Плагины управления
 from .token_manager.token_manager_plugin import TokenManagerPlugin
 
+# Плагины настроек
+from .settings_manager.settings_manager_plugin import SettingsManagerPlugin
+
 # Список всех доступных плагинов
 __all__ = [
     'BasePlugin',
@@ -29,7 +32,8 @@ __all__ = [
     'VKSearchPlugin',
     'TextProcessingPlugin',
     'LinkComparatorPlugin',
-    'TokenManagerPlugin'
+    'TokenManagerPlugin',
+    'SettingsManagerPlugin'
 ]
 
 # Словарь плагинов для автоматической загрузки
@@ -40,5 +44,6 @@ PLUGIN_CLASSES = {
     'VKSearchPlugin': VKSearchPlugin,
     'TextProcessingPlugin': TextProcessingPlugin,
     'LinkComparatorPlugin': LinkComparatorPlugin,
-    'TokenManagerPlugin': TokenManagerPlugin
+    'TokenManagerPlugin': TokenManagerPlugin,
+    'SettingsManagerPlugin': SettingsManagerPlugin
 } 

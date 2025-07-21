@@ -11,8 +11,9 @@ from oauth2client.service_account import ServiceAccountCredentials
 import emoji
 
 class VKParserInterface:
-    def __init__(self, parent_frame):
+    def __init__(self, parent_frame, settings_adapter=None):
         self.parent_frame = parent_frame
+        self.settings_adapter = settings_adapter
         
         # Инициализация переменных
         self.vk_api_wrapper = None
@@ -240,22 +241,39 @@ class VKParserInterface:
         cell_range_entry = ttk.Entry(range_frame, textvariable=self.cell_range_var, width=20)
         cell_range_entry.grid(row=2, column=1, sticky="w", padx=(5, 0), pady=(5, 2))
         
-        # Привязываем события изменения настроек диапазона для автоматического сохранения
-        self.cell_range_var.trace("w", lambda *args: self.save_sheets_range_settings())
-        self.sheet_from_var.trace("w", lambda *args: self.save_sheets_range_settings())
-        self.sheet_to_var.trace("w", lambda *args: self.save_sheets_range_settings())
-        
-        # Привязываем автосохранение для всех остальных полей
-        self.start_date_var.trace("w", lambda *args: self.save_window_settings())
-        self.start_time_var.trace("w", lambda *args: self.save_window_settings())
-        self.end_date_var.trace("w", lambda *args: self.save_window_settings())
-        self.end_time_var.trace("w", lambda *args: self.save_window_settings())
-        self.exact_match_var.trace("w", lambda *args: self.save_window_settings())
-        self.attachments_var.trace("w", lambda *args: self.save_window_settings())
-        
-        # Привязываем автосохранение для текстовых полей
-        self.keywords_text.bind("<KeyRelease>", lambda event: self.save_window_settings())
-        self.minus_words_text.bind("<KeyRelease>", lambda event: self.save_window_settings())
+        # Привязываем автосохранение через адаптер настроек
+        if self.settings_adapter:
+            # Привязываем переменные к настройкам
+            self.settings_adapter.bind_variable_to_setting(self.start_date_var, "parser", "start_date")
+            self.settings_adapter.bind_variable_to_setting(self.start_time_var, "parser", "start_time")
+            self.settings_adapter.bind_variable_to_setting(self.end_date_var, "parser", "end_date")
+            self.settings_adapter.bind_variable_to_setting(self.end_time_var, "parser", "end_time")
+            self.settings_adapter.bind_variable_to_setting(self.exact_match_var, "parser", "exact_match")
+            self.settings_adapter.bind_variable_to_setting(self.attachments_var, "parser", "attachments")
+            self.settings_adapter.bind_variable_to_setting(self.token_var, "parser", "vk_token")
+            self.settings_adapter.bind_variable_to_setting(self.cell_range_var, "sheets", "cell_range")
+            self.settings_adapter.bind_variable_to_setting(self.sheet_from_var, "sheets", "sheet_from")
+            self.settings_adapter.bind_variable_to_setting(self.sheet_to_var, "sheets", "sheet_to")
+            self.settings_adapter.bind_variable_to_setting(self.sheets_url_var, "sheets", "url")
+            
+            # Привязываем текстовые виджеты
+            self.settings_adapter.bind_text_widget_to_setting(self.keywords_text, "parser", "keywords")
+            self.settings_adapter.bind_text_widget_to_setting(self.minus_words_text, "parser", "minus_words")
+        else:
+            # Fallback к старому способу
+            self.cell_range_var.trace("w", lambda *args: self.save_sheets_range_settings())
+            self.sheet_from_var.trace("w", lambda *args: self.save_sheets_range_settings())
+            self.sheet_to_var.trace("w", lambda *args: self.save_sheets_range_settings())
+            
+            self.start_date_var.trace("w", lambda *args: self.save_window_settings())
+            self.start_time_var.trace("w", lambda *args: self.save_window_settings())
+            self.end_date_var.trace("w", lambda *args: self.save_window_settings())
+            self.end_time_var.trace("w", lambda *args: self.save_window_settings())
+            self.exact_match_var.trace("w", lambda *args: self.save_window_settings())
+            self.attachments_var.trace("w", lambda *args: self.save_window_settings())
+            
+            self.keywords_text.bind("<KeyRelease>", lambda event: self.save_window_settings())
+            self.minus_words_text.bind("<KeyRelease>", lambda event: self.save_window_settings())
         
         # Подсказка
         ttk.Label(range_frame, text="Примеры: A:Z, A1:D100, Sheet1!A:Z", 
@@ -384,42 +402,73 @@ class VKParserInterface:
     def load_saved_token(self):
         """Загрузка сохраненного токена"""
         try:
-            if os.path.exists("config/vk_token.txt"):
-                with open("config/vk_token.txt", "r") as f:
-                    token = f.read().strip()
+            if self.settings_adapter:
+                token = self.settings_adapter.get_setting("parser", "vk_token", "")
+                if token:
                     self.token_var.set(token)
+            else:
+                # Fallback к старому способу
+                if os.path.exists("config/vk_token.txt"):
+                    with open("config/vk_token.txt", "r") as f:
+                        token = f.read().strip()
+                        self.token_var.set(token)
         except Exception as e:
             print(f"Ошибка загрузки токена: {str(e)}")
     
     def load_search_history(self):
         """Загрузка истории поиска"""
         try:
-            if os.path.exists("data/settings.json"):
-                with open("data/settings.json", "r", encoding="utf-8") as f:
-                    settings = json.load(f)
-                    if "search_history" in settings:
-                        # Здесь можно добавить загрузку истории поиска
-                        pass
+            if self.settings_adapter:
+                history = self.settings_adapter.get_setting("parser", "search_history", [])
+                # Здесь можно добавить загрузку истории поиска
+            else:
+                # Fallback к старому способу
+                if os.path.exists("data/settings.json"):
+                    with open("data/settings.json", "r", encoding="utf-8") as f:
+                        settings = json.load(f)
+                        if "search_history" in settings:
+                            # Здесь можно добавить загрузку истории поиска
+                            pass
         except Exception as e:
             print(f"Ошибка загрузки истории: {str(e)}")
     
     def load_sheets_url(self):
         """Загрузка URL Google Sheets"""
         try:
-            if os.path.exists("sheets_url.txt"):
-                with open("sheets_url.txt", "r") as f:
-                    url = f.read().strip()
-                    # Здесь можно добавить загрузку URL
+            if self.settings_adapter:
+                url = self.settings_adapter.get_setting("sheets", "url", "")
+                if url:
+                    self.sheets_url_var.set(url)
+            else:
+                # Fallback к старому способу
+                if os.path.exists("sheets_url.txt"):
+                    with open("sheets_url.txt", "r") as f:
+                        url = f.read().strip()
+                        if url:
+                            self.sheets_url_var.set(url)
         except Exception as e:
             print(f"Ошибка загрузки URL: {str(e)}")
     
     def load_sheets_range_settings(self):
         """Загрузка настроек диапазона Google Sheets"""
         try:
-            if os.path.exists("data/settings.json"):
-                with open("data/settings.json", "r", encoding="utf-8") as f:
-                    settings = json.load(f)
-                    # Здесь можно добавить загрузку настроек диапазона
+            if self.settings_adapter:
+                cell_range = self.settings_adapter.get_setting("sheets", "cell_range", "A:Z")
+                sheet_from = self.settings_adapter.get_setting("sheets", "sheet_from", "")
+                sheet_to = self.settings_adapter.get_setting("sheets", "sheet_to", "")
+                
+                if cell_range:
+                    self.cell_range_var.set(cell_range)
+                if sheet_from:
+                    self.sheet_from_var.set(sheet_from)
+                if sheet_to:
+                    self.sheet_to_var.set(sheet_to)
+            else:
+                # Fallback к старому способу
+                if os.path.exists("data/settings.json"):
+                    with open("data/settings.json", "r", encoding="utf-8") as f:
+                        settings = json.load(f)
+                        # Здесь можно добавить загрузку настроек диапазона
         except Exception as e:
             print(f"Ошибка загрузки настроек: {str(e)}")
     
@@ -507,7 +556,7 @@ class VKParserInterface:
         pass
     
     def save_window_settings(self):
-        """Сохранение настроек окна"""
+        """Сохранение настроек парсера"""
         try:
             settings = {
                 "keywords": self.keywords_text.get("1.0", tk.END).strip(),
@@ -518,14 +567,17 @@ class VKParserInterface:
                 "end_time": self.end_time_var.get(),
                 "exact_match": self.exact_match_var.get(),
                 "attachments": self.attachments_var.get(),
+                "vk_token": self.token_var.get(),
                 "last_saved": datetime.now().isoformat()
             }
             
-            # Создаем папку data если её нет
-            os.makedirs("data", exist_ok=True)
-            
-            with open("data/settings.json", "w", encoding="utf-8") as f:
-                json.dump(settings, f, indent=2, ensure_ascii=False)
+            if self.settings_adapter:
+                self.settings_adapter.save_parser_settings(settings)
+            else:
+                # Fallback к старому способу
+                os.makedirs("data", exist_ok=True)
+                with open("data/settings.json", "w", encoding="utf-8") as f:
+                    json.dump(settings, f, indent=2, ensure_ascii=False)
                 
         except Exception as e:
             print(f"Ошибка сохранения настроек: {str(e)}")
@@ -604,14 +656,17 @@ class VKParserInterface:
             settings = {
                 "cell_range": self.cell_range_var.get(),
                 "sheet_from": self.sheet_from_var.get(),
-                "sheet_to": self.sheet_to_var.get()
+                "sheet_to": self.sheet_to_var.get(),
+                "url": self.sheets_url_var.get()
             }
             
-            # Создаем папку data если её нет
-            os.makedirs("data", exist_ok=True)
-            
-            with open("data/sheets_range_settings.json", "w", encoding="utf-8") as f:
-                json.dump(settings, f, indent=2, ensure_ascii=False)
+            if self.settings_adapter:
+                self.settings_adapter.save_sheets_settings(settings)
+            else:
+                # Fallback к старому способу
+                os.makedirs("data", exist_ok=True)
+                with open("data/sheets_range_settings.json", "w", encoding="utf-8") as f:
+                    json.dump(settings, f, indent=2, ensure_ascii=False)
                 
         except Exception as e:
             print(f"Ошибка сохранения настроек диапазона: {str(e)}")

@@ -7,6 +7,7 @@ from datetime import datetime
 # Импортируем наши интерфейсы
 from .link_comparator_interface import LinkComparatorInterface
 from .vk_parser_interface import VKParserInterface
+from .settings_adapter import SettingsAdapter
 
 class MainInterface:
     def __init__(self, root):
@@ -14,8 +15,11 @@ class MainInterface:
         self.root.title("Сравнитель ссылок и Парсер ВК")
         self.root.geometry("1200x800")
         
+        # Инициализируем адаптер настроек
+        self.settings_adapter = SettingsAdapter()
+        self.settings_plugin = self.settings_adapter.create_settings_manager()
+        
         # Загружаем сохраненные настройки размеров
-        self.settings_file = "window_settings.json"
         self.load_window_settings()
         
         # Настройка интерфейса
@@ -107,7 +111,7 @@ class MainInterface:
         # Вкладка 2: Парсер ВК
         self.vk_parser_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.vk_parser_frame, text="Парсер ВК")
-        self.vk_parser_interface = VKParserInterface(self.vk_parser_frame)
+        self.vk_parser_interface = VKParserInterface(self.vk_parser_frame, self.settings_adapter)
     
     def on_window_resize(self, event):
         """Обработка изменения размера окна"""
@@ -131,11 +135,7 @@ class MainInterface:
                 "last_saved": datetime.now().isoformat()
             }
             
-            # Создаем папку data если её нет
-            os.makedirs("data", exist_ok=True)
-            
-            with open(self.settings_file, "w", encoding="utf-8") as f:
-                json.dump(settings, f, indent=2, ensure_ascii=False)
+            self.settings_adapter.save_window_settings(settings)
                 
         except Exception as e:
             print(f"Ошибка сохранения настроек окна: {str(e)}")
@@ -143,18 +143,16 @@ class MainInterface:
     def load_window_settings(self):
         """Загрузка настроек окна"""
         try:
-            if os.path.exists(self.settings_file):
-                with open(self.settings_file, "r", encoding="utf-8") as f:
-                    settings = json.load(f)
-                
-                # Применяем сохраненные размеры и позицию
-                width = settings.get("window_width", 1200)
-                height = settings.get("window_height", 800)
-                x = settings.get("window_x", 100)
-                y = settings.get("window_y", 100)
-                
-                # Устанавливаем размеры и позицию окна
-                self.root.geometry(f"{width}x{height}+{x}+{y}")
+            settings = self.settings_adapter.load_window_settings()
+            
+            # Применяем сохраненные размеры и позицию
+            width = settings.get("window_width", 1200)
+            height = settings.get("window_height", 800)
+            x = settings.get("window_x", 100)
+            y = settings.get("window_y", 100)
+            
+            # Устанавливаем размеры и позицию окна
+            self.root.geometry(f"{width}x{height}+{x}+{y}")
                 
         except Exception as e:
             print(f"Ошибка загрузки настроек окна: {str(e)}")
