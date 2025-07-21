@@ -12,6 +12,14 @@ import emoji
 from typing import Optional, List, Dict, Any
 from src.plugins.google_sheets.google_sheets_plugin import GoogleSheetsPlugin
 from src.plugins.text_processing.text_processing_plugin import TextProcessingPlugin
+import threading
+import asyncio
+import time
+import sys
+import concurrent.futures
+import pytz
+sys.path.append(os.path.expanduser("~/Desktop/Проекты/Скрипт таблиц"))
+from async_vk_integration import AsyncVKSearch
 
 
 class SimpleTokenManager:
@@ -118,6 +126,7 @@ class SimpleTokenManager:
 
 class VKParserInterface:
     def __init__(self, parent_frame, settings_adapter=None):
+        self.history_file = os.path.join("data", "search_history.json")
         self.parent_frame = parent_frame
         self.root = parent_frame.winfo_toplevel()  # Получаем корневое окно
         
@@ -394,6 +403,10 @@ class VKParserInterface:
         self.sheets_status = ttk.Label(left_scrollable_frame, text="", font=("Arial", 9))
         self.sheets_status.grid(row=21, column=0, sticky="w", pady=(0, 10))
         
+        # Строка прогресса поиска
+        self.progress_label = ttk.Label(left_scrollable_frame, text="", font=("Arial", 9), foreground="blue")
+        self.progress_label.grid(row=22, column=0, sticky="w", pady=(0, 5))
+        
         # Правая панель - история и результаты (делаем уже)
         right_frame = ttk.Frame(self.paned_window)
         self.paned_window.add(right_frame, weight=1)  # Правая панель получает 25% пространства
@@ -624,24 +637,217 @@ class VKParserInterface:
             print(f"Ошибка загрузки настроек: {str(e)}")
     
     def start_vk_search(self):
-        """Запуск поиска в ВК"""
+        """Запуск асинхронного поиска в ВК (без фильтрации по дате, фильтрация по времени на клиенте)"""
         try:
-            # Проверяем токен перед поиском
-            if not self.auto_check_token():
-                messagebox.showerror("Ошибка", "Проверьте токен ВК в файле config/vk_token.txt")
-                return
-            
-            # Получаем параметры поиска
-            keywords = self.keywords_text.get("1.0", tk.END).strip()
+            keywords = self.keywords_text.get("1.0", tk.END).strip().splitlines()
+            keywords = [k.strip() for k in keywords if k.strip()]
             if not keywords:
                 messagebox.showerror("Ошибка", "Введите ключевые фразы")
                 return
-            
-            # Здесь будет логика поиска
-            messagebox.showinfo("Информация", "Поиск запущен")
-            
+            start_date = self.start_date_var.get().strip()
+            end_date = self.end_date_var.get().strip()
+            start_time = self.start_time_var.get().strip()
+            end_time = self.end_time_var.get().strip()
+            exact_match = self.exact_match_var.get()
+            minus_words = self.minus_words_text.get("1.0", tk.END).strip().splitlines()
+            minus_words = [w.strip() for w in minus_words if w.strip()]
+            token = self.token_var.get().strip()
+            if not token:
+                messagebox.showerror("Ошибка", "Токен ВК не найден")
+                return
+            def quote_for_exact(k):
+                k = k.strip().strip('"')
+                q = f'"{k}"' if exact_match else k
+                print(f"[VKParser] Фраза для точного вхождения (print): {q}")
+                print(f"[VKParser] Фраза для точного вхождения (repr): {repr(q)}")
+                return q
+            api_keywords = [quote_for_exact(k) for k in keywords]
+            # Не передаём фильтрацию по дате в VK API
+            start_ts = None
+            end_ts = None
+            for item in self.results_tree.get_children():
+                self.results_tree.delete(item)
+            threading.Thread(target=self._run_async_search_thread, args=(keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time), daemon=True).start()
         except Exception as e:
             messagebox.showerror("Ошибка", f"Ошибка запуска поиска: {str(e)}")
+
+    def _run_async_search_thread(self, keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(self._async_search_and_display(keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time))
+
+    async def _async_search_and_display(self, keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time):
+        try:
+            self._set_progress(f"Запуск поиска по {len(keywords)} запросам...")
+            start_time_all = time.time()
+            results = []
+            async with AsyncVKSearch(token, max_concurrent=5) as vk_search:
+                total = len(api_keywords)
+                done = 0
+                batch_size = 1
+                all_posts = []
+                for i in range(0, total, batch_size):
+                    batch = api_keywords[i:i+batch_size]
+                    print(f"[VKParser] VK API запрос: фраза={batch}, start_ts={start_ts}, end_ts={end_ts}, exact_match={exact_match}, minus_words={minus_words}")
+                    # Не передаём start_ts и end_ts если они None
+                    if start_ts is None or end_ts is None:
+                        batch_results = await vk_search.search_multiple_queries(batch, None, None, exact_match, minus_words)
+                    else:
+                        batch_results = await vk_search.search_multiple_queries(batch, start_ts, end_ts, exact_match, minus_words)
+                    print(f"[VKParser] Ответ VK API для фразы {batch}: {batch_results}")
+                    all_posts.extend(batch_results)
+                    done += len(batch)
+                    elapsed = time.time() - start_time_all
+                    speed = done / elapsed if elapsed > 0 else 1
+                    remaining = total - done
+                    eta = int(remaining / speed) if speed > 0 else 0
+                    self._set_progress(f"Обработано {done} из {total}, осталось ~{eta} сек")
+                results = all_posts
+            self._set_progress(f"Поиск завершен. Найдено {len(results)} постов.")
+            filtered = self._filter_and_format_results(results, keywords, exact_match, start_date, start_time, end_date, end_time)
+            filename = f"search_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+            results_dir = os.path.join("data", "results")
+            os.makedirs(results_dir, exist_ok=True)
+            filepath = os.path.join(results_dir, filename)
+            if filtered:
+                with open(filepath, "w", newline='', encoding="utf-8") as f:
+                    writer = csv.DictWriter(f, fieldnames=["link", "text", "type", "author", "author_link", "date", "likes", "comments", "reposts", "views"])
+                    writer.writeheader()
+                    writer.writerows(filtered)
+            self._add_search_history_entry(keywords, start_date, end_date, exact_match, minus_words, filepath, len(filtered))
+            self._display_results_from_csv(filepath)
+        except Exception as e:
+            self._set_progress("")
+            messagebox.showerror("Ошибка", f"Ошибка асинхронного поиска: {str(e)}")
+
+    def _filter_and_format_results(self, posts, keywords, exact_match, start_date, start_time, end_date, end_time):
+        # Фильтрация по ключевым фразам и времени (по Москве)
+        from datetime import datetime as dt
+        def parse_vk_date(ts):
+            try:
+                if ts is None:
+                    return None
+                return dt.fromtimestamp(int(ts))
+            except Exception:
+                return None
+        # Формируем диапазон дат и времени (по Москве)
+        try:
+            import pytz
+            moscow_tz = pytz.timezone('Europe/Moscow')
+            start_dt = moscow_tz.localize(dt.strptime(f"{start_date} {start_time}", "%d.%m.%Y %H:%M"))
+            end_dt = moscow_tz.localize(dt.strptime(f"{end_date} {end_time}", "%d.%m.%Y %H:%M"))
+        except Exception:
+            start_dt = None
+            end_dt = None
+        unique_links = set()
+        filtered = []
+        for post in posts:
+            text = post.get("text", "")
+            # Фильтрация по ключевым фразам
+            if exact_match:
+                if not any(k in text for k in keywords):
+                    continue
+            else:
+                if not any(k.lower() in text.lower() for k in keywords):
+                    continue
+            # Фильтрация по времени (по Москве)
+            date_val = post.get("date")
+            if date_val is None or not str(date_val).isdigit():
+                continue
+            post_dt_utc = parse_vk_date(date_val)
+            if post_dt_utc:
+                import pytz
+                moscow_tz = pytz.timezone('Europe/Moscow')
+                post_dt_msk = post_dt_utc.astimezone(moscow_tz)
+                if start_dt and end_dt:
+                    if not (start_dt <= post_dt_msk <= end_dt):
+                        continue
+            # Формируем ссылку
+            owner_id = post.get("owner_id")
+            post_id = post.get("id")
+            link = f"https://vk.com/wall{owner_id}_{post_id}" if owner_id and post_id else ""
+            if not link or link in unique_links:
+                continue
+            unique_links.add(link)
+            # Формируем автора
+            author = post.get("from_id", "")
+            author_link = f"https://vk.com/id{author}" if author else ""
+            # Исправленная обработка даты
+            date_str = post_dt_msk.strftime("%d.%m.%Y %H:%M") if post_dt_utc else "Нет даты"
+            filtered.append({
+                "link": link,
+                "text": text,
+                "type": post.get("post_type", ""),
+                "author": author,
+                "author_link": author_link,
+                "date": date_str,
+                "likes": post.get("likes", {}).get("count", 0),
+                "comments": post.get("comments", {}).get("count", 0),
+                "reposts": post.get("reposts", {}).get("count", 0),
+                "views": post.get("views", {}).get("count", 0)
+            })
+        return filtered
+
+    def _set_progress(self, text):
+        self.progress_label.config(text=text)
+        self.progress_label.update_idletasks()
+
+    def _add_search_history_entry(self, keywords, start_date, end_date, exact_match, minus_words, filepath, count):
+        # Формируем запись
+        entry = {
+            "datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "keywords": keywords,
+            "start_date": start_date,
+            "end_date": end_date,
+            "exact_match": exact_match,
+            "minus_words": minus_words,
+            "filepath": filepath,
+            "count": count
+        }
+        # Сохраняем в файл
+        history = self._read_history_file()
+        history.insert(0, entry)  # Новые сверху
+        with open(self.history_file, "w", encoding="utf-8") as f:
+            json.dump(history, f, ensure_ascii=False, indent=2)
+        # Добавляем в таблицу истории
+        self._insert_history_row(entry)
+
+    def _load_search_history_entries(self):
+        # Загружаем историю из файла и отображаем в таблице
+        if not os.path.exists(self.history_file):
+            return
+        history = self._read_history_file()
+        for entry in history:
+            self._insert_history_row(entry)
+
+    def _insert_history_row(self, entry):
+        # Вставляет строку в таблицу истории
+        values = (
+            entry.get("datetime", ""),
+            ", ".join(entry.get("keywords", [])),
+            f"{entry.get('start_date', '')} - {entry.get('end_date', '')}",
+            entry.get("count", 0),
+            os.path.basename(entry.get("filepath", ""))
+        )
+        self.tasks_tree.insert("", 0, values=values, tags=(entry.get("filepath", ""),))
+
+    def _read_history_file(self):
+        try:
+            with open(self.history_file, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return []
+
+    def _display_results_from_csv(self, filepath):
+        # Открыть CSV и отобразить в self.results_tree
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                self.results_tree.delete(*self.results_tree.get_children())
+                for row in reader:
+                    self.results_tree.insert("", "end", values=tuple(row.values()))
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Не удалось отобразить результаты: {str(e)}")
     
     def open_token_manager(self):
         """Открывает окно управления токенами"""
@@ -942,15 +1148,20 @@ class VKParserInterface:
             messagebox.showerror("Ошибка", f"Не удалось загрузить задачи: {str(e)}")
     
     def open_task_file(self, event):
-        """Открытие файла задачи по двойному клику"""
+        # Открытие файла результата поиска по двойному клику на истории
         try:
             selection = self.tasks_tree.selection()
             if selection:
                 item = self.tasks_tree.item(selection[0])
-                # Здесь будет логика открытия файла задачи
-                messagebox.showinfo("Информация", f"Открытие файла задачи: {item['values']}")
+                tags = self.tasks_tree.item(selection[0], "tags")
+                if tags and tags[0]:
+                    filepath = tags[0]
+                    if os.path.exists(filepath):
+                        self._display_results_from_csv(filepath)
+                    else:
+                        messagebox.showerror("Ошибка", f"Файл результата не найден: {filepath}")
         except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось открыть файл: {str(e)}")
+            messagebox.showerror("Ошибка", f"Не удалось открыть файл результата: {str(e)}")
     
     def display_results_in_treeview(self, df):
         """Отображение результатов в Treeview"""
@@ -1060,3 +1271,28 @@ class VKParserInterface:
         except Exception as e:
             self.gsheets_status.config(text="Google Sheets: Ошибка", foreground="red")
             print(f"❌ Ошибка автоподключения Google Sheets: {e}") 
+
+    def _get_utc_timestamps(self, start_date, start_time, end_date, end_time, only_date=False):
+        # Если only_date=True, возвращает timestamp начала и конца дня по Москве
+        from datetime import datetime as dt, time as dtime, timedelta
+        import pytz
+        try:
+            moscow_tz = pytz.timezone('Europe/Moscow')
+            if only_date:
+                start_dt = dt.strptime(start_date, "%d.%m.%Y")
+                end_dt = dt.strptime(end_date, "%d.%m.%Y")
+                start_dt = moscow_tz.localize(dt.combine(start_dt, dtime(0, 0, 0)))
+                end_dt = moscow_tz.localize(dt.combine(end_dt, dtime(23, 59, 59)))
+            else:
+                start_dt = moscow_tz.localize(dt.strptime(f"{start_date} {start_time}", "%d.%m.%Y %H:%M"))
+                end_dt = moscow_tz.localize(dt.strptime(f"{end_date} {end_time}", "%d.%m.%Y %H:%M"))
+            start_utc = start_dt.astimezone(pytz.utc)
+            end_utc = end_dt.astimezone(pytz.utc)
+            start_ts = int(start_utc.timestamp())
+            end_ts = int(end_utc.timestamp())
+            print(f"[VKParser] start_date: {start_date} (MSK) -> {start_dt} | UTC: {start_utc} | timestamp: {start_ts}")
+            print(f"[VKParser] end_date:   {end_date} (MSK) -> {end_dt} | UTC: {end_utc} | timestamp: {end_ts}")
+            return start_ts, end_ts
+        except Exception as e:
+            print(f"[VKParser] Ошибка преобразования времени: {e}")
+            return None, None 
