@@ -21,6 +21,7 @@ import pytz
 from src.plugins.vk_search.vk_search_plugin import VKSearchPlugin
 from src.plugins.vk_search.vk_time_utils import to_vk_timestamp, from_vk_timestamp
 from src.plugins.token_manager.token_limiter import TokenLimiter
+from src.plugins.stats_plugin import StatsPlugin
 
 
 class TokenPool:
@@ -36,7 +37,6 @@ class TokenPool:
 
 class VKParserInterface:
     def __init__(self, parent_frame, settings_adapter=None):
-        self.history_file = os.path.join("data", "search_history.json")
         self.parent_frame = parent_frame
         self.root = parent_frame.winfo_toplevel()  # Получаем корневое окно
         
@@ -83,9 +83,9 @@ class VKParserInterface:
         
         # Загружаем сохраненные данные
         self.load_saved_token()
-        self.load_search_history()
         self.load_sheets_url()
         self.load_sheets_range_settings()
+        self._load_tasks_from_results_folder()  # <--- добавляем автозагрузку задач
         
         # Автоматическое подключение токенов при запуске
         self.root.after(500, self.auto_connect_tokens)
@@ -171,6 +171,7 @@ class VKParserInterface:
         
         self.keywords_text = tk.Text(left_scrollable_frame, height=8, width=55)
         self.keywords_text.grid(row=5, column=0, sticky="ew", pady=(0, 8))
+        self.keywords_text.bind("<KeyRelease>", self._on_keywords_changed)
         
         # Период поиска
         ttk.Label(left_scrollable_frame, text="Период поиска новостей (обязательный параметр):", font=("Arial", 11, "bold")).grid(row=6, column=0, sticky="w", pady=(0, 2))
@@ -347,16 +348,19 @@ class VKParserInterface:
         # Список задач с прокруткой
         history_frame = ttk.Frame(all_frame)
         history_frame.pack(fill="both", expand=True, pady=(0, 10))
-        
-        self.tasks_tree = ttk.Treeview(history_frame, columns=("date", "datetime", "count", "status"), show="headings", height=8)
+        self.tasks_tree = ttk.Treeview(history_frame, columns=("date", "time", "count", "si", "views", "status"), show="headings", height=8)
         self.tasks_tree.heading("date", text="Дата")
-        self.tasks_tree.heading("datetime", text="Дата/Время")
+        self.tasks_tree.heading("time", text="Время")
         self.tasks_tree.heading("count", text="Кол-во")
+        self.tasks_tree.heading("si", text="SI")
+        self.tasks_tree.heading("views", text="Просмотры")
         self.tasks_tree.heading("status", text="Статус")
-        self.tasks_tree.column("date", width=60)
-        self.tasks_tree.column("datetime", width=120)
+        self.tasks_tree.column("date", width=80)
+        self.tasks_tree.column("time", width=80)
         self.tasks_tree.column("count", width=60)
-        self.tasks_tree.column("status", width=100)
+        self.tasks_tree.column("si", width=80)
+        self.tasks_tree.column("views", width=100)
+        self.tasks_tree.column("status", width=80)
         
         # Добавляем прокрутку для таблицы истории
         history_scrollbar_y = ttk.Scrollbar(history_frame, orient="vertical", command=self.tasks_tree.yview)
@@ -423,8 +427,12 @@ class VKParserInterface:
         ttk.Label(info_frame, text="Что означают статусы задач >", foreground="blue", cursor="hand2").pack(anchor="w")
         
         # Кнопка сохранения результатов
-        self.save_results_button = ttk.Button(right_frame, text="Сохранить результаты", command=self.save_vk_results)
-        self.save_results_button.pack(side="bottom", fill="x", pady=(5, 0))
+        # Удалить старую кнопку сохранения результатов
+        # self.save_results_button = ttk.Button(right_frame, text="Сохранить результаты", command=self.save_vk_results)
+        # self.save_results_button.pack(side="bottom", fill="x", pady=(5, 0))
+        # Оставить только новую кнопку экспорта
+        self.export_results_button = ttk.Button(right_frame, text="Экспортировать результаты", command=self._export_current_results)
+        self.export_results_button.pack(side="bottom", fill="x", pady=(5, 0))
         
         # Настройка весов
         right_frame.grid_rowconfigure(0, weight=1)
@@ -504,23 +512,6 @@ class VKParserInterface:
             print(f"❌ Ошибка проверки токена: {e}")
             return False
     
-    def load_search_history(self):
-        """Загрузка истории поиска"""
-        try:
-            if self.settings_adapter:
-                history = self.settings_adapter.get_setting("parser", "search_history", [])
-                # Здесь можно добавить загрузку истории поиска
-            else:
-                # Fallback к старому способу
-                if os.path.exists("data/settings.json"):
-                    with open("data/settings.json", "r", encoding="utf-8") as f:
-                        settings = json.load(f)
-                        if "search_history" in settings:
-                            # Здесь можно добавить загрузку истории поиска
-                            pass
-        except Exception as e:
-            print(f"Ошибка загрузки истории: {str(e)}")
-    
     def load_sheets_url(self):
         """Загрузка URL Google Sheets"""
         try:
@@ -592,15 +583,81 @@ class VKParserInterface:
                 return
             for item in self.results_tree.get_children():
                 self.results_tree.delete(item)
-            threading.Thread(target=self._run_async_search_thread, args=(keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time), daemon=True).start()
+            threading.Thread(target=self._run_async_search_thread_safe, args=(keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time), daemon=True).start()
         except Exception as e:
             messagebox.showerror("Ошибка", f"Ошибка запуска поиска: {str(e)}")
 
-    def _run_async_search_thread(self, keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time):
+    def _run_async_search_thread_safe(self, keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time):
+        import asyncio
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        # Передаём token_limiter вместо token_pool
-        loop.run_until_complete(self._async_search_and_display(keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, self.token_limiter, start_date, start_time, end_date, end_time))
+        data_manager = self.plugin_manager.get_plugin('data_manager')
+        filepath = None
+        try:
+            # Запуск поиска через VKSearchPlugin
+            results = loop.run_until_complete(
+                self.vk_search_plugin.search_multiple_queries(
+                    keywords, start_ts, end_ts, exact_match, minus_words
+                )
+            )
+            # Фильтрация и отображение результатов
+            filtered = self._filter_and_format_results(results, keywords, exact_match, start_date, start_time, end_date, end_time)
+            filename = f"search_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+            results_dir = os.path.join("data", "results")
+            os.makedirs(results_dir, exist_ok=True)
+            filepath = os.path.join(results_dir, filename)
+            if filtered and data_manager:
+                try:
+                    filepath = data_manager.save_results_to_csv(filtered, filename)
+                except Exception as e:
+                    filepath = None
+            elif filtered:
+                with open(filepath, "w", newline='', encoding="utf-8") as f:
+                    writer = csv.DictWriter(f, fieldnames=["link", "text", "type", "author", "author_link", "date", "likes", "comments", "reposts", "views"])
+                    writer.writeheader()
+                    writer.writerows(filtered)
+            # Согласно архитектурному правилу, сохраняем meta.json только через DataManagerPlugin
+            if data_manager:
+                data_manager.save_task_meta_full(
+                    keywords=keywords,
+                    start_date=start_date,
+                    end_date=end_date,
+                    exact_match=exact_match,
+                    minus_words=minus_words,
+                    filepath=filepath,
+                    filtered=filtered
+                )
+                self._load_tasks_from_results_folder()
+            if filepath:
+                if os.path.exists(filepath):
+                    self._display_results_from_csv(filepath)
+                else:
+                    messagebox.showerror("Ошибка", f"Файл результата не найден: {filepath}")
+            if not filepath:
+                messagebox.showerror("Ошибка", "Не удалось сохранить результаты поиска в файл.")
+            self.progress_var.set(0)
+            self.progress_bar.update()
+        except Exception as e:
+            # Согласно архитектурному правилу, сохраняем meta.json с ошибкой только через DataManagerPlugin
+            if data_manager:
+                data_manager.save_task_meta_full(
+                    keywords=keywords,
+                    start_date=start_date,
+                    end_date=end_date,
+                    exact_match=exact_match,
+                    minus_words=minus_words,
+                    filepath=filepath if filepath else 'unknown.csv',
+                    filtered=[],
+                    status=None,
+                    exception=str(e)
+                )
+                self._load_tasks_from_results_folder()
+            self.progress_var.set(0)
+            self.progress_bar.update()
+            self._set_progress("")
+            messagebox.showerror("Ошибка", f"Ошибка асинхронного поиска: {str(e)}")
+        finally:
+            loop.close()
 
     async def _async_search_and_display(self, keywords, api_keywords, start_ts, end_ts, exact_match, minus_words, token_limiter, start_date, start_time, end_date, end_time):
         try:
@@ -685,7 +742,6 @@ class VKParserInterface:
                     writer.writeheader()
                     writer.writerows(filtered)
             if filepath:
-                self._add_search_history_entry(keywords, start_date, end_date, exact_match, minus_words, filepath, len(filtered))
                 if os.path.exists(filepath):
                     self._display_results_from_csv(filepath)
                 else:
@@ -773,228 +829,6 @@ class VKParserInterface:
         self.progress_label.config(text=text)
         self.progress_label.update_idletasks()
 
-    def _add_search_history_entry(self, keywords, start_date, end_date, exact_match, minus_words, filepath, count):
-        # Формируем запись
-        entry = {
-            "datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "keywords": keywords,
-            "start_date": start_date,
-            "end_date": end_date,
-            "exact_match": exact_match,
-            "minus_words": minus_words,
-            "filepath": filepath,
-            "count": count
-        }
-        # Сохраняем в файл
-        history = self._read_history_file()
-        history.insert(0, entry)  # Новые сверху
-        with open(self.history_file, "w", encoding="utf-8") as f:
-            json.dump(history, f, ensure_ascii=False, indent=2)
-        # Добавляем в таблицу истории
-        self._insert_history_row(entry)
-
-    def _load_search_history_entries(self):
-        # Загружаем историю из файла и отображаем в таблице
-        if not os.path.exists(self.history_file):
-            return
-        history = self._read_history_file()
-        for entry in history:
-            self._insert_history_row(entry)
-
-    def _insert_history_row(self, entry):
-        # Вставляет строку в таблицу истории
-        values = (
-            entry.get("datetime", ""),
-            ", ".join(entry.get("keywords", [])),
-            f"{entry.get('start_date', '')} - {entry.get('end_date', '')}",
-            entry.get("count", 0),
-            os.path.basename(entry.get("filepath", ""))
-        )
-        self.tasks_tree.insert("", 0, values=values, tags=(entry.get("filepath", ""),))
-
-    def _read_history_file(self):
-        try:
-            with open(self.history_file, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return []
-
-    def _display_results_from_csv(self, filepath):
-        # Открыть CSV и отобразить в self.results_tree
-        try:
-            fieldnames = ["link", "text", "type", "author", "author_link", "date", "likes", "comments", "reposts", "views"]
-            with open(filepath, "r", encoding="utf-8") as f:
-                reader = csv.DictReader(f)
-                self.results_tree.delete(*self.results_tree.get_children())
-                for row in reader:
-                    self.results_tree.insert("", "end", values=tuple(row.get(f, "") for f in fieldnames))
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось отобразить результаты: {str(e)}")
-    
-    def open_token_manager(self):
-        """Открывает окно управления токенами"""
-        try:
-            if not self.token_manager:
-                messagebox.showerror("Ошибка", "TokenManagerPlugin недоступен")
-                return
-            
-            # Создаем окно управления токенами
-            token_window = tk.Toplevel(self.root)
-            token_window.title("Управление токенами")
-            token_window.geometry("500x400")
-            token_window.resizable(False, False)
-            
-            # Центрируем окно
-            token_window.transient(self.root)
-            token_window.grab_set()
-            
-            # Создаем интерфейс управления токенами
-            self._create_token_manager_ui(token_window)
-            
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Ошибка открытия менеджера токенов: {str(e)}")
-    
-    def _create_token_manager_ui(self, parent):
-        """Создает интерфейс управления токенами"""
-        # Главный фрейм
-        main_frame = ttk.Frame(parent, padding="10")
-        main_frame.pack(fill="both", expand=True)
-        
-        # Заголовок
-        ttk.Label(main_frame, text="Управление токенами", font=("Arial", 14, "bold")).pack(pady=(0, 20))
-        
-        # Список токенов
-        ttk.Label(main_frame, text="Доступные токены:", font=("Arial", 11, "bold")).pack(anchor="w")
-        
-        # Создаем Treeview для отображения токенов
-        columns = ("service", "status", "created")
-        token_tree = ttk.Treeview(main_frame, columns=columns, show="headings", height=8)
-        token_tree.heading("service", text="Сервис")
-        token_tree.heading("status", text="Статус")
-        token_tree.heading("created", text="Создан")
-        token_tree.column("service", width=150)
-        token_tree.column("status", width=100)
-        token_tree.column("created", width=150)
-        token_tree.pack(fill="both", expand=True, pady=(0, 10))
-        
-        # Загружаем токены
-        if self.token_manager:
-            tokens = self.token_manager.list_tokens()
-            for token_info in tokens:
-                service = token_info.get("service", "Unknown")
-                status = "Активен" if self.token_manager._is_token_valid(service) else "Неактивен"
-                created = token_info.get("created_at", "Неизвестно")
-                token_tree.insert("", "end", values=(service, status, created))
-        
-        # Кнопки управления
-        button_frame = ttk.Frame(main_frame)
-        button_frame.pack(fill="x", pady=(10, 0))
-        
-        ttk.Button(button_frame, text="Добавить токен", 
-                  command=lambda: self._add_token_dialog(parent)).pack(side="left", padx=(0, 5))
-        ttk.Button(button_frame, text="Удалить токен", 
-                  command=lambda: self._remove_token_dialog(token_tree)).pack(side="left", padx=5)
-        ttk.Button(button_frame, text="Обновить", 
-                  command=lambda: self._refresh_token_list(token_tree)).pack(side="left", padx=5)
-        ttk.Button(button_frame, text="Закрыть", 
-                  command=parent.destroy).pack(side="right")
-    
-    def _add_token_dialog(self, parent):
-        """Диалог добавления токена"""
-        dialog = tk.Toplevel(parent)
-        dialog.title("Добавить токен")
-        dialog.geometry("400x200")
-        dialog.transient(parent)
-        dialog.grab_set()
-        
-        frame = ttk.Frame(dialog, padding="10")
-        frame.pack(fill="both", expand=True)
-        
-        ttk.Label(frame, text="Сервис:").grid(row=0, column=0, sticky="w", pady=5)
-        service_var = tk.StringVar(value="vk")
-        service_entry = ttk.Entry(frame, textvariable=service_var, width=30)
-        service_entry.grid(row=0, column=1, sticky="ew", padx=(10, 0), pady=5)
-        
-        ttk.Label(frame, text="Токен:").grid(row=1, column=0, sticky="w", pady=5)
-        token_var = tk.StringVar()
-        token_entry = ttk.Entry(frame, textvariable=token_var, width=30, show="*")
-        token_entry.grid(row=1, column=1, sticky="ew", padx=(10, 0), pady=5)
-        
-        def save_token():
-            service = service_var.get().strip()
-            token = token_var.get().strip()
-            if service and token:
-                if self.token_manager.add_token(service, token):
-                    messagebox.showinfo("Успех", f"Токен для {service} добавлен")
-                    dialog.destroy()
-                else:
-                    messagebox.showerror("Ошибка", "Не удалось добавить токен")
-            else:
-                messagebox.showerror("Ошибка", "Заполните все поля")
-        
-        ttk.Button(frame, text="Сохранить", command=save_token).grid(row=2, column=0, columnspan=2, pady=20)
-    
-    def _remove_token_dialog(self, token_tree):
-        """Диалог удаления токена"""
-        selection = token_tree.selection()
-        if not selection:
-            messagebox.showwarning("Предупреждение", "Выберите токен для удаления")
-            return
-        
-        item = token_tree.item(selection[0])
-        service = item['values'][0]
-        
-        if messagebox.askyesno("Подтверждение", f"Удалить токен для {service}?"):
-            if self.token_manager.remove_token(service):
-                messagebox.showinfo("Успех", f"Токен для {service} удален")
-                self._refresh_token_list(token_tree)
-            else:
-                messagebox.showerror("Ошибка", "Не удалось удалить токен")
-    
-    def _refresh_token_list(self, token_tree):
-        """Обновляет список токенов"""
-        for item in token_tree.get_children():
-            token_tree.delete(item)
-        
-        if self.token_manager:
-            tokens = self.token_manager.list_tokens()
-            for token_info in tokens:
-                service = token_info.get("service", "Unknown")
-                status = "Активен" if self.token_manager._is_token_valid(service) else "Неактивен"
-                created = token_info.get("created_at", "Неизвестно")
-                token_tree.insert("", "end", values=(service, status, created))
-    
-    def save_vk_results(self):
-        """Сохранение результатов поиска"""
-        if not self.results_tree.get_children():
-            messagebox.showwarning("Предупреждение", "Нет результатов для сохранения")
-            return
-        
-        file_path = filedialog.asksaveasfilename(
-            title="Сохранить результаты поиска",
-            defaultextension=".csv",
-            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
-        )
-        
-        if file_path:
-            try:
-                with open(file_path, 'w', newline='', encoding='utf-8') as file:
-                    writer = csv.writer(file)
-                    writer.writerow(["Заголовок", "Ссылка", "Дата"])
-                    
-                    for item in self.results_tree.get_children():
-                        values = self.results_tree.item(item)['values']
-                        writer.writerow(values)
-                
-                messagebox.showinfo("Успех", f"Результаты сохранены в {file_path}")
-            except Exception as e:
-                messagebox.showerror("Ошибка", f"Не удалось сохранить файл: {str(e)}")
-    
-    def on_paned_window_change(self, event):
-        """Обработка изменения позиции разделителя панелей"""
-        # Здесь можно добавить сохранение позиции разделителя
-        pass
-    
     def save_window_settings(self):
         """Сохранение настроек парсера"""
         try:
@@ -1130,20 +964,85 @@ class VKParserInterface:
             messagebox.showerror("Ошибка", f"Не удалось загрузить задачи: {str(e)}")
     
     def open_task_file(self, event):
-        # Открытие файла результата поиска по двойному клику на истории
+        # Двойной клик — открывает окно настроек задачи через DataManagerPlugin
+        item_id = self.tasks_tree.identify_row(event.y)
+        if not item_id:
+            return
+        tags = self.tasks_tree.item(item_id, "tags")
+        if tags and tags[0]:
+            filepath = tags[0]
+            data_manager = self.plugin_manager.get_plugin('data_manager')
+            if data_manager:
+                meta = data_manager.load_task_meta(filepath)
+                if meta:
+                    self._show_task_settings_window(meta, filepath)
+                else:
+                    messagebox.showinfo("Информация", "Нет meta.json для этой задачи")
+
+    def _show_task_settings_window(self, meta, filepath):
+        """Открывает окно с настройками задачи и итоговыми метриками, позволяет повторно запустить задачу."""
+        win = tk.Toplevel(self.root)
+        win.title("Настройки задачи и метрики")
+        win.geometry("500x600")
+        frame = ttk.Frame(win, padding=10)
+        frame.pack(fill="both", expand=True)
+        # Настройки задачи
+        ttk.Label(frame, text="Параметры задачи", font=("Arial", 12, "bold")).pack(anchor="w", pady=(0, 5))
+        params = [
+            ("Ключевые слова", ', '.join(meta.get('keywords', []))),
+            ("Дата с", meta.get('start_date', '')),
+            ("Дата по", meta.get('end_date', '')),
+            ("Точное вхождение", str(meta.get('exact_match', ''))),
+            ("Минус-слова", ', '.join(meta.get('minus_words', []))),
+        ]
+        for label, value in params:
+            row = ttk.Frame(frame)
+            row.pack(fill="x", pady=2)
+            ttk.Label(row, text=label+":", width=18).pack(side="left")
+            ttk.Label(row, text=value, wraplength=350).pack(side="left", fill="x", expand=True)
+        # Итоговые метрики
+        ttk.Label(frame, text="\nИтоговые метрики", font=("Arial", 12, "bold")).pack(anchor="w", pady=(10, 5))
+        stats = meta.get('stats', {})
+        stats_params = [
+            ("Кол-во ссылок", meta.get('count', 0)),
+            ("Сумма SI (лайки+репосты+комменты)", stats.get('total_SI', 0)),
+            ("Лайки", stats.get('total_likes', 0)),
+            ("Комментарии", stats.get('total_comments', 0)),
+            ("Репосты", stats.get('total_reposts', 0)),
+            ("Просмотры", stats.get('total_views', 0)),
+        ]
+        for label, value in stats_params:
+            row = ttk.Frame(frame)
+            row.pack(fill="x", pady=2)
+            ttk.Label(row, text=label+":", width=28).pack(side="left")
+            ttk.Label(row, text=str(value)).pack(side="left", fill="x", expand=True)
+        # Кнопка повторного запуска
+        def rerun_task():
+            win.destroy()
+            self._rerun_task_from_meta(meta)
+        ttk.Button(frame, text="Запустить задачу с этими настройками", command=rerun_task).pack(pady=20)
+
+    def _rerun_task_from_meta(self, meta):
+        """Повторно запускает задачу с настройками из meta.json"""
         try:
-            selection = self.tasks_tree.selection()
-            if selection:
-                item = self.tasks_tree.item(selection[0])
-                tags = self.tasks_tree.item(selection[0], "tags")
-                if tags and tags[0]:
-                    filepath = tags[0]
-                    if os.path.exists(filepath):
-                        self._display_results_from_csv(filepath)
-                    else:
-                        messagebox.showerror("Ошибка", f"Файл результата не найден: {filepath}")
+            keywords = meta.get('keywords', [])
+            start_date = meta.get('start_date', '')
+            end_date = meta.get('end_date', '')
+            exact_match = meta.get('exact_match', True)
+            minus_words = meta.get('minus_words', [])
+            # Можно добавить другие параметры при необходимости
+            # Преобразуем даты и время в timestamp через vk_time_utils
+            start_time = meta.get('start_time', '07:00')
+            end_time = meta.get('end_time', '06:00')
+            start_ts = to_vk_timestamp(start_date, start_time)
+            end_ts = to_vk_timestamp(end_date, end_time)
+            token = self.token_limiter.get_token()
+            if not token:
+                messagebox.showerror("Ошибка", "Нет доступных VK токенов (все на cooldown)")
+                return
+            threading.Thread(target=self._run_async_search_thread_safe, args=(keywords, keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time), daemon=True).start()
         except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось открыть файл результата: {str(e)}")
+            messagebox.showerror("Ошибка", f"Не удалось повторно запустить задачу: {str(e)}")
     
     def display_results_in_treeview(self, df):
         """Отображение результатов в Treeview"""
@@ -1268,3 +1167,83 @@ class VKParserInterface:
         except Exception as e:
             print(f"[VKParser] Ошибка преобразования времени: {e}")
             return None, None 
+
+    def on_paned_window_change(self, event):
+        """Обработка изменения позиции разделителя панелей (заглушка)"""
+        pass
+
+    def _on_keywords_changed(self, event=None):
+        if hasattr(self, 'settings_adapter') and self.settings_adapter:
+            keywords = self.keywords_text.get("1.0", tk.END).strip()
+            self.settings_adapter.set_setting("window", "keywords", keywords) 
+
+    def _load_tasks_from_results_folder(self):
+        """Загружает все задачи через DataManagerPlugin и обновляет таблицу задач."""
+        print("[DEBUG] Обновление таблицы задач через DataManagerPlugin...")
+        self.tasks_tree.delete(*self.tasks_tree.get_children())
+        data_manager = self.plugin_manager.get_plugin('data_manager')
+        if not data_manager:
+            print("[DEBUG] DataManagerPlugin не найден")
+            return
+        tasks = data_manager.get_all_tasks()
+        print(f"[DEBUG] Найдено задач: {len(tasks)}")
+        if tasks:
+            print(f"[DEBUG] Первая задача: {tasks[0]}")
+        for meta in tasks:
+            try:
+                dt = meta.get('datetime', '')
+                if dt:
+                    dt_obj = datetime.strptime(dt, "%Y-%m-%d %H:%M:%S")
+                    date_str = dt_obj.strftime("%d.%m.%Y")
+                    time_str = dt_obj.strftime("%H:%M:%S")
+                else:
+                    date_str = time_str = "?"
+                count = meta.get('count', 0)
+                stats = meta.get('stats', {})
+                si = stats.get('total_SI', 0)
+                views = stats.get('total_views', 0)
+                status = meta.get('status', 'Готово')
+                filepath = meta.get('filepath', '')
+                print(f"[DEBUG] Вставка задачи: {date_str} {time_str} {count} {si} {views} {status} {filepath}")
+                self.tasks_tree.insert("", 0, values=(date_str, time_str, count, si, views, status), tags=(filepath,))
+            except Exception as e:
+                print(f"[DEBUG] Ошибка добавления задачи: {e}")
+
+    def _on_task_single_click(self, event):
+        # Одиночный клик — подтягивает результаты задачи в нижнюю таблицу
+        item_id = self.tasks_tree.identify_row(event.y)
+        if not item_id:
+            return
+        tags = self.tasks_tree.item(item_id, "tags")
+        if tags and tags[0]:
+            filepath = tags[0]
+            if os.path.exists(filepath):
+                self._display_results_from_csv(filepath)
+
+    def _save_task_meta(self, meta, filepath):
+        data_manager = self.plugin_manager.get_plugin('data_manager')
+        if data_manager:
+            data_manager.save_task_meta(meta, filepath)
+
+    def _export_current_results(self):
+        """Экспортирует текущие результаты из нижней таблицы в CSV"""
+        if not self.results_tree.get_children():
+            messagebox.showwarning("Предупреждение", "Нет результатов для экспорта")
+            return
+        file_path = filedialog.asksaveasfilename(
+            title="Экспортировать результаты",
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.")]
+        )
+        if file_path:
+            try:
+                columns = [self.results_tree.heading(col)["text"] for col in self.results_tree["columns"]]
+                with open(file_path, 'w', newline='', encoding='utf-8') as file:
+                    writer = csv.writer(file)
+                    writer.writerow(columns)
+                    for item in self.results_tree.get_children():
+                        values = self.results_tree.item(item)['values']
+                        writer.writerow(values)
+                messagebox.showinfo("Успех", f"Результаты экспортированы в {file_path}")
+            except Exception as e:
+                messagebox.showerror("Ошибка", f"Не удалось экспортировать файл: {str(e)}")

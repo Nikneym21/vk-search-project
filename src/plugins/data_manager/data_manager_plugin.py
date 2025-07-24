@@ -366,3 +366,57 @@ class DataManagerPlugin(BasePlugin):
             "format": "csv"
         })
         return str(filepath) 
+
+    def save_task_meta(self, meta: dict, filepath: str) -> None:
+        """Сохраняет meta.json для задачи по указанному пути (filepath — путь к .csv)"""
+        meta_path = str(filepath).replace('.csv', '.meta.json')
+        with open(meta_path, 'w', encoding='utf-8') as f:
+            json.dump(meta, f, ensure_ascii=False, indent=2)
+
+    def load_task_meta(self, filepath: str) -> dict:
+        """Загружает meta.json для задачи по указанному пути (filepath — путь к .csv)"""
+        meta_path = str(filepath).replace('.csv', '.meta.json')
+        if not Path(meta_path).exists():
+            return {}
+        with open(meta_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+
+    def get_all_tasks(self) -> list:
+        """Возвращает список всех задач (по всем meta.json в export_path)"""
+        tasks = []
+        export_path = Path(self.config.get('export_path', 'data/results'))
+        meta_files = list(export_path.glob('*.meta.json'))
+        print(f"[DataManagerPlugin][DEBUG] Найдено meta.json: {len(meta_files)}")
+        for meta_file in meta_files:
+            print(f"[DataManagerPlugin][DEBUG] meta.json файл: {meta_file}")
+            try:
+                with open(meta_file, 'r', encoding='utf-8') as f:
+                    meta = json.load(f)
+                    meta['meta_path'] = str(meta_file)
+                    tasks.append(meta)
+            except Exception as e:
+                print(f"[DataManagerPlugin][DEBUG] Ошибка чтения meta.json: {meta_file}: {e}")
+        print(f"[DataManagerPlugin][DEBUG] Всего задач: {len(tasks)}")
+        if tasks:
+            print(f"[DataManagerPlugin][DEBUG] Первая задача: {tasks[0]}")
+        return tasks 
+
+    def save_task_meta_full(self, *, keywords, start_date, end_date, exact_match, minus_words, filepath, filtered, status=None, exception=None):
+        """Формирует и сохраняет meta.json для задачи по всем параметрам и результату."""
+        from src.plugins.stats_plugin import StatsPlugin
+        meta = {
+            'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'keywords': keywords,
+            'start_date': start_date,
+            'end_date': end_date,
+            'exact_match': exact_match,
+            'minus_words': minus_words,
+            'filepath': filepath,
+            'count': len(filtered) if filtered else 0,
+            'stats': StatsPlugin.calculate_stats(filtered) if filtered else {},
+            'status': status or ('Готово' if filtered else 'Пусто')
+        }
+        if exception:
+            meta['status'] = f'Ошибка: {exception}'
+        print(f"[DataManagerPlugin][DEBUG] save_task_meta_full: {filepath} -> {meta}")
+        self.save_task_meta(meta, filepath) 
