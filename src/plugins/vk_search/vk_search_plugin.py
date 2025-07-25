@@ -324,7 +324,9 @@ class VKSearchPlugin(BasePlugin):
         # Проверяем кэш
         cache_key = self._get_cache_key(params)
         if cache_key in self.cache and self._is_cache_valid(self.cache[cache_key]):
-            self.log_info(f"📋 Кэш-хит для запроса '{query}'")
+            # Логируем cache hit только для небольших объемов
+            if self.requests_made < 50:
+                self.log_info(f"📋 Кэш-хит для запроса '{query}'")
             self._update_cache_stats(cache_key, True)
             return self.cache[cache_key]["data"]
         
@@ -349,12 +351,16 @@ class VKSearchPlugin(BasePlugin):
                         if 'error' in data:
                             error_code = data['error'].get('error_code')
                             if error_code == 6:  # Too many requests per second
-                                self.log_warning(f"Rate limit для запроса '{query}', ожидание...")
+                                # Логируем rate limit только для первых случаев
+                                if self.rate_limit_hits < 10:
+                                    self.log_warning(f"Rate limit для запроса '{query}', ожидание...")
                                 self.rate_limit_hits += 1
                                 await asyncio.sleep(1)
                                 continue
                             else:
-                                self.log_error(f"Ошибка VK API для запроса '{query}': {data['error']}")
+                                # Логируем ошибки API только для небольших объемов
+                                if self.requests_made < 100:
+                                    self.log_error(f"Ошибка VK API для запроса '{query}': {data['error']}")
                                 return []
                         
                         if 'response' in data:
@@ -382,14 +388,20 @@ class VKSearchPlugin(BasePlugin):
                             
                             return items
                         else:
-                            self.log_error(f"Неожиданный ответ VK API для запроса '{query}': {data}")
+                            # Логируем неожиданные ответы только для небольших объемов
+                            if self.requests_made < 50:
+                                self.log_error(f"Неожиданный ответ VK API для запроса '{query}': {data}")
                             return []
                     else:
-                        self.log_error(f"HTTP ошибка {response.status} для запроса '{query}'")
+                        # Логируем HTTP ошибки только для небольших объемов
+                        if self.requests_made < 50:
+                            self.log_error(f"HTTP ошибка {response.status} для запроса '{query}'")
                         return []
                         
             except Exception as e:
-                self.log_error(f"Ошибка запроса для '{query}': {e}")
+                # Логируем ошибки только для небольших объемов
+                if self.requests_made < 100:
+                    self.log_error(f"Ошибка запроса для '{query}': {e}")
                 if attempt < retry_count - 1:
                     await asyncio.sleep(1)
                     continue
@@ -418,8 +430,13 @@ class VKSearchPlugin(BasePlugin):
         if batch_size is None:
             batch_size = self.config["batch_size"]
         
-        self.log_info(f"🚀 Оптимизированный массовый поиск для {len(keyword_token_pairs)} запросов")
-        self.log_info(f"⚙️ Batch size: {batch_size}, Max batches: {self.config['max_batches']}")
+        # Оптимизированное логирование для больших объемов
+        total_queries = len(keyword_token_pairs)
+        if total_queries > 10:
+            self.log_info(f"🚀 Массовый поиск: {total_queries} запросов, batch_size={batch_size}")
+        else:
+            self.log_info(f"🚀 Оптимизированный массовый поиск для {len(keyword_token_pairs)} запросов")
+            self.log_info(f"⚙️ Batch size: {batch_size}, Max batches: {self.config['max_batches']}")
         
         # Переводим start_date/end_date из МСК в UTC, если они строки
         def moscow_to_utc_timestamp(dt_str):
@@ -456,6 +473,11 @@ class VKSearchPlugin(BasePlugin):
             for i in range(0, len(keyword_token_pairs), batch_size):
                 batch = keyword_token_pairs[i:i+batch_size]
                 tasks = []
+                
+                # Логируем прогресс для больших объемов
+                if total_queries > 20 and i % (batch_size * 5) == 0:
+                    progress = (i / len(keyword_token_pairs)) * 100
+                    self.log_info(f"📊 Прогресс: {progress:.1f}% ({i}/{total_queries} запросов)")
                 
                 for keyword, token in batch:
                     # Умная ротация токенов - выбираем токен с наименьшей нагрузкой
@@ -496,13 +518,23 @@ class VKSearchPlugin(BasePlugin):
                     if isinstance(result, list):
                         all_posts.extend(result)
                     elif isinstance(result, Exception):
-                        self.log_error(f"Ошибка поиска: {result}")
+                        # Логируем только первые ошибки для больших объемов
+                        if total_queries <= 20 or self.requests_made < 50:
+                            self.log_error(f"Ошибка поиска: {result}")
+                
+                # Логируем статистику по батчам для больших объемов
+                if total_queries > 20 and len(all_posts) > 0:
+                    self.log_info(f"📈 Батч {i//batch_size + 1}: получено {len(all_posts)} постов")
         
         # Очищаем старый кэш
         self._cleanup_cache()
         
-        self.log_info(f"✅ Получено {len(all_posts)} постов от VK API")
-        self.log_info(f"📊 Статистика: {self.requests_made} запросов, {len(self.response_times)} измерений времени")
+        # Финальная статистика
+        if total_queries > 10:
+            self.log_info(f"✅ Завершено: {len(all_posts)} постов, {self.requests_made} запросов")
+        else:
+            self.log_info(f"✅ Получено {len(all_posts)} постов от VK API")
+            self.log_info(f"📊 Статистика: {self.requests_made} запросов, {len(self.response_times)} измерений времени")
         
         return all_posts
     

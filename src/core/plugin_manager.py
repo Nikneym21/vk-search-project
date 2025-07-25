@@ -124,6 +124,13 @@ class PluginManager:
         logger = self.get_logger()
         
         try:
+            # Автоматически включаем режим больших объемов для LoggerPlugin
+            if len(keywords) > 20:
+                logger_plugin = self.get_plugin('logger')
+                if logger_plugin:
+                    logger_plugin.set_high_volume_mode(True)
+                    logger.info(f"🔧 Включен режим больших объемов для {len(keywords)} ключевых фраз")
+            
             logger.info(f"🚀 Координация поиска и фильтрации для {len(keywords)} ключевых слов")
             
             # Получаем VKSearchPlugin
@@ -200,6 +207,12 @@ class PluginManager:
             
             execution_time = time.time() - start_time
             logger.info(f"✅ Отфильтровано {len(filtered_posts)} постов за {execution_time:.2f} сек")
+            
+            # Отключаем режим больших объемов после завершения
+            if len(keywords) > 20:
+                logger_plugin = self.get_plugin('logger')
+                if logger_plugin:
+                    logger_plugin.set_high_volume_mode(False)
             
             return filtered_posts
             

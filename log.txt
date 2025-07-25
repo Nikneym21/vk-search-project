@@ -40,3 +40,36 @@
   warnings.warn(
 /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:301: UserWarning: resource_tracker: There appear to be 8 leaked semaphore objects to clean up at shutdown: {'/mp-jhru7hqk', '/mp-1zi7m_4t', '/mp-5pzd2vx9', '/mp-60bnwfi2', '/mp-sw4s6qdf', '/mp-gm0ckn6y', '/mp-7t3lr9q8', '/mp-0io03qfp'}
   warnings.warn(
+*** Terminating app due to uncaught exception 'NSInternalInconsistencyException', reason: 'NSWindow should only be instantiated on the main thread!'
+*** First throw call stack:
+(
+	0   CoreFoundation                      0x00007ff8070351ea __exceptionPreprocess + 242
+	1   libobjc.A.dylib                     0x00007ff806b0024b objc_exception_throw + 62
+	2   CoreFoundation                      0x00007ff807058444 -[NSException raise] + 9
+	3   AppKit                              0x00007ff80aa3fe33 -[NSWindow _initContent:styleMask:backing:defer:contentView:] + 1646
+	4   AppKit                              0x00007ff80abcb19b -[NSPanel _initContent:styleMask:backing:defer:contentView:] + 50
+	5   AppKit                              0x00007ff80aa3f7be -[NSWindow initWithContentRect:styleMask:backing:defer:] + 42
+	6   AppKit                              0x00007ff80abcb154 -[NSPanel initWithContentRect:styleMask:backing:defer:] + 59
+	7   AppKit                              0x00007ff80aa3e00f -[NSWindowTemplate nibInstantiate] + 338
+	8   AppKit                              0x00007ff80aa0b376 -[NSIBObjectData instantiateObject:] + 223
+	9   AppKit                              0x00007ff80aa0aad8 -[NSIBObjectData nibInstantiateWithOwner:options:topLevelObjects:] + 474
+	10  AppKit                              0x00007ff80a9ff366 loadNib + 413
+	11  AppKit                              0x00007ff80a9fe74a +[NSBundle(NSNibLoading) _loadNibFile:nameTable:options:withZone:ownerBundle:] + 763
+	12  AppKit                              0x00007ff80a9fe35a -[NSBundle(NSNibLoading) loadNibNamed:owner:topLevelObjects:] + 201
+	13  AppKit                              0x00007ff80ad346bb -[NSAlert init] + 101
+	14  Tk                                  0x0000000106c12459 TkAboutDlg + 313
+	15  Tcl                                 0x00000001068b9a82 Tcl_GetVersion + 4610
+	16  Tcl                                 0x00000001068b495f TclNRRunCallbacks + 159
+	17  Tcl                                 0x00000001068b4684 Tcl_EvalObjv + 84
+	18  _tkinter.cpython-313-darwin.so      0x00000001063a339c Tkapp_Call + 412
+	19  Python                              0x0000000106e2ca9e cfunction_call + 110
+	20  Python                              0x0000000106f67deb _PyEval_EvalFrameDefault + 77435
+	21  Python                              0x0000000106dab759 method_vectorcall + 217
+	22  Python                              0x0000000106f67c7c _PyEval_EvalFrameDefault + 77068
+	23  Python                              0x0000000106dab854 method_vectorcall + 468
+	24  Python                              0x00000001070d1392 thread_run + 146
+	25  Python                              0x00000001070424d4 pythread_wrapper + 36
+	26  libsystem_pthread.dylib             0x00007ff806edddf1 _pthread_start + 99
+	27  libsystem_pthread.dylib             0x00007ff806ed9857 thread_start + 15
+)
+libc++abi: terminating due to uncaught exception of type NSException
