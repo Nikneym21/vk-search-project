@@ -1,0 +1,2890 @@
+[
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 7,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753344426,
+          "id": 457447767,
+          "owner_id": -25943575,
+          "access_key": "73177b1ae9cc9ffc78",
+          "sizes": [
+            {
+              "height": 96,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 213,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 853,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=960x0"
+            },
+            {
+              "height": 144,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 320,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 480,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 720,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "cefb85fcde1024a532",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu",
+            "width": 960
+          }
+        }
+      }
+    ],
+    "date": 1753344426,
+    "from_id": -25943575,
+    "id": 1158294,
+    "likes": {
+      "can_like": 1,
+      "count": 198,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -25943575,
+    "post_source": {
+      "platform": "android",
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Лис передает всем доброе утро",
+    "views": {
+      "count": 2508
+    },
+    "moscow_ts": 1753319226,
+    "moscow_date": "11:07 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 1,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753341277,
+          "id": 457355240,
+          "owner_id": -125866183,
+          "access_key": "7e92bd993c7363bdaa",
+          "post_id": 516874,
+          "sizes": [
+            {
+              "height": 96,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 213,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 853,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=960x0"
+            },
+            {
+              "height": 144,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 320,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 480,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 720,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "05d1b42b961fb2d344",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu",
+            "width": 960
+          }
+        }
+      }
+    ],
+    "date": 1753341627,
+    "from_id": -125866183,
+    "id": 516874,
+    "likes": {
+      "can_like": 1,
+      "count": 26,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -125866183,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Лис передает всем доброе утро",
+    "views": {
+      "count": 352
+    },
+    "moscow_ts": 1753316427,
+    "moscow_date": "10:20 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "donut_miniapp_url": "https://vk.com/app51528700#/?owner_id=-224831014&type=donut_badges&params=%257B%2522item_id%2522%253A%252234969%2522%257D&comment=1",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753335233,
+          "id": 457248267,
+          "owner_id": -224831014,
+          "access_key": "7a8fc5969c92f2f575",
+          "sizes": [
+            {
+              "height": 96,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 213,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 853,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=960x0"
+            },
+            {
+              "height": 144,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 320,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 480,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 720,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "233f4c2f0a5b88502c",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu",
+            "width": 960
+          }
+        }
+      }
+    ],
+    "date": 1753335233,
+    "from_id": -224831014,
+    "id": 34969,
+    "likes": {
+      "can_like": 1,
+      "count": 11,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -224831014,
+    "post_source": {
+      "platform": "android",
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 1,
+      "user_reposted": 0
+    },
+    "text": "Лис передает всем доброе утро",
+    "views": {
+      "count": 233
+    },
+    "moscow_ts": 1753310033,
+    "moscow_date": "08:33 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 2,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "donut_miniapp_url": "https://vk.com/app51528700#/?owner_id=-227552131&type=donut_badges&params=%257B%2522item_id%2522%253A%252232900%2522%257D&comment=1",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753334799,
+          "id": 457247995,
+          "owner_id": -227552131,
+          "access_key": "cbb9ca57b51ea0c438",
+          "sizes": [
+            {
+              "height": 96,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 213,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 853,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=960x0"
+            },
+            {
+              "height": 144,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 320,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 480,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 720,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "b86c2858e595667d5c",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu",
+            "width": 960
+          }
+        }
+      }
+    ],
+    "date": 1753334799,
+    "from_id": -227552131,
+    "id": 32900,
+    "likes": {
+      "can_like": 1,
+      "count": 20,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -227552131,
+    "post_source": {
+      "platform": "iphone",
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Лис передает всем доброе утро",
+    "views": {
+      "count": 294
+    },
+    "moscow_ts": 1753309599,
+    "moscow_date": "08:26 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753333532,
+          "id": 457276176,
+          "owner_id": -148824521,
+          "access_key": "17042859b691431b02",
+          "sizes": [
+            {
+              "height": 96,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 213,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 853,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=960x0"
+            },
+            {
+              "height": 144,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 320,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 480,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 720,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "7f6ff7bf7c31bc485d",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu",
+            "width": 960
+          }
+        }
+      }
+    ],
+    "date": 1753333532,
+    "from_id": -148824521,
+    "id": 116485,
+    "likes": {
+      "can_like": 1,
+      "count": 16,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -148824521,
+    "post_source": {
+      "platform": "android",
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Лис передает всем доброе утро",
+    "views": {
+      "count": 339
+    },
+    "moscow_ts": 1753308332,
+    "moscow_date": "08:05 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753330748,
+          "id": 457294899,
+          "owner_id": -210977948,
+          "access_key": "094c47b77699ccd5d8",
+          "post_id": 171710,
+          "sizes": [
+            {
+              "height": 96,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 213,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 853,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=960x0"
+            },
+            {
+              "height": 144,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 320,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 480,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 720,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "23398ceaee2cd11af9",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu",
+            "width": 960
+          }
+        }
+      }
+    ],
+    "date": 1753333201,
+    "from_id": -210977948,
+    "id": 171710,
+    "likes": {
+      "can_like": 1,
+      "count": 5,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -210977948,
+    "post_source": {
+      "platform": "android",
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Лис передает всем доброе утро",
+    "views": {
+      "count": 93
+    },
+    "moscow_ts": 1753308001,
+    "moscow_date": "08:00 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 3,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "donut_miniapp_url": "https://vk.com/app51528700#/?owner_id=-221267807&type=donut_badges&params=%257B%2522item_id%2522%253A%2522163904%2522%257D&comment=1",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753329419,
+          "id": 457271540,
+          "owner_id": -221267807,
+          "access_key": "ffc5e9e2e3ea8f3cd0",
+          "sizes": [
+            {
+              "height": 96,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 213,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 853,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=960x0"
+            },
+            {
+              "height": 144,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 320,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 480,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 720,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 960,
+              "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "64c92b897a8066c849",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-74.userapi.com/s/v1/ig2/EdyKIVncwx50TkxyqLCD2xwY045EtiAMNrsaNrwYF4ybuRzQGmWUpooAh11Kpl-uZg67BPgcPtgrnO6dZucDB_DK.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,960x1280&from=bu",
+            "width": 960
+          }
+        }
+      }
+    ],
+    "date": 1753329419,
+    "from_id": -221267807,
+    "id": 163904,
+    "likes": {
+      "can_like": 1,
+      "count": 64,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -221267807,
+    "post_source": {
+      "platform": "android",
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Лис передает всем доброе утро",
+    "views": {
+      "count": 756
+    },
+    "moscow_ts": 1753304219,
+    "moscow_date": "06:56 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753360788,
+          "id": 457243199,
+          "owner_id": -226389423,
+          "access_key": "0d31d7798f43c2294c",
+          "sizes": [
+            {
+              "height": 62,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=72x0"
+            },
+            {
+              "height": 137,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=160x0"
+            },
+            {
+              "height": 549,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=640x0"
+            },
+            {
+              "height": 927,
+              "type": "y",
+              "width": 1080,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1080x0"
+            },
+            {
+              "height": 1099,
+              "type": "z",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 1099,
+              "type": "w",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 93,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=108x0"
+            },
+            {
+              "height": 206,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=240x0"
+            },
+            {
+              "height": 309,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=360x0"
+            },
+            {
+              "height": 464,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=540x0"
+            },
+            {
+              "height": 1099,
+              "type": "base",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "81357f54ae55f3ccb7",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1099,
+            "type": "base",
+            "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu",
+            "width": 1280
+          }
+        }
+      }
+    ],
+    "date": 1753360788,
+    "from_id": -226389423,
+    "id": 10085,
+    "likes": {
+      "can_like": 1,
+      "count": 197,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -226389423,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Даже в боевых условиях человек остаётся человеком.\nДобро всегда найдёт себе место — даже на передовой.",
+    "views": {
+      "count": 9861
+    },
+    "moscow_ts": 1753335588,
+    "moscow_date": "15:39 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753351954,
+          "id": 457273810,
+          "owner_id": -63960562,
+          "access_key": "4b5a92e41c6e97ba06",
+          "post_id": 343049,
+          "sizes": [
+            {
+              "height": 62,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=72x0"
+            },
+            {
+              "height": 137,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=160x0"
+            },
+            {
+              "height": 549,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=640x0"
+            },
+            {
+              "height": 927,
+              "type": "y",
+              "width": 1080,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1080x0"
+            },
+            {
+              "height": 1099,
+              "type": "z",
+              "width": 1280,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 1099,
+              "type": "w",
+              "width": 1280,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 93,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=108x0"
+            },
+            {
+              "height": 206,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=240x0"
+            },
+            {
+              "height": 309,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=360x0"
+            },
+            {
+              "height": 464,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=540x0"
+            },
+            {
+              "height": 1099,
+              "type": "base",
+              "width": 1280,
+              "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "277995cfe2ddc26c2c",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1099,
+            "type": "base",
+            "url": "https://sun9-25.userapi.com/s/v1/if2/ovPmz5mHJFZ8LN6ceMBhcUouoY2r-9h6uCPJGgYuvAMwvJ_Mla-JJyLeNanFXG8necJXKKOONP8U3o2g5ezhAFJ1.jpg?quality=96&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu",
+            "width": 1280
+          }
+        }
+      }
+    ],
+    "date": 1753351954,
+    "from_id": -63960562,
+    "id": 343049,
+    "likes": {
+      "can_like": 1,
+      "count": 1,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -63960562,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Даже в боевых условиях человек остаётся человеком.\nДобро всегда найдёт себе место — даже на передовой.",
+    "views": {
+      "count": 108
+    },
+    "moscow_ts": 1753326754,
+    "moscow_date": "13:12 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 9
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "donut_miniapp_url": "https://vk.com/app51528700#/?owner_id=-200203334&type=donut_badges&params=%257B%2522item_id%2522%253A%252262754%2522%257D&comment=1",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753340546,
+          "id": 457251187,
+          "owner_id": -200203334,
+          "access_key": "49b158b3123ca5100f",
+          "post_id": 62754,
+          "sizes": [
+            {
+              "height": 62,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=72x0"
+            },
+            {
+              "height": 137,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=160x0"
+            },
+            {
+              "height": 549,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=640x0"
+            },
+            {
+              "height": 927,
+              "type": "y",
+              "width": 1080,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1080x0"
+            },
+            {
+              "height": 1099,
+              "type": "z",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 1099,
+              "type": "w",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 93,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=108x0"
+            },
+            {
+              "height": 206,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=240x0"
+            },
+            {
+              "height": 309,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=360x0"
+            },
+            {
+              "height": 464,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=540x0"
+            },
+            {
+              "height": 1099,
+              "type": "base",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "6b09c277e4c44eef10",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1099,
+            "type": "base",
+            "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu",
+            "width": 1280
+          }
+        }
+      }
+    ],
+    "date": 1753351320,
+    "from_id": -200203334,
+    "id": 62754,
+    "likes": {
+      "can_like": 1,
+      "count": 134,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -200203334,
+    "post_source": {
+      "platform": "iphone",
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 2,
+      "user_reposted": 0
+    },
+    "text": "Даже в боевых условиях человек остаётся человеком.\nДобро всегда найдёт себе место — даже на передовой.",
+    "views": {
+      "count": 1140
+    },
+    "moscow_ts": 1753326120,
+    "moscow_date": "13:02 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 1,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753348643,
+          "id": 457492345,
+          "owner_id": -98660148,
+          "access_key": "3cd7e5993f75586c56",
+          "sizes": [
+            {
+              "height": 62,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=72x0"
+            },
+            {
+              "height": 137,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=160x0"
+            },
+            {
+              "height": 549,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=640x0"
+            },
+            {
+              "height": 927,
+              "type": "y",
+              "width": 1080,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1080x0"
+            },
+            {
+              "height": 1099,
+              "type": "z",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 1099,
+              "type": "w",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 93,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=108x0"
+            },
+            {
+              "height": 206,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=240x0"
+            },
+            {
+              "height": 309,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=360x0"
+            },
+            {
+              "height": 464,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=540x0"
+            },
+            {
+              "height": 1099,
+              "type": "base",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "abc4926ae23db703b2",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1099,
+            "type": "base",
+            "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu",
+            "width": 1280
+          }
+        }
+      }
+    ],
+    "date": 1753348644,
+    "from_id": -98660148,
+    "id": 823772,
+    "likes": {
+      "can_like": 1,
+      "count": 16,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -98660148,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Даже в боевых условиях человек остаётся человеком.\nДобро всегда найдёт себе место — даже на передовой.✊",
+    "views": {
+      "count": 378
+    },
+    "moscow_ts": 1753323444,
+    "moscow_date": "12:17 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "donut_miniapp_url": "https://vk.com/app51528700#/?owner_id=-229357719&type=donut_badges&params=%257B%2522item_id%2522%253A%252214448%2522%257D&comment=1",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753346267,
+          "id": 457240894,
+          "owner_id": -229357719,
+          "access_key": "7c52934d0f4db171ce",
+          "sizes": [
+            {
+              "height": 62,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=72x0"
+            },
+            {
+              "height": 137,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=160x0"
+            },
+            {
+              "height": 549,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=640x0"
+            },
+            {
+              "height": 927,
+              "type": "y",
+              "width": 1080,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1080x0"
+            },
+            {
+              "height": 1099,
+              "type": "z",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 1099,
+              "type": "w",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 93,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=108x0"
+            },
+            {
+              "height": 206,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=240x0"
+            },
+            {
+              "height": 309,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=360x0"
+            },
+            {
+              "height": 464,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=540x0"
+            },
+            {
+              "height": 1099,
+              "type": "base",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "4b69ee776e16b309e3",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1099,
+            "type": "base",
+            "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu",
+            "width": 1280
+          }
+        }
+      }
+    ],
+    "date": 1753346267,
+    "from_id": -229357719,
+    "id": 14448,
+    "likes": {
+      "can_like": 1,
+      "count": 21,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -229357719,
+    "post_source": {
+      "platform": "android",
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Даже в боевых условиях человек остаётся человеком.\nДобро всегда найдёт себе место — даже на передовой.🇷🇺",
+    "views": {
+      "count": 222
+    },
+    "moscow_ts": 1753321067,
+    "moscow_date": "11:37 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 2,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "donut_miniapp_url": "https://vk.com/app51528700#/?owner_id=-210812857&type=donut_badges&params=%257B%2522item_id%2522%253A%2522607130%2522%257D&comment=1",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753331388,
+          "id": 457307426,
+          "owner_id": -210812857,
+          "access_key": "e546089c5caba9b37e",
+          "post_id": 607130,
+          "sizes": [
+            {
+              "height": 62,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=72x0"
+            },
+            {
+              "height": 137,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=160x0"
+            },
+            {
+              "height": 549,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=640x0"
+            },
+            {
+              "height": 927,
+              "type": "y",
+              "width": 1080,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1080x0"
+            },
+            {
+              "height": 1099,
+              "type": "z",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 1099,
+              "type": "w",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 93,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=108x0"
+            },
+            {
+              "height": 206,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=240x0"
+            },
+            {
+              "height": 309,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=360x0"
+            },
+            {
+              "height": 464,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=540x0"
+            },
+            {
+              "height": 1099,
+              "type": "base",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "5d5dbb6669507e9c9b",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1099,
+            "type": "base",
+            "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu",
+            "width": 1280
+          }
+        }
+      }
+    ],
+    "date": 1753339980,
+    "from_id": -210812857,
+    "id": 607130,
+    "likes": {
+      "can_like": 1,
+      "count": 113,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -210812857,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "🇷🇺🇷🇺🇷🇺🙏\nДаже в боевых условиях человек остаётся человеком.\nДобро всегда найдёт себе место — даже на передовой.",
+    "views": {
+      "count": 3272
+    },
+    "moscow_ts": 1753314780,
+    "moscow_date": "09:53 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753331534,
+          "id": 457260140,
+          "owner_id": -68164411,
+          "access_key": "dd4e43123c3b05908b",
+          "post_id": 114468,
+          "sizes": [
+            {
+              "height": 62,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=72x0"
+            },
+            {
+              "height": 137,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=160x0"
+            },
+            {
+              "height": 549,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=640x0"
+            },
+            {
+              "height": 927,
+              "type": "y",
+              "width": 1080,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1080x0"
+            },
+            {
+              "height": 1099,
+              "type": "z",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 1099,
+              "type": "w",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=1280x0"
+            },
+            {
+              "height": 93,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=108x0"
+            },
+            {
+              "height": 206,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=240x0"
+            },
+            {
+              "height": 309,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=360x0"
+            },
+            {
+              "height": 464,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu&cs=540x0"
+            },
+            {
+              "height": 1099,
+              "type": "base",
+              "width": 1280,
+              "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "fdfa5154e5b5bcc9fb",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1099,
+            "type": "base",
+            "url": "https://sun9-62.userapi.com/s/v1/if2/nlZghh6pJIIvC4U7i2RVQUdp2uGh5Quekcq0NwCIiDG-AhMnkFZLOSOs1awFbD-AzpnusMcwetkn9VDRVPR821hw.jpg?quality=95&as=32x27,48x41,72x62,108x93,160x137,240x206,360x309,480x412,540x464,640x549,720x618,1080x927,1280x1099&from=bu",
+            "width": 1280
+          }
+        }
+      }
+    ],
+    "date": 1753333201,
+    "from_id": -68164411,
+    "id": 114468,
+    "likes": {
+      "can_like": 1,
+      "count": 11,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -68164411,
+    "post_source": {
+      "platform": "android",
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Даже в боевых условиях человек остаётся человеком. Добро всегда найдёт себе место — даже на передовой.\n\n#СВО #РОССИЯ2025 #РусскийМир #МИРZ 🇷🇺",
+    "views": {
+      "count": 127
+    },
+    "moscow_ts": 1753308001,
+    "moscow_date": "08:00 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 6
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753340429,
+          "id": 456263330,
+          "owner_id": -224692604,
+          "access_key": "764d3e05af11fa5118",
+          "post_id": 112692,
+          "sizes": [
+            {
+              "height": 101,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 225,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 900,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=910x0"
+            },
+            {
+              "height": 152,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 338,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 506,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 760,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "7249f850e16527892b",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu",
+            "width": 910
+          }
+        }
+      }
+    ],
+    "date": 1753364340,
+    "from_id": -224692604,
+    "id": 112692,
+    "likes": {
+      "can_like": 1,
+      "count": 210,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -224692604,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 1,
+      "user_reposted": 0
+    },
+    "text": "Нас не сломить. Ни пеплом, ни разрухой.\nА мягкий мишка — напоминание, что победа нужна ради будущего.",
+    "views": {
+      "count": 2926
+    },
+    "moscow_ts": 1753339140,
+    "moscow_date": "16:39 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753360031,
+          "id": 457369660,
+          "owner_id": -58801394,
+          "access_key": "673e3b58300dc08894",
+          "sizes": [
+            {
+              "height": 101,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 225,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 900,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=910x0"
+            },
+            {
+              "height": 152,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 338,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 506,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 760,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "8d8ff0bf62cd957118",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu",
+            "width": 910
+          }
+        }
+      }
+    ],
+    "date": 1753360031,
+    "from_id": -58801394,
+    "id": 1018653,
+    "likes": {
+      "can_like": 1,
+      "count": 410,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -58801394,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 2,
+      "user_reposted": 0
+    },
+    "text": "Нас не сломить. Ни пеплом, ни разрухой.\nА мягкий мишка — напоминание, что победа нужна ради будущего.",
+    "views": {
+      "count": 17552
+    },
+    "moscow_ts": 1753334831,
+    "moscow_date": "15:27 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753359731,
+          "id": 457315650,
+          "owner_id": -46217147,
+          "access_key": "38646ea9c80c718a0f",
+          "sizes": [
+            {
+              "height": 101,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 225,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 900,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=910x0"
+            },
+            {
+              "height": 152,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 338,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 506,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 760,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "2148101a105584bc77",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu",
+            "width": 910
+          }
+        }
+      }
+    ],
+    "date": 1753359731,
+    "from_id": -46217147,
+    "id": 311482,
+    "likes": {
+      "can_like": 1,
+      "count": 273,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -46217147,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Нас не сломить. Ни пеплом, ни разрухой.\nА мягкий мишка — напоминание, что победа нужна ради будущего.",
+    "views": {
+      "count": 25016
+    },
+    "moscow_ts": 1753334531,
+    "moscow_date": "15:22 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 4
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753350119,
+          "id": 457241111,
+          "owner_id": -221142732,
+          "access_key": "b5f39be9b10541ae7e",
+          "post_id": 9278,
+          "sizes": [
+            {
+              "height": 101,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-20.userapi.com/s/v1/ig2/Mk-m2JzrCUhAfN0K7EbEchfHmf3XoW4TOf4RLz4L19TCmqWTSc7CkbLrP1YkITPnkjnK-5Keou3cwiv-U_a_ftd5.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 225,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-20.userapi.com/s/v1/ig2/Mk-m2JzrCUhAfN0K7EbEchfHmf3XoW4TOf4RLz4L19TCmqWTSc7CkbLrP1YkITPnkjnK-5Keou3cwiv-U_a_ftd5.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 900,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-20.userapi.com/s/v1/ig2/Mk-m2JzrCUhAfN0K7EbEchfHmf3XoW4TOf4RLz4L19TCmqWTSc7CkbLrP1YkITPnkjnK-5Keou3cwiv-U_a_ftd5.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 910,
+              "url": "https://sun9-20.userapi.com/s/v1/ig2/Mk-m2JzrCUhAfN0K7EbEchfHmf3XoW4TOf4RLz4L19TCmqWTSc7CkbLrP1YkITPnkjnK-5Keou3cwiv-U_a_ftd5.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=910x0"
+            },
+            {
+              "height": 152,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-20.userapi.com/s/v1/ig2/Mk-m2JzrCUhAfN0K7EbEchfHmf3XoW4TOf4RLz4L19TCmqWTSc7CkbLrP1YkITPnkjnK-5Keou3cwiv-U_a_ftd5.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 338,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-20.userapi.com/s/v1/ig2/Mk-m2JzrCUhAfN0K7EbEchfHmf3XoW4TOf4RLz4L19TCmqWTSc7CkbLrP1YkITPnkjnK-5Keou3cwiv-U_a_ftd5.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 506,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-20.userapi.com/s/v1/ig2/Mk-m2JzrCUhAfN0K7EbEchfHmf3XoW4TOf4RLz4L19TCmqWTSc7CkbLrP1YkITPnkjnK-5Keou3cwiv-U_a_ftd5.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 760,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-20.userapi.com/s/v1/ig2/Mk-m2JzrCUhAfN0K7EbEchfHmf3XoW4TOf4RLz4L19TCmqWTSc7CkbLrP1YkITPnkjnK-5Keou3cwiv-U_a_ftd5.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 910,
+              "url": "https://sun9-20.userapi.com/s/v1/ig2/Mk-m2JzrCUhAfN0K7EbEchfHmf3XoW4TOf4RLz4L19TCmqWTSc7CkbLrP1YkITPnkjnK-5Keou3cwiv-U_a_ftd5.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "dd770eff907b5572d2",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-20.userapi.com/s/v1/ig2/Mk-m2JzrCUhAfN0K7EbEchfHmf3XoW4TOf4RLz4L19TCmqWTSc7CkbLrP1YkITPnkjnK-5Keou3cwiv-U_a_ftd5.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu",
+            "width": 910
+          }
+        }
+      }
+    ],
+    "date": 1753350119,
+    "from_id": -221142732,
+    "id": 9278,
+    "likes": {
+      "can_like": 1,
+      "count": 49,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -221142732,
+    "post_source": {
+      "platform": "android",
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Нас не сломить. Ни пеплом, ни разрухой.\nА мягкий мишка — напоминание, что победа нужна ради будущего.🇷🇺",
+    "views": {
+      "count": 1529
+    },
+    "moscow_ts": 1753324919,
+    "moscow_date": "12:41 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753349241,
+          "id": 457331023,
+          "owner_id": -161845830,
+          "access_key": "76cf10e8a5ce8a6fa1",
+          "sizes": [
+            {
+              "height": 101,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 225,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 900,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=910x0"
+            },
+            {
+              "height": 152,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 338,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 506,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 760,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "5cf9101f40b6084846",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu",
+            "width": 910
+          }
+        }
+      }
+    ],
+    "date": 1753349241,
+    "from_id": -161845830,
+    "id": 381939,
+    "likes": {
+      "can_like": 1,
+      "count": 311,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -161845830,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 1,
+      "user_reposted": 0
+    },
+    "text": "Нас не сломить. Ни пеплом, ни разрухой.\n\nА мягкий мишка — напоминание, что победа нужна ради будущего.",
+    "views": {
+      "count": 13943
+    },
+    "moscow_ts": 1753324041,
+    "moscow_date": "12:27 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 0,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753346942,
+          "id": 457266234,
+          "owner_id": -152048620,
+          "access_key": "7ee8e5c56802960381",
+          "sizes": [
+            {
+              "height": 101,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 225,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 900,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=910x0"
+            },
+            {
+              "height": 152,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 338,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 506,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 760,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "7062a81d427a726e20",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu",
+            "width": 910
+          }
+        }
+      }
+    ],
+    "date": 1753346943,
+    "from_id": -152048620,
+    "id": 79570,
+    "likes": {
+      "can_like": 1,
+      "count": 180,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -152048620,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Нас не сломить. Ни пеплом, ни разрухой.\nА мягкий мишка — напоминание, что победа нужна ради будущего.",
+    "views": {
+      "count": 8673
+    },
+    "moscow_ts": 1753321743,
+    "moscow_date": "11:49 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 3,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753346822,
+          "id": 457672524,
+          "owner_id": -150020650,
+          "access_key": "e8ba7ca8f82a2af98f",
+          "sizes": [
+            {
+              "height": 101,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 225,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 900,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=910x0"
+            },
+            {
+              "height": 152,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 338,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 506,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 760,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "c850e45714f6f9bcca",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu",
+            "width": 910
+          }
+        }
+      }
+    ],
+    "date": 1753346822,
+    "from_id": -150020650,
+    "id": 2111758,
+    "likes": {
+      "can_like": 1,
+      "count": 558,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -150020650,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 4,
+      "user_reposted": 0
+    },
+    "text": "Нас не сломить. Ни пеплом, ни разрухой.\n\nА мягкий мишка — напоминание, что победа нужна ради будущего.",
+    "views": {
+      "count": 20562
+    },
+    "moscow_ts": 1753321622,
+    "moscow_date": "11:47 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 4,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753345184,
+          "id": 457251319,
+          "owner_id": -226599028,
+          "access_key": "1b6a255ab75dbddbe1",
+          "sizes": [
+            {
+              "height": 101,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 225,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 900,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=910x0"
+            },
+            {
+              "height": 152,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 338,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 506,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 760,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "ea02d995a4fc332b6a",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu",
+            "width": 910
+          }
+        }
+      }
+    ],
+    "date": 1753345184,
+    "from_id": -226599028,
+    "id": 90791,
+    "likes": {
+      "can_like": 1,
+      "count": 135,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -226599028,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 1,
+      "user_reposted": 0
+    },
+    "text": "Нас не сломить. Ни пеплом, ни разрухой.\nА мягкий мишка — напоминание, что победа нужна ради будущего.",
+    "views": {
+      "count": 1970
+    },
+    "moscow_ts": 1753319984,
+    "moscow_date": "11:19 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 4,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753344041,
+          "id": 457413408,
+          "owner_id": -147085429,
+          "access_key": "d420d0f089b9e9a6b4",
+          "sizes": [
+            {
+              "height": 101,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 225,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 900,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=910x0"
+            },
+            {
+              "height": 152,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 338,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 506,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 760,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "a6b7945edde06bcc8c",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu",
+            "width": 910
+          }
+        }
+      }
+    ],
+    "date": 1753344041,
+    "from_id": -147085429,
+    "id": 119872,
+    "likes": {
+      "can_like": 1,
+      "count": 21,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -147085429,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "Нас не сломить. Ни пеплом, ни разрухой.\nА мягкий мишка — напоминание, что победа нужна ради будущего.",
+    "views": {
+      "count": 635
+    },
+    "moscow_ts": 1753318841,
+    "moscow_date": "11:00 24.07.2025"
+  },
+  {
+    "inner_type": "wall_wallpost",
+    "donut": {
+      "is_donut": false
+    },
+    "comments": {
+      "can_post": 1,
+      "count": 2,
+      "groups_can_post": true
+    },
+    "marked_as_ads": 0,
+    "type": "post",
+    "attachments": [
+      {
+        "type": "photo",
+        "photo": {
+          "album_id": -7,
+          "date": 1753338462,
+          "id": 457283954,
+          "owner_id": -69052778,
+          "access_key": "587dfbc6cd1b2c7089",
+          "post_id": 234558,
+          "sizes": [
+            {
+              "height": 101,
+              "type": "s",
+              "width": 72,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=72x0"
+            },
+            {
+              "height": 225,
+              "type": "m",
+              "width": 160,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=160x0"
+            },
+            {
+              "height": 900,
+              "type": "x",
+              "width": 640,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=640x0"
+            },
+            {
+              "height": 1280,
+              "type": "y",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=910x0"
+            },
+            {
+              "height": 152,
+              "type": "o",
+              "width": 108,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=108x0"
+            },
+            {
+              "height": 338,
+              "type": "p",
+              "width": 240,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=240x0"
+            },
+            {
+              "height": 506,
+              "type": "q",
+              "width": 360,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=360x0"
+            },
+            {
+              "height": 760,
+              "type": "r",
+              "width": 540,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu&cs=540x0"
+            },
+            {
+              "height": 1280,
+              "type": "base",
+              "width": 910,
+              "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu"
+            }
+          ],
+          "text": "",
+          "user_id": 100,
+          "web_view_token": "43d68f320a7ac4781d",
+          "has_tags": false,
+          "orig_photo": {
+            "height": 1280,
+            "type": "base",
+            "url": "https://sun9-84.userapi.com/s/v1/ig2/tfWTItPSvUbJKYEEXZXhp65U4XbNb-a0VqJCnmN2QPjPiLugtir2YtwDSKuy0dv550X4J9B02pIbknbAioTVqGUF.jpg?quality=95&as=32x45,48x68,72x101,108x152,160x225,240x338,360x506,480x675,540x760,640x900,720x1013,910x1280&from=bu",
+            "width": 910
+          }
+        }
+      }
+    ],
+    "date": 1753342200,
+    "from_id": -69052778,
+    "id": 234558,
+    "likes": {
+      "can_like": 1,
+      "count": 24,
+      "user_likes": 0,
+      "can_publish": 1,
+      "repost_disabled": false
+    },
+    "owner_id": -69052778,
+    "post_source": {
+      "type": "api"
+    },
+    "post_type": "post",
+    "reposts": {
+      "count": 0,
+      "user_reposted": 0
+    },
+    "text": "❗Нас не сломить. Ни пеплом, ни разрухой.\n\n❤ — А мягкий мишка — напоминание, что победа нужна ради будущего.\n\n🤍 [https://vk.com/wall-69052778_111823|ТГ канал «Шёпот Белгород»] 🤍 \n \n💙 [https://vk.com/shepot_belgorod1231|Прислать новость] [https://vk.com/shepot_belgorod1231|/] [https://vk.com/shepot_belgorod1231|Писать по рекламе]",
+    "views": {
+      "count": 1342
+    },
+    "moscow_ts": 1753317000,
+    "moscow_date": "10:30 24.07.2025"
+  }
+]

@@ -13,8 +13,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.core.plugin_manager import PluginManager
 from src.core.event_system import EventType, event_system
 from src.core.config_manager import ConfigManager
-from src.gui.main_window import MainWindow
-from src.utils.helpers import setup_logging
+from src.gui.main_interface import MainInterface
+from src.core.logger_utils import setup_logger
 from loguru import logger
 
 
@@ -32,7 +32,7 @@ class VKSearchApplication:
             logger.info("Инициализация VK Search Application")
             
             # Настройка логирования
-            setup_logging()
+            # setup_logger(log_file="logs/app.log", level="DEBUG")
             
             # Загрузка конфигурации
             if not self.config_manager.load_config():
@@ -135,7 +135,7 @@ class VKSearchApplication:
             logger.info("Запуск графического интерфейса")
             
             # Создаем главное окно
-            self.main_window = MainWindow(self.plugin_manager, self.config_manager)
+            self.main_window = MainInterface(self.plugin_manager, self.config_manager)
             
             # Запускаем GUI
             self.main_window.run()
@@ -164,6 +164,8 @@ class VKSearchApplication:
 def main():
     """Главная функция приложения"""
     try:
+        # Настройка логгера
+        setup_logger(log_file="logs/app.log", level="DEBUG")
         # Создаем экземпляр приложения
         app = VKSearchApplication()
         

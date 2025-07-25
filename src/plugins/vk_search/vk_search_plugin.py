@@ -9,6 +9,7 @@ from loguru import logger
 
 from ...core.event_system import EventType
 from ..base_plugin import BasePlugin
+from ..text_processing.text_processing_plugin import TextProcessingPlugin
 
 import time
 from datetime import datetime
@@ -32,7 +33,6 @@ class VKSearchPlugin(BasePlugin):
             "access_token": None
         }
         
-        self.session: Optional[aiohttp.ClientSession] = None
         self._request_count = 0
         self._last_request_time = 0
     
@@ -44,19 +44,12 @@ class VKSearchPlugin(BasePlugin):
             self.log_error("Некорректная конфигурация плагина")
             return
         
-        # Создаем сессию для HTTP запросов
-        timeout = aiohttp.ClientTimeout(total=self.config["timeout"])
-        self.session = aiohttp.ClientSession(timeout=timeout)
-        
         self.log_info("Плагин VK Search инициализирован")
         self.emit_event(EventType.PLUGIN_LOADED, {"status": "initialized"})
     
     def shutdown(self) -> None:
         """Завершение работы плагина"""
         self.log_info("Завершение работы плагина VK Search")
-        
-        if self.session:
-            asyncio.create_task(self.session.close())
         
         self.emit_event(EventType.PLUGIN_UNLOADED, {"status": "shutdown"})
         self.log_info("Плагин VK Search завершен")
@@ -76,7 +69,7 @@ class VKSearchPlugin(BasePlugin):
         """Возвращает список обязательных ключей конфигурации"""
         return ["access_token"]
     
-    async def search_posts(self, query: str, count: int = 100, 
+    async def search_posts(self, session, query: str, count: int = 100, 
                           owner_id: Optional[int] = None) -> List[Dict[str, Any]]:
         """Поиск постов по запросу"""
         if not self.is_enabled():
@@ -103,7 +96,7 @@ class VKSearchPlugin(BasePlugin):
             
             url = "https://api.vk.com/method/newsfeed.search"
             
-            async with self.session.get(url, params=params) as response:
+            async with session.get(url, params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     
@@ -128,7 +121,7 @@ class VKSearchPlugin(BasePlugin):
             self.emit_event(EventType.ERROR_OCCURRED, {"error": str(e)})
             return []
     
-    async def get_group_posts(self, group_id: int, count: int = 100) -> List[Dict[str, Any]]:
+    async def get_group_posts(self, session, group_id: int, count: int = 100) -> List[Dict[str, Any]]:
         """Получение постов группы"""
         if not self.is_enabled():
             raise RuntimeError("Плагин отключен")
@@ -145,7 +138,7 @@ class VKSearchPlugin(BasePlugin):
             
             url = "https://api.vk.com/method/wall.get"
             
-            async with self.session.get(url, params=params) as response:
+            async with session.get(url, params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     
@@ -163,7 +156,7 @@ class VKSearchPlugin(BasePlugin):
             self.log_error(f"Ошибка получения постов группы: {e}")
             return []
     
-    async def get_user_info(self, user_id: int) -> Optional[Dict[str, Any]]:
+    async def get_user_info(self, session, user_id: int) -> Optional[Dict[str, Any]]:
         """Получение информации о пользователе"""
         if not self.is_enabled():
             raise RuntimeError("Плагин отключен")
@@ -180,7 +173,7 @@ class VKSearchPlugin(BasePlugin):
             
             url = "https://api.vk.com/method/users.get"
             
-            async with self.session.get(url, params=params) as response:
+            async with session.get(url, params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     
@@ -223,22 +216,21 @@ class VKSearchPlugin(BasePlugin):
 
     async def search_multiple_queries(self, queries: List[str], start_date, end_date, 
                                     exact_match: bool = True, minus_words: List[str] = None, batch_size: int = 3) -> List[Dict[str, Any]]:
-        """
-        Асинхронный массовый поиск по нескольким запросам с фильтрацией дублей и обработкой постов
-        """
         import time
         t0 = time.time()
         self.log_info(f"🚀 Начинаем асинхронный поиск для {len(queries)} запросов")
         all_posts = []
-        for i in range(0, len(queries), batch_size):
-            batch = queries[i:i+batch_size]
-            tasks = [self._search_single_query(q, start_date, end_date, exact_match, minus_words) for q in batch]
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            for result in results:
-                if isinstance(result, list):
-                    all_posts.extend(result)
-                elif isinstance(result, Exception):
-                    self.log_error(f"Ошибка поиска: {result}")
+        timeout = aiohttp.ClientTimeout(total=self.config["timeout"])
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            for i in range(0, len(queries), batch_size):
+                batch = queries[i:i+batch_size]
+                tasks = [self._search_single_query(session, q, start_date, end_date, exact_match, minus_words) for q in batch]
+                results = await asyncio.gather(*tasks, return_exceptions=True)
+                for result in results:
+                    if isinstance(result, list):
+                        all_posts.extend(result)
+                    elif isinstance(result, Exception):
+                        self.log_error(f"Ошибка поиска: {result}")
         t1 = time.time()
         self.log_info(f"⏱️ Время на запросы: {t1-t0:.2f} сек")
         t2 = time.time()
@@ -249,9 +241,8 @@ class VKSearchPlugin(BasePlugin):
         self.log_info(f"⏱️ Время на фильтрацию: {t3-t2:.2f} сек")
         return unique_posts
 
-    async def _search_single_query(self, query: str, start_date, end_date, 
+    async def _search_single_query(self, session, query: str, start_date, end_date, 
                                   exact_match: bool, minus_words: List[str] = None) -> List[Dict[str, Any]]:
-        """Асинхронный поиск по одному запросу с обработкой и нормализацией постов"""
         await self._rate_limit()
         try:
             self.log_info(f"🔍 Поиск: '{query[:50]}...'")
@@ -284,7 +275,7 @@ class VKSearchPlugin(BasePlugin):
             for offset in offsets:
                 params_copy = params.copy()
                 params_copy['offset'] = offset
-                tasks.append(self._fetch_vk_batch(params_copy, query))
+                tasks.append(self._fetch_vk_batch(session, params_copy, query))
             results = await asyncio.gather(*tasks, return_exceptions=True)
             posts = []
             for result in results:
@@ -301,19 +292,29 @@ class VKSearchPlugin(BasePlugin):
             self.log_error(f"Ошибка поиска '{query[:30]}...': {e}")
             return []
 
-    async def _fetch_vk_batch(self, params, query):
-        try:
-            async with self.session.get("https://api.vk.com/method/newsfeed.search", params=params) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    response_obj = data.get('response') if isinstance(data, dict) else None
-                    items = response_obj.get('items', []) if isinstance(response_obj, dict) else []
-                    return [self._process_post(item, query) for item in items if item]
-                else:
-                    self.log_error(f"HTTP ошибка: {response.status}")
-                    return []
-        except Exception as e:
-            self.log_error(f"Ошибка VK API: {e}")
+    async def _fetch_vk_batch(self, session, params, query, retry_count=3):
+        for attempt in range(retry_count):
+            try:
+                async with session.get("https://api.vk.com/method/newsfeed.search", params=params) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if "error" in data:
+                            err = data["error"]
+                            if err.get("error_code") == 6:
+                                self.log_error(f"VK API rate limit (error 6): {err}. Попытка {attempt+1}/{retry_count}")
+                                await asyncio.sleep(2)  # Пауза перед повтором
+                                continue
+                            self.log_error(f"Ошибка VK API: {err}")
+                            return []
+                        posts = data.get("response", {}).get("items", [])
+                        return posts
+                    else:
+                        self.log_error(f"HTTP ошибка: {response.status}")
+                        return []
+            except Exception as e:
+                self.log_error(f"Ошибка поиска по offset: {e}")
+                if attempt < retry_count - 1:
+                    await asyncio.sleep(2)
             return []
 
     def _process_post(self, item: Dict, query: str) -> Optional[Dict]:
@@ -345,15 +346,15 @@ class VKSearchPlugin(BasePlugin):
             return None
 
     def filter_unique_posts(self, posts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Фильтрация уникальных постов по (owner_id, post_id)"""
+        """Фильтрует уникальные посты по (owner_id, id)"""
         seen = set()
-        unique = []
+        unique_posts = []
         for post in posts:
-            key = (post.get('owner_id'), post.get('post_id'))
+            key = (post.get('owner_id'), post.get('id'))
             if key not in seen:
                 seen.add(key)
-                unique.append(post)
-        return unique
+                unique_posts.append(post)
+        return unique_posts
 
     def _get_author_name(self, item: Dict) -> str:
         try:
@@ -382,3 +383,77 @@ class VKSearchPlugin(BasePlugin):
             return int(dt.timestamp())
         except ValueError as e:
             raise ValueError(f"Неверный формат даты: {datetime_str}") 
+
+    async def mass_search_with_tokens(self, keyword_token_pairs: List[tuple], start_date, end_date, exact_match: bool = True, minus_words: List[str] = None, batch_size: int = 3) -> List[Dict[str, Any]]:
+        """
+        Массовый асинхронный поиск: для каждого ключевого слова используется свой токен.
+        keyword_token_pairs: список кортежей (keyword, token)
+        start_date/end_date: могут быть либо int (timestamp UTC), либо str в формате '%d.%m.%Y %H:%M' (МСК)
+        """
+        import time
+        from datetime import datetime, timedelta, timezone
+        self.log_info(f"🚀 Массовый асинхронный поиск для {len(keyword_token_pairs)} запросов с разными токенами")
+        # Переводим start_date/end_date из МСК в UTC, если они строки
+        def moscow_to_utc_timestamp(dt_str):
+            moscow_tz = timezone(timedelta(hours=3))
+            dt = datetime.strptime(dt_str, "%d.%m.%Y %H:%M")
+            dt = dt.replace(tzinfo=moscow_tz)
+            dt_utc = dt.astimezone(timezone.utc)
+            return int(dt_utc.timestamp())
+        _start_ts = start_date
+        _end_ts = end_date
+        if isinstance(start_date, str):
+            _start_ts = moscow_to_utc_timestamp(start_date)
+        if isinstance(end_date, str):
+            _end_ts = moscow_to_utc_timestamp(end_date)
+        all_posts = []
+        timeout = aiohttp.ClientTimeout(total=self.config["timeout"])
+        text_plugin = TextProcessingPlugin()
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            for i in range(0, len(keyword_token_pairs), batch_size):
+                batch = keyword_token_pairs[i:i+batch_size]
+                tasks = []
+                for keyword, token in batch:
+                    params = {
+                        'q': f'"{keyword}"' if exact_match else keyword,
+                        'count': 200,
+                        'extended': 1,
+                        'access_token': token,
+                        'v': self.config["api_version"]
+                    }
+                    if _start_ts is not None:
+                        params['start_time'] = _start_ts
+                    if _end_ts is not None:
+                        params['end_time'] = _end_ts
+                    if minus_words:
+                        for word in minus_words:
+                            if word.strip():
+                                params['q'] += f' -{word.strip()}'
+                    max_batches = 5
+                    offsets = [j * 200 for j in range(max_batches)]
+                    for offset in offsets:
+                        params_copy = params.copy()
+                        params_copy['offset'] = offset
+                        tasks.append(self._fetch_vk_batch(session, params_copy, keyword))
+                results = await asyncio.gather(*tasks, return_exceptions=True)
+                for result in results:
+                    if isinstance(result, list):
+                        # Локальная фильтрация по ключу (точное вхождение с очисткой текста)
+                        if exact_match:
+                            filtered = []
+                            for post in result:
+                                text = str(post.get('text', '') or post.get('post_text', ''))
+                                text_clean = text_plugin.clean_text_completely(text)
+                                keyword_clean = text_plugin.clean_text_completely(keyword)
+                                if keyword_clean in text_clean:
+                                    filtered.append(post)
+                            all_posts.extend(filtered)
+                        else:
+                            all_posts.extend(result)
+                    elif isinstance(result, Exception):
+                        self.log_error(f"Ошибка поиска: {result}")
+        # Фильтрация уникальных постов
+        unique_posts = self.filter_unique_posts(all_posts)
+        num_duplicates = len(all_posts) - len(unique_posts)
+        self.log_info(f"✅ Найдено {len(unique_posts)} уникальных постов для всех запросов (до фильтрации: {len(all_posts)}, дублей: {num_duplicates})")
+        return unique_posts 

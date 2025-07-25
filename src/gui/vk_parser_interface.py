@@ -594,13 +594,28 @@ class VKParserInterface:
         data_manager = self.plugin_manager.get_plugin('data_manager')
         filepath = None
         try:
-            # Запуск поиска через VKSearchPlugin
+            # Собираем пары (ключевое слово, токен)
+            token_limiter = self.token_limiter
+            keyword_token_pairs = []
+            for keyword in api_keywords:
+                t = token_limiter.get_token()
+                if not t:
+                    self._set_progress("Нет доступных VK токенов, ожидание...")
+                    time.sleep(5)
+                    token_limiter.unblock_expired()
+                    t = token_limiter.get_token()
+                    if not t:
+                        continue
+                keyword_token_pairs.append((keyword, t))
+            # Вызываем только mass_search_with_tokens у VKSearchPlugin
             results = loop.run_until_complete(
-                self.vk_search_plugin.search_multiple_queries(
-                    keywords, start_ts, end_ts, exact_match, minus_words
+                self.vk_search_plugin.mass_search_with_tokens(
+                    keyword_token_pairs, start_ts, end_ts, exact_match, minus_words
                 )
             )
-            # Фильтрация и отображение результатов
+            self.progress_var.set(100)
+            self.progress_bar.update()
+            self._set_progress(f"Поиск завершен. Найдено {len(results)} постов.")
             filtered = self._filter_and_format_results(results, keywords, exact_match, start_date, start_time, end_date, end_time)
             filename = f"search_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
             results_dir = os.path.join("data", "results")
@@ -616,7 +631,6 @@ class VKParserInterface:
                     writer = csv.DictWriter(f, fieldnames=["link", "text", "type", "author", "author_link", "date", "likes", "comments", "reposts", "views"])
                     writer.writeheader()
                     writer.writerows(filtered)
-            # Согласно архитектурному правилу, сохраняем meta.json только через DataManagerPlugin
             if data_manager:
                 data_manager.save_task_meta_full(
                     keywords=keywords,
@@ -638,7 +652,6 @@ class VKParserInterface:
             self.progress_var.set(0)
             self.progress_bar.update()
         except Exception as e:
-            # Согласно архитектурному правилу, сохраняем meta.json с ошибкой только через DataManagerPlugin
             if data_manager:
                 data_manager.save_task_meta_full(
                     keywords=keywords,
@@ -758,77 +771,13 @@ class VKParserInterface:
             messagebox.showerror("Ошибка", f"Ошибка асинхронного поиска: {str(e)}")
 
     def _filter_and_format_results(self, posts, keywords, exact_match, start_date, start_time, end_date, end_time):
-        # Убираем None из списка постов
-        posts = [p for p in posts if p is not None]
-        # Формируем диапазон дат и времени (по Москве)
-        try:
-            import pytz
-            moscow_tz = pytz.timezone('Europe/Moscow')
-            start_dt = moscow_tz.localize(datetime.strptime(f"{start_date} {start_time}", "%d.%m.%Y %H:%M"))
-            end_dt = moscow_tz.localize(datetime.strptime(f"{end_date} {end_time}", "%d.%m.%Y %H:%M"))
-        except Exception:
-            start_dt = None
-            end_dt = None
-        unique_links = set()
-        filtered = []
-        for post in posts:
-            text = post.get("text") or post.get("post_text") or ""
-            cleaned_text = self.text_processing_plugin.clean_text_completely(text)
-            # Фильтрация по ключевым фразам: ищем точное вхождение фразы в очищенном тексте поста
-            if exact_match:
-                cleaned_keywords = [self.text_processing_plugin.clean_text_completely(k).lower() for k in keywords]
-                if not any(k in cleaned_text.lower() for k in cleaned_keywords):
-                    continue
-            else:
-                if not any(keyword in cleaned_text for keyword in keywords):
-                    continue
-            # Корректное формирование даты
-            date_val = post.get("timestamp") or post.get("date") or 0
-            date_str = "Нет даты"
-            try:
-                post_dt_utc = from_vk_timestamp(int(date_val))
-                if isinstance(post_dt_utc, tuple):
-                    post_dt_utc = post_dt_utc[0]
-                if isinstance(post_dt_utc, str):
-                    try:
-                        post_dt_utc = datetime.fromisoformat(post_dt_utc)
-                    except Exception:
-                        # Пробуем формат дд.мм.гггг
-                        post_dt_utc = datetime.strptime(post_dt_utc, "%d.%m.%Y")
-                import pytz
-                moscow_tz = pytz.timezone('Europe/Moscow')
-                post_dt_msk = post_dt_utc.astimezone(moscow_tz)
-                date_str = post_dt_msk.strftime("%d.%m.%Y %H:%M")
-            except Exception as e:
-                print("DEBUG date error:", e, date_val, type(post_dt_utc))
-            owner_id = post.get("owner_id")
-            post_id = post.get("post_id") or post.get("id")
-            link = f"https://vk.com/wall{owner_id}_{post_id}" if owner_id and post_id else post.get("Ссылка", "")
-            # Удаляю повторное формирование date_str, использую только ранее вычисленный date_str
-            if not link or link in unique_links:
-                continue
-            unique_links.add(link)
-            author = post.get("author") or post.get("from_id") or ""
-            author_link = f"https://vk.com/id{owner_id}" if owner_id else ""
-            # Удаляю повторное формирование date_str, использую только ранее вычисленный date_str
-            filtered.append({
-                "link": link,
-                "text": text,
-                "type": post.get("type") or post.get("post_type") or "post",
-                "author": author,
-                "author_link": author_link,
-                "date": date_str,
-                "likes": post.get("likes") if isinstance(post.get("likes"), int) else post.get("likes", 0),
-                "comments": post.get("comments") if isinstance(post.get("comments"), int) else post.get("comments", 0),
-                "reposts": post.get("shares") or post.get("reposts") or 0,
-                "views": post.get("views") or 0
-            })
-        return filtered
+        # ВРЕМЕННО: отключаем фильтрацию, возвращаем все посты как есть
+        return posts
 
     def _set_progress(self, text):
         self.progress_label.config(text=text)
         self.progress_label.update_idletasks()
-
+    
     def save_window_settings(self):
         """Сохранение настроек парсера"""
         try:
@@ -969,14 +918,14 @@ class VKParserInterface:
         if not item_id:
             return
         tags = self.tasks_tree.item(item_id, "tags")
-        if tags and tags[0]:
-            filepath = tags[0]
+                if tags and tags[0]:
+                    filepath = tags[0]
             data_manager = self.plugin_manager.get_plugin('data_manager')
             if data_manager:
                 meta = data_manager.load_task_meta(filepath)
                 if meta:
                     self._show_task_settings_window(meta, filepath)
-                else:
+                    else:
                     messagebox.showinfo("Информация", "Нет meta.json для этой задачи")
 
     def _show_task_settings_window(self, meta, filepath):
@@ -1067,6 +1016,14 @@ class VKParserInterface:
                 ))
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось отобразить результаты: {str(e)}") 
+
+    def _display_results_from_csv(self, filepath):
+        """Загружает CSV и отображает результаты в Treeview"""
+        try:
+            df = pd.read_csv(filepath)
+            self.display_results_in_treeview(df)
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Не удалось загрузить результаты из файла: {str(e)}")
 
     def auto_connect_tokens(self):
         """Автоматическое подключение всех токенов при запуске"""
@@ -1189,7 +1146,11 @@ class VKParserInterface:
         print(f"[DEBUG] Найдено задач: {len(tasks)}")
         if tasks:
             print(f"[DEBUG] Первая задача: {tasks[0]}")
-        for meta in tasks:
+        
+        # Сортируем задачи по дате/времени в обратном порядке (новые сверху)
+        sorted_tasks = sorted(tasks, key=lambda x: x.get('datetime', ''), reverse=True)
+        
+        for meta in sorted_tasks:
             try:
                 dt = meta.get('datetime', '')
                 if dt:
@@ -1205,7 +1166,7 @@ class VKParserInterface:
                 status = meta.get('status', 'Готово')
                 filepath = meta.get('filepath', '')
                 print(f"[DEBUG] Вставка задачи: {date_str} {time_str} {count} {si} {views} {status} {filepath}")
-                self.tasks_tree.insert("", 0, values=(date_str, time_str, count, si, views, status), tags=(filepath,))
+                self.tasks_tree.insert("", "end", values=(date_str, time_str, count, si, views, status), tags=(filepath,))
             except Exception as e:
                 print(f"[DEBUG] Ошибка добавления задачи: {e}")
 

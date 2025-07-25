@@ -74,6 +74,10 @@ class LinkComparatorPlugin(BasePlugin):
                 self.table1_data = pd.read_csv(file_path)
             elif file_path.endswith('.xlsx') or file_path.endswith('.xls'):
                 self.table1_data = pd.read_excel(file_path)
+            elif file_path.endswith('.txt'):
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    lines = [line.strip() for line in f if line.strip()]
+                self.table1_data = pd.DataFrame({'text': lines})
             else:
                 raise ValueError("Неподдерживаемый формат файла")
             
@@ -96,6 +100,10 @@ class LinkComparatorPlugin(BasePlugin):
                 self.table2_data = pd.read_csv(file_path)
             elif file_path.endswith('.xlsx') or file_path.endswith('.xls'):
                 self.table2_data = pd.read_excel(file_path)
+            elif file_path.endswith('.txt'):
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    lines = [line.strip() for line in f if line.strip()]
+                self.table2_data = pd.DataFrame({'text': lines})
             else:
                 raise ValueError("Неподдерживаемый формат файла")
             
