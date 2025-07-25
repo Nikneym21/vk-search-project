@@ -169,9 +169,24 @@ class PluginManager:
                 start_date = f"{start_date} 00:00"
             if isinstance(end_date, str) and len(end_date.split()) == 1:
                 end_date = f"{end_date} 23:59"
-                
-            keyword_token_pairs = [(keyword, token) for keyword in keywords]
             
+            # Получаем все доступные токены для ротации
+            all_tokens = token_manager.list_vk_tokens()
+            if not all_tokens:
+                # Если нет токенов в менеджере, используем токен из файла
+                all_tokens = [token]
+            
+            logger.info(f"Доступно токенов для ротации: {len(all_tokens)}")
+            
+            # Создаем пары (ключевое слово, токен) с ротацией токенов
+            keyword_token_pairs = []
+            for i, keyword in enumerate(keywords):
+                token_index = i % len(all_tokens)
+                selected_token = all_tokens[token_index]
+                keyword_token_pairs.append((keyword, selected_token))
+            
+            logger.info(f"Создано {len(keyword_token_pairs)} пар (ключевое слово, токен) с ротацией")
+                
             # Выполняем поиск
             raw_posts = await vk_plugin.mass_search_with_tokens(
                 keyword_token_pairs=keyword_token_pairs,
