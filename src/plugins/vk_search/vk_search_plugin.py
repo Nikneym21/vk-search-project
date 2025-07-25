@@ -21,19 +21,32 @@ class VKSearchPlugin(BasePlugin):
         self.version = "1.0.0"
         self.description = "Плагин для поиска постов в VK через API"
         
-        # Конфигурация по умолчанию
+        # Оптимизированная конфигурация для ускорения
         self.config = {
             "access_token": None,
             "api_version": "5.131",
-            "request_delay": 0.3,
-            "max_requests_per_second": 3,
-            "timeout": 30,
-            "max_retries": 3
+            "request_delay": 0.1,  # Уменьшено с 0.3 до 0.1
+            "max_requests_per_second": 8,  # Увеличено с 3 до 8
+            "timeout": 15,  # Уменьшено с 30 до 15
+            "max_retries": 3,
+            "batch_size": 8,  # Увеличено с 3 до 8
+            "max_batches": 10,  # Увеличено с 5 до 10
+            "use_connection_pooling": True,
+            "enable_caching": True,
+            "cache_ttl": 300,  # 5 минут
+            "adaptive_rate_limiting": True,
+            "min_delay": 0.05,  # Минимальная задержка
+            "max_delay": 1.0,   # Максимальная задержка
         }
         
-        # Статистика
+        # Статистика и метрики производительности
         self.requests_made = 0
         self.session = None
+        self.cache = {}
+        self.token_usage = {}
+        self.rate_limit_hits = 0
+        self.response_times = []
+        self.last_request_time = 0
     
     def initialize(self) -> None:
         """Инициализация плагина"""
@@ -68,17 +81,86 @@ class VKSearchPlugin(BasePlugin):
         return ["access_token"]
     
     async def _rate_limit(self) -> None:
-        """Rate limiting для VK API"""
-        delay = self.config["request_delay"]
+        """Адаптивный Rate limiting для VK API"""
+        current_time = time.time()
+        
+        # Адаптивная регулировка задержки
+        if self.config["adaptive_rate_limiting"]:
+            # Если недавно был rate limit, увеличиваем задержку
+            if self.rate_limit_hits > 0:
+                delay = min(self.config["max_delay"], 
+                           self.config["request_delay"] * (1.5 ** self.rate_limit_hits))
+            else:
+                # Если все хорошо, постепенно уменьшаем задержку
+                delay = max(self.config["min_delay"], 
+                           self.config["request_delay"] * 0.95)
+            
+            # Ограничиваем задержку в заданных пределах
+            delay = max(self.config["min_delay"], 
+                       min(self.config["max_delay"], delay))
+        else:
+            delay = self.config["request_delay"]
+        
         if delay > 0:
             await asyncio.sleep(delay)
+        
+        self.last_request_time = current_time
     
+    def _get_best_token(self, available_tokens: List[str]) -> str:
+        """Выбирает токен с наименьшей нагрузкой"""
+        if not self.token_usage:
+            return available_tokens[0]
+        
+        # Находим токен с наименьшим количеством запросов
+        best_token = min(self.token_usage.items(), key=lambda x: x[1])[0]
+        
+        # Если токен не в списке доступных, берем первый
+        if best_token not in available_tokens:
+            return available_tokens[0]
+        
+        return best_token
+    
+    def _update_token_usage(self, token: str):
+        """Обновляет статистику использования токена"""
+        self.token_usage[token] = self.token_usage.get(token, 0) + 1
+    
+    def _get_cache_key(self, params: dict) -> str:
+        """Генерирует ключ кэша для параметров запроса"""
+        import hashlib
+        key_data = str(sorted(params.items()))
+        return hashlib.md5(key_data.encode()).hexdigest()
+    
+    def _is_cache_valid(self, cache_entry: dict) -> bool:
+        """Проверяет валидность кэша"""
+        if not self.config["enable_caching"]:
+            return False
+        
+        current_time = time.time()
+        return current_time - cache_entry["timestamp"] < self.config["cache_ttl"]
+
     def get_statistics(self) -> Dict[str, Any]:
-        """Возвращает статистику плагина"""
+        """Возвращает расширенную статистику плагина"""
+        avg_response_time = 0
+        if self.response_times:
+            avg_response_time = sum(self.response_times) / len(self.response_times)
+        
+        cache_hit_rate = 0
+        if self.requests_made > 0:
+            cache_hits = len([r for r in self.response_times if r < 0.1])  # Примерная оценка
+            cache_hit_rate = cache_hits / self.requests_made
+        
         return {
             "requests_made": self.requests_made,
             "enabled": self.is_enabled(),
-            "config": self.get_config()
+            "config": self.get_config(),
+            "performance_metrics": {
+                "average_response_time": round(avg_response_time, 3),
+                "rate_limit_hits": self.rate_limit_hits,
+                "cache_size": len(self.cache),
+                "cache_hit_rate": round(cache_hit_rate, 3),
+                "token_usage": self.token_usage,
+                "requests_per_second": round(self.requests_made / max(1, avg_response_time), 2) if avg_response_time > 0 else 0
+            }
         }
 
     async def search_multiple_queries(self, queries: List[str], start_date, end_date, 
@@ -127,11 +209,26 @@ class VKSearchPlugin(BasePlugin):
 
     async def _fetch_vk_batch(self, session, params, query, retry_count=3):
         """
-        Получение одной партии результатов от VK API
+        Оптимизированное получение одной партии результатов от VK API
         """
+        import time
+        
+        # Проверяем кэш
+        cache_key = self._get_cache_key(params)
+        if cache_key in self.cache and self._is_cache_valid(self.cache[cache_key]):
+            self.log_info(f"📋 Кэш-хит для запроса '{query}'")
+            return self.cache[cache_key]["data"]
+        
+        start_time = time.time()
+        
         for attempt in range(retry_count):
             try:
                 await self._rate_limit()
+                
+                # Обновляем статистику использования токена
+                token = params.get('access_token')
+                if token:
+                    self._update_token_usage(token)
                 
                 async with session.get('https://api.vk.com/method/newsfeed.search', params=params) as response:
                     self.requests_made += 1
@@ -143,6 +240,7 @@ class VKSearchPlugin(BasePlugin):
                             error_code = data['error'].get('error_code')
                             if error_code == 6:  # Too many requests per second
                                 self.log_warning(f"Rate limit для запроса '{query}', ожидание...")
+                                self.rate_limit_hits += 1
                                 await asyncio.sleep(1)
                                 continue
                             else:
@@ -151,6 +249,22 @@ class VKSearchPlugin(BasePlugin):
                         
                         if 'response' in data:
                             items = data['response'].get('items', [])
+                            
+                            # Кэшируем результат
+                            if self.config["enable_caching"]:
+                                self.cache[cache_key] = {
+                                    "data": items,
+                                    "timestamp": time.time()
+                                }
+                            
+                            # Записываем время ответа
+                            response_time = time.time() - start_time
+                            self.response_times.append(response_time)
+                            
+                            # Сбрасываем счетчик rate limit если запрос успешен
+                            if self.rate_limit_hits > 0:
+                                self.rate_limit_hits = max(0, self.rate_limit_hits - 1)
+                            
                             return items
                         else:
                             self.log_error(f"Неожиданный ответ VK API для запроса '{query}': {data}")
@@ -178,16 +292,19 @@ class VKSearchPlugin(BasePlugin):
         except ValueError as e:
             raise ValueError(f"Неверный формат даты: {datetime_str}") 
 
-    async def mass_search_with_tokens(self, keyword_token_pairs: List[tuple], start_date, end_date, exact_match: bool = True, minus_words: List[str] = None, batch_size: int = 3) -> List[Dict[str, Any]]:
+    async def mass_search_with_tokens(self, keyword_token_pairs: List[tuple], start_date, end_date, exact_match: bool = True, minus_words: List[str] = None, batch_size: int = None) -> List[Dict[str, Any]]:
         """
-        Массовый асинхронный поиск: для каждого ключевого слова используется свой токен.
-        keyword_token_pairs: список кортежей (keyword, token)
-        start_date/end_date: могут быть либо int (timestamp UTC), либо str в формате '%d.%m.%Y %H:%M' (МСК)
+        Оптимизированный массовый асинхронный поиск с умной ротацией токенов
         """
         import time
         from datetime import datetime, timedelta, timezone
         
-        self.log_info(f"🚀 Массовый асинхронный поиск для {len(keyword_token_pairs)} запросов с разными токенами")
+        # Используем конфигурационный batch_size если не передан
+        if batch_size is None:
+            batch_size = self.config["batch_size"]
+        
+        self.log_info(f"🚀 Оптимизированный массовый поиск для {len(keyword_token_pairs)} запросов")
+        self.log_info(f"⚙️ Batch size: {batch_size}, Max batches: {self.config['max_batches']}")
         
         # Переводим start_date/end_date из МСК в UTC, если они строки
         def moscow_to_utc_timestamp(dt_str):
@@ -205,19 +322,36 @@ class VKSearchPlugin(BasePlugin):
             _end_ts = moscow_to_utc_timestamp(end_date)
         
         all_posts = []
+        
+        # Оптимизированные настройки HTTP клиента
         timeout = aiohttp.ClientTimeout(total=self.config["timeout"])
         
-        async with aiohttp.ClientSession(timeout=timeout) as session:
+        if self.config["use_connection_pooling"]:
+            connector = aiohttp.TCPConnector(
+                limit=100,
+                limit_per_host=20,
+                ttl_dns_cache=300,
+                use_dns_cache=True
+            )
+        else:
+            connector = None
+        
+        async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
+            # Обрабатываем запросы батчами с улучшенной параллелизацией
             for i in range(0, len(keyword_token_pairs), batch_size):
                 batch = keyword_token_pairs[i:i+batch_size]
                 tasks = []
                 
                 for keyword, token in batch:
+                    # Умная ротация токенов - выбираем токен с наименьшей нагрузкой
+                    available_tokens = [t for _, t in keyword_token_pairs]
+                    best_token = self._get_best_token(available_tokens)
+                    
                     params = {
                         'q': f'"{keyword}"' if exact_match else keyword,
                         'count': 200,
                         'extended': 1,
-                        'access_token': token,
+                        'access_token': best_token,
                         'v': self.config["api_version"]
                     }
                     
@@ -231,7 +365,8 @@ class VKSearchPlugin(BasePlugin):
                             if word.strip():
                                 params['q'] += f' -{word.strip()}'
                     
-                    max_batches = 5
+                    # Увеличиваем количество батчей для получения большего количества постов
+                    max_batches = self.config["max_batches"]
                     offsets = [j * 200 for j in range(max_batches)]
                     
                     for offset in offsets:
@@ -239,6 +374,7 @@ class VKSearchPlugin(BasePlugin):
                         params_copy['offset'] = offset
                         tasks.append(self._fetch_vk_batch(session, params_copy, keyword))
                 
+                # Выполняем все задачи параллельно
                 results = await asyncio.gather(*tasks, return_exceptions=True)
                 
                 for result in results:
@@ -247,5 +383,28 @@ class VKSearchPlugin(BasePlugin):
                     elif isinstance(result, Exception):
                         self.log_error(f"Ошибка поиска: {result}")
         
-        self.log_info(f"✅ Получено {len(all_posts)} постов от VK API для всех запросов")
-        return all_posts 
+        # Очищаем старый кэш
+        self._cleanup_cache()
+        
+        self.log_info(f"✅ Получено {len(all_posts)} постов от VK API")
+        self.log_info(f"📊 Статистика: {self.requests_made} запросов, {len(self.response_times)} измерений времени")
+        
+        return all_posts
+    
+    def _cleanup_cache(self):
+        """Очищает устаревшие записи кэша"""
+        if not self.config["enable_caching"]:
+            return
+        
+        current_time = time.time()
+        expired_keys = []
+        
+        for key, entry in self.cache.items():
+            if not self._is_cache_valid(entry):
+                expired_keys.append(key)
+        
+        for key in expired_keys:
+            del self.cache[key]
+        
+        if expired_keys:
+            self.log_info(f"🧹 Очищено {len(expired_keys)} устаревших записей кэша") 
