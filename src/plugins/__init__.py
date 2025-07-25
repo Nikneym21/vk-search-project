@@ -11,6 +11,7 @@ from .text_processing.text_processing_plugin import TextProcessingPlugin
 from .link_comparator.link_comparator_plugin import LinkComparatorPlugin
 from .settings_manager.settings_manager_plugin import SettingsManagerPlugin
 from .token_manager.token_manager_plugin import TokenManagerPlugin
+from .filter.filter_plugin import FilterPlugin
 
 __all__ = [
     'VKSearchPlugin',
@@ -20,7 +21,8 @@ __all__ = [
     'TextProcessingPlugin',
     'LinkComparatorPlugin',
     'SettingsManagerPlugin',
-    'TokenManagerPlugin'
+    'TokenManagerPlugin',
+    'FilterPlugin'
 ]
 
 # Словарь плагинов для автоматической загрузки
@@ -32,5 +34,6 @@ PLUGIN_CLASSES = {
     'TextProcessingPlugin': TextProcessingPlugin,
     'LinkComparatorPlugin': LinkComparatorPlugin,
     'TokenManagerPlugin': TokenManagerPlugin,
-    'SettingsManagerPlugin': SettingsManagerPlugin
+    'SettingsManagerPlugin': SettingsManagerPlugin,
+    'FilterPlugin': FilterPlugin
 } 

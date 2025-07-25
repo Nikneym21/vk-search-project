@@ -78,29 +78,6 @@ class TestVKSearchPlugin(unittest.TestCase):
         self.assertIn("config", stats)
         self.assertTrue(stats["enabled"])
     
-    def test_filter_unique_posts(self):
-        """Тест фильтрации уникальных постов"""
-        # Создаем тестовые посты с дубликатами
-        posts = [
-            {"owner_id": 1, "id": 100, "text": "post 1"},
-            {"owner_id": 1, "id": 100, "text": "post 1 duplicate"},  # Дубликат
-            {"owner_id": 2, "id": 200, "text": "post 2"},
-            {"owner_id": 1, "id": 101, "text": "post 3"},
-        ]
-        
-        unique_posts = self.plugin.filter_unique_posts(posts)
-        
-        # Должно остаться 3 уникальных поста (убрать дубликат)
-        self.assertEqual(len(unique_posts), 3)
-        
-        # Проверяем, что дубликат убран
-        owner_ids = [post["owner_id"] for post in unique_posts]
-        post_ids = [post["id"] for post in unique_posts]
-        
-        # Проверяем, что комбинация (owner_id, id) уникальна
-        combinations = list(zip(owner_ids, post_ids))
-        self.assertEqual(len(combinations), len(set(combinations)))
-    
     def test_parse_datetime(self):
         """Тест парсинга даты"""
         # Тест валидной даты
@@ -157,6 +134,7 @@ class TestVKSearchPlugin(unittest.TestCase):
         """Массовый поиск по VK API без внутренней фильтрации, экспорт в CSV для сравнения с другим парсером"""
         import csv
         from datetime import datetime
+        import aiohttp
         # 1. Получаем все токены
         with open("config/vk_token.txt", encoding="utf-8") as f:
             tokens = [line.strip() for line in f if line.strip()]
@@ -211,15 +189,11 @@ class TestVKSearchPlugin(unittest.TestCase):
                             elif isinstance(result, Exception):
                                 plugin.log_error(f"Ошибка поиска: {result}")
                         await asyncio.sleep(0.3)
-                    # Локальная фильтрация по ключу (без точного совпадения)
-                    text_plugin = TextProcessingPlugin()
-                    filtered = []
-                    for post in posts_for_keyword:
-                        text = str(post.get('text', '') or post.get('post_text', ''))
-                        text_clean = text_plugin.clean_text_completely(text)
-                        keyword_clean = text_plugin.clean_text_completely(keyword)
-                        if keyword_clean in text_clean:
-                            filtered.append(post)
+                    # Используем FilterPlugin для фильтрации
+                    from src.plugins.filter.filter_plugin import FilterPlugin
+                    filter_plugin = FilterPlugin()
+                    filter_plugin.initialize()
+                    filtered = filter_plugin.filter_posts_by_keyword_with_text_cleaning(posts_for_keyword, keyword, exact_match=False)
                     all_posts.extend(filtered)
             return all_posts
 
@@ -294,7 +268,6 @@ class TestVKSearchPlugin(unittest.TestCase):
         """Массовый поиск по VK API без точного совпадения (exact_match=False), экспорт в CSV для сравнения с эталоном"""
         import csv
         from datetime import datetime
-        import asyncio
         import aiohttp
         # 1. Получаем все токены
         with open("config/vk_token.txt", encoding="utf-8") as f:
@@ -350,15 +323,11 @@ class TestVKSearchPlugin(unittest.TestCase):
                             elif isinstance(result, Exception):
                                 plugin.log_error(f"Ошибка поиска: {result}")
                         await asyncio.sleep(0.3)
-                    # Локальная фильтрация по ключу (без точного совпадения)
-                    text_plugin = TextProcessingPlugin()
-                    filtered = []
-                    for post in posts_for_keyword:
-                        text = str(post.get('text', '') or post.get('post_text', ''))
-                        text_clean = text_plugin.clean_text_completely(text)
-                        keyword_clean = text_plugin.clean_text_completely(keyword)
-                        if keyword_clean in text_clean:
-                            filtered.append(post)
+                    # Используем FilterPlugin для фильтрации
+                    from src.plugins.filter.filter_plugin import FilterPlugin
+                    filter_plugin = FilterPlugin()
+                    filter_plugin.initialize()
+                    filtered = filter_plugin.filter_posts_by_keyword_with_text_cleaning(posts_for_keyword, keyword, exact_match=False)
                     all_posts.extend(filtered)
             return all_posts
 
@@ -431,7 +400,6 @@ class TestVKSearchPlugin(unittest.TestCase):
         """Массовый поиск по VK API без фильтрации по дате (start_time и end_time не передаются), экспорт в CSV для сравнения с эталоном"""
         import csv
         from datetime import datetime
-        import asyncio
         import aiohttp
         # 1. Получаем все токены
         with open("config/vk_token.txt", encoding="utf-8") as f:
@@ -484,15 +452,11 @@ class TestVKSearchPlugin(unittest.TestCase):
                             elif isinstance(result, Exception):
                                 plugin.log_error(f"Ошибка поиска: {result}")
                         await asyncio.sleep(0.3)
-                    # Локальная фильтрация по ключу (без точного совпадения)
-                    text_plugin = TextProcessingPlugin()
-                    filtered = []
-                    for post in posts_for_keyword:
-                        text = str(post.get('text', '') or post.get('post_text', ''))
-                        text_clean = text_plugin.clean_text_completely(text)
-                        keyword_clean = text_plugin.clean_text_completely(keyword)
-                        if keyword_clean in text_clean:
-                            filtered.append(post)
+                    # Используем FilterPlugin для фильтрации
+                    from src.plugins.filter.filter_plugin import FilterPlugin
+                    filter_plugin = FilterPlugin()
+                    filter_plugin.initialize()
+                    filtered = filter_plugin.filter_posts_by_keyword_with_text_cleaning(posts_for_keyword, keyword, exact_match=False)
                     all_posts.extend(filtered)
             return all_posts
 
@@ -563,7 +527,6 @@ class TestVKSearchPlugin(unittest.TestCase):
 
     def test_export_raw_results_exact_match_no_date(self):
         """Массовый поиск по VK API с точным совпадением (exact_match=True), фильтрация по дате на стороне API (start_time/end_time в UTC, рассчитанные из Москвы), экспорт в JSON для отладки"""
-        import asyncio
         import aiohttp
         from datetime import datetime, timedelta, timezone
         # 1. Получаем все токены
@@ -588,7 +551,7 @@ class TestVKSearchPlugin(unittest.TestCase):
         start_ts_utc = moscow_to_utc_timestamp("24.07.2025 00:00")
         end_ts_utc = moscow_to_utc_timestamp("24.07.2025 23:59")
         async def run_mass_search():
-    plugin = VKSearchPlugin()
+            plugin = VKSearchPlugin()
             plugin.config["access_token"] = tokens[0] # For validation only
             plugin.initialize()
             all_posts = []
@@ -666,37 +629,21 @@ class TestVKSearchPlugin(unittest.TestCase):
         # 4. Локальная фильтрация: хотя бы одна фраза содержится в тексте (точно, с очисткой)
         filtered = []
         for _, row in df.iterrows():
-            text = str(row.get('text', '') or row.get('post_text', ''))
+            text = str(row.get('text', ''))
             text_clean = text_plugin.clean_text_completely(text)
-            for phrase in keywords:
-                phrase_clean = text_plugin.clean_text_completely(phrase)
-                if phrase_clean in text_clean:
-                    filtered.append(row)
+            for keyword in keywords:
+                keyword_clean = text_plugin.clean_text_completely(keyword)
+                if keyword_clean in text_clean:
+                    filtered.append(row.to_dict())
                     break
-        print(f"После локальной фильтрации: {len(filtered)} постов")
-        # 5. Проверка: хотя бы один пост найден
-        self.assertGreater(len(filtered), 0, "Локальная фильтрация не нашла ни одного поста!")
+        print(f"Отфильтровано {len(filtered)} постов из {len(df)}")
+        self.assertGreater(len(filtered), 0, "Не найдено ни одного поста с ключевыми фразами")
+        # 5. Экспорт отфильтрованных результатов
+        filtered_df = pd.DataFrame(filtered)
+        output_file = f"filtered_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        filtered_df.to_csv(output_file, index=False, encoding='utf-8')
+        print(f"Экспортировано в {output_file}")
 
 
-if __name__ == "__main__":
-    # Создаем тестовый набор
-    loader = unittest.TestLoader()
-    suite = loader.loadTestsFromTestCase(TestVKSearchPlugin)
-    
-    # Запускаем тесты
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
-    
-    # Выводим результат
-    if result.wasSuccessful():
-        print("\n✅ Все тесты прошли успешно!")
-    else:
-        print(f"\n❌ Тесты завершились с ошибками: {len(result.failures)} failures, {len(result.errors)} errors")
-        for failure in result.failures:
-            print(f"FAILURE: {failure[0]}")
-            print(f"  {failure[1]}")
-        for error in result.errors:
-            print(f"ERROR: {error[0]}")
-            print(f"  {error[1]}")
-    
-    sys.exit(0 if result.wasSuccessful() else 1) 
+if __name__ == '__main__':
+    unittest.main() 

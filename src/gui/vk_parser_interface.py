@@ -771,8 +771,109 @@ class VKParserInterface:
             messagebox.showerror("Ошибка", f"Ошибка асинхронного поиска: {str(e)}")
 
     def _filter_and_format_results(self, posts, keywords, exact_match, start_date, start_time, end_date, end_time):
-        # ВРЕМЕННО: отключаем фильтрацию, возвращаем все посты как есть
-        return posts
+        """
+        Фильтрация и форматирование результатов поиска
+        Использует PluginManager для координации между плагинами
+        """
+        try:
+            # Используем PluginManager для координации поиска
+            if hasattr(self, 'plugin_manager') and self.plugin_manager:
+                # Если у нас есть PluginManager, используем его координацию
+                import asyncio
+                
+                # Создаем новую event loop для асинхронного вызова
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                
+                try:
+                    # Вызываем координацию через PluginManager
+                    results = loop.run_until_complete(
+                        self.plugin_manager.coordinate_search_and_filter(
+                            keywords=keywords,
+                            start_date=start_date,
+                            end_date=end_date,
+                            exact_match=exact_match,
+                            minus_words=None,
+                            batch_size=3
+                        )
+                    )
+                    return results
+                finally:
+                    loop.close()
+            else:
+                # Fallback: используем старую логику
+                from src.plugins.filter.filter_plugin import FilterPlugin
+                filter_plugin = FilterPlugin()
+                filter_plugin.initialize()
+                
+                # Фильтруем по ключевым фразам и удаляем дубликаты
+                if keywords:
+                    filtered_posts = filter_plugin.filter_posts_comprehensive(
+                        posts=posts,
+                        keywords=keywords,
+                        exact_match=exact_match,
+                        use_text_cleaning=True,
+                        remove_duplicates=True
+                    )
+                else:
+                    # Если нет ключевых фраз, только удаляем дубликаты
+                    filtered_posts = filter_plugin.filter_unique_posts(posts)
+                
+                # Форматируем результаты для отображения
+                formatted_results = []
+                for post in filtered_posts:
+                    # Получаем информацию о посте
+                    owner_id = post.get('owner_id', 0)
+                    post_id = post.get('id', 0)
+                    text = post.get('text', '')
+                    date = post.get('date', 0)
+                    
+                    # Форматируем дату
+                    if date:
+                        dt = datetime.fromtimestamp(date)
+                        formatted_date = dt.strftime("%H:%M %d.%m.%Y")
+                    else:
+                        formatted_date = ""
+                    
+                    # Получаем статистику
+                    likes = post.get('likes', {})
+                    comments = post.get('comments', {})
+                    reposts = post.get('reposts', {})
+                    views = post.get('views', {})
+                    
+                    # Извлекаем значения
+                    likes_count = likes.get('count', 0) if isinstance(likes, dict) else likes
+                    comments_count = comments.get('count', 0) if isinstance(comments, dict) else comments
+                    reposts_count = reposts.get('count', 0) if isinstance(reposts, dict) else reposts
+                    views_count = views.get('count', 0) if isinstance(views, dict) else views
+                    
+                    # Формируем ссылку
+                    if owner_id < 0:
+                        author_link = f"https://vk.com/club{abs(owner_id)}"
+                    else:
+                        author_link = f"https://vk.com/id{owner_id}"
+                    
+                    formatted_post = {
+                        "link": f"https://vk.com/wall{owner_id}_{post_id}",
+                        "text": text,
+                        "type": "Пост",
+                        "author": post.get('author_name', ''),
+                        "author_link": author_link,
+                        "date": formatted_date,
+                        "likes": likes_count,
+                        "comments": comments_count,
+                        "reposts": reposts_count,
+                        "views": views_count
+                    }
+                    formatted_results.append(formatted_post)
+                
+                filter_plugin.shutdown()
+                return formatted_results
+            
+        except Exception as e:
+            print(f"Ошибка фильтрации и форматирования результатов: {e}")
+            # В случае ошибки возвращаем исходные посты без фильтрации
+            return posts
 
     def _set_progress(self, text):
         self.progress_label.config(text=text)
@@ -918,14 +1019,14 @@ class VKParserInterface:
         if not item_id:
             return
         tags = self.tasks_tree.item(item_id, "tags")
-                if tags and tags[0]:
+        if tags and tags[0]:
                     filepath = tags[0]
-            data_manager = self.plugin_manager.get_plugin('data_manager')
-            if data_manager:
+        data_manager = self.plugin_manager.get_plugin('data_manager')
+        if data_manager:
                 meta = data_manager.load_task_meta(filepath)
                 if meta:
                     self._show_task_settings_window(meta, filepath)
-                    else:
+                else:
                     messagebox.showinfo("Информация", "Нет meta.json для этой задачи")
 
     def _show_task_settings_window(self, meta, filepath):
