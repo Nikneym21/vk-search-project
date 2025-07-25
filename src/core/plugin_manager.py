@@ -132,14 +132,43 @@ class PluginManager:
             # 1. Выполняем поиск через VKSearchPlugin
             logger.info(f"Координация поиска по {len(keywords)} ключевым фразам")
             
-            # Подготавливаем пары (запрос, токен)
+            # Получаем VKSearchPlugin
             vk_plugin = self.get_plugin('vk_search')
             if not vk_plugin:
                 raise ValueError("VKSearchPlugin не найден")
-                
-            token = vk_plugin.config.get("access_token")
+            
+            # Получаем токен из TokenManagerPlugin
+            token_manager = self.get_plugin('token_manager')
+            if not token_manager:
+                raise ValueError("TokenManagerPlugin не найден")
+            
+            # Получаем VK токен
+            token = token_manager.get_token("vk")
             if not token:
-                raise ValueError("Токен VK не настроен")
+                # Пытаемся загрузить из файла
+                try:
+                    with open("config/vk_token.txt", 'r', encoding='utf-8') as f:
+                        lines = f.readlines()
+                        for line in lines:
+                            line = line.strip()
+                            if line and not line.startswith('#') and not line.startswith('//'):
+                                token = line
+                                break
+                except Exception as e:
+                    logger.error(f"Ошибка загрузки токена из файла: {e}")
+            
+            if not token:
+                raise ValueError("Токен VK не найден ни в TokenManager, ни в файле")
+            
+            # Устанавливаем токен в VKSearchPlugin
+            vk_plugin.config["access_token"] = token
+            logger.info("Токен VK установлен в VKSearchPlugin")
+            
+            # Обрабатываем даты - если передана только дата, добавляем время
+            if isinstance(start_date, str) and len(start_date.split()) == 1:
+                start_date = f"{start_date} 00:00"
+            if isinstance(end_date, str) and len(end_date.split()) == 1:
+                end_date = f"{end_date} 23:59"
                 
             keyword_token_pairs = [(keyword, token) for keyword in keywords]
             

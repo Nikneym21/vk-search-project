@@ -68,7 +68,8 @@ class VKSearchApplication:
                 'GoogleSheetsPlugin',
                 'TextProcessingPlugin',
                 'LinkComparatorPlugin',
-                'TokenManagerPlugin'
+                'TokenManagerPlugin',
+                'FilterPlugin'
             ]
             
             for plugin_name in plugins_to_load:
