@@ -37,6 +37,8 @@ class LinkComparatorInterface:
         self.table1_label.grid(row=0, column=0, sticky="w")
         
         ttk.Button(self.table1_frame, text="Выбрать файл", command=self.load_table1).grid(row=0, column=1, padx=(10, 0))
+        # Кнопка загрузки из Google Sheets
+        ttk.Button(self.table1_frame, text="Загрузить из Google Sheets", command=self.open_gsheets_dialog_table1).grid(row=0, column=2, padx=(10, 0))
         
         # Выбор столбцов для таблицы 1
         self.table1_columns_frame = ttk.Frame(main_frame)
@@ -91,9 +93,13 @@ class LinkComparatorInterface:
         self.stats_label = ttk.Label(main_frame, text="")
         self.stats_label.grid(row=10, column=0, columnspan=3, sticky="w")
         
-        # Кнопка сохранения результатов
-        self.save_button = ttk.Button(main_frame, text="Сохранить результаты", command=self.save_results, state="disabled")
-        self.save_button.grid(row=11, column=0, columnspan=3, pady=(10, 0))
+        # Кнопка сохранения результатов (заменить на две)
+        # self.save_button = ttk.Button(main_frame, text="Сохранить результаты", command=self.save_results, state="disabled")
+        # self.save_button.grid(row=11, column=0, columnspan=3, pady=(10, 0))
+        self.save_csv_button = ttk.Button(main_frame, text="Сохранить как CSV", command=self.save_results_csv, state="disabled")
+        self.save_csv_button.grid(row=11, column=0, pady=(10, 0), sticky="ew")
+        self.save_txt_button = ttk.Button(main_frame, text="Сохранить как TXT", command=self.save_results_txt, state="disabled")
+        self.save_txt_button.grid(row=11, column=1, pady=(10, 0), sticky="ew")
         
         # Настройка весов для растягивания
         main_frame.columnconfigure(0, weight=1)
@@ -137,12 +143,15 @@ class LinkComparatorInterface:
             self.table2_columns_combo['values'] = columns
     
     def load_file(self, file_path):
-        """Загрузка файла в DataFrame"""
         try:
             if file_path.endswith('.csv'):
                 return pd.read_csv(file_path)
             elif file_path.endswith(('.xlsx', '.xls')):
                 return pd.read_excel(file_path)
+            elif file_path.endswith('.txt'):
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    lines = [line.strip() for line in f if line.strip()]
+                return pd.DataFrame({'text': lines})
             else:
                 messagebox.showerror("Ошибка", "Неподдерживаемый формат файла")
                 return None
@@ -181,9 +190,10 @@ class LinkComparatorInterface:
         # Обновляем статистику
         self.stats_label.config(text=f"Найдено {len(unique_links)} уникальных ссылок из {len(links2)} в таблице 2")
         
-        # Активируем кнопку сохранения
+        # Активируем кнопки сохранения
         if unique_links:
-            self.save_button.config(state="normal")
+            self.save_csv_button.config(state="normal")
+            self.save_txt_button.config(state="normal")
     
     def extract_links(self, df, selected_column):
         """Извлечение ссылок из DataFrame"""
@@ -235,28 +245,132 @@ class LinkComparatorInterface:
         """Проверка, является ли текст ссылкой"""
         return text.startswith(('http://', 'https://'))
     
-    def save_results(self):
-        """Сохранение результатов в файл"""
+    def save_results_csv(self):
+        """Сохранение результатов в CSV"""
         if not self.result_tree.get_children():
             messagebox.showwarning("Предупреждение", "Нет результатов для сохранения")
             return
-        
         file_path = filedialog.asksaveasfilename(
-            title="Сохранить результаты",
+            title="Сохранить результаты как CSV",
             defaultextension=".csv",
-            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.")]
         )
-        
         if file_path:
             try:
                 with open(file_path, 'w', newline='', encoding='utf-8') as file:
                     writer = csv.writer(file)
                     writer.writerow(["Уникальные ссылки"])
-                    
                     for item in self.result_tree.get_children():
                         link = self.result_tree.item(item)['values'][0]
                         writer.writerow([link])
-                
-                messagebox.showinfo("Успех", f"Результаты сохранены в {file_path}")
+            except Exception as e:
+                messagebox.showerror("Ошибка", f"Не удалось сохранить файл: {str(e)}")
+
+    def save_results_txt(self):
+        """Сохранение результатов в TXT"""
+        if not self.result_tree.get_children():
+            messagebox.showwarning("Предупреждение", "Нет результатов для сохранения")
+            return
+        file_path = filedialog.asksaveasfilename(
+            title="Сохранить результаты как TXT",
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt"), ("All files", "*.")]
+        )
+        if file_path:
+            try:
+                with open(file_path, 'w', encoding='utf-8') as file:
+                    for item in self.result_tree.get_children():
+                        link = self.result_tree.item(item)['values'][0]
+                        file.write(f"{link}\n")
             except Exception as e:
                 messagebox.showerror("Ошибка", f"Не удалось сохранить файл: {str(e)}") 
+
+    def open_gsheets_dialog_table1(self):
+        """Открывает окно выбора Google Sheets для первой таблицы"""
+        win = tk.Toplevel(self.parent_frame)
+        win.title("Загрузка из Google Sheets (Таблица 1)")
+        win.geometry("400x250")
+        frame = ttk.Frame(win, padding=10)
+        frame.pack(fill="both", expand=True)
+
+        ttk.Label(frame, text="URL Google Sheets:").grid(row=0, column=0, sticky="w")
+        url_var = tk.StringVar()
+        url_entry = ttk.Entry(frame, textvariable=url_var, width=40)
+        url_entry.grid(row=0, column=1, sticky="ew")
+
+        ttk.Label(frame, text="Лист:").grid(row=1, column=0, sticky="w")
+        sheet_var = tk.StringVar()
+        sheet_combo = ttk.Combobox(frame, textvariable=sheet_var, state="readonly", width=30)
+        sheet_combo.grid(row=1, column=1, sticky="ew")
+
+        ttk.Label(frame, text="Столбец:").grid(row=2, column=0, sticky="w")
+        column_var = tk.StringVar()
+        column_combo = ttk.Combobox(frame, textvariable=column_var, state="readonly", width=30)
+        column_combo.grid(row=2, column=1, sticky="ew")
+
+        def fetch_sheets():
+            url = url_var.get().strip()
+            if not url:
+                messagebox.showwarning("Внимание", "Введите URL Google Sheets!")
+                return
+            try:
+                if not hasattr(self, 'google_sheets_plugin') or self.google_sheets_plugin is None:
+                    # Импортируем и инициализируем плагин, если не был создан
+                    from src.plugins.google_sheets.google_sheets_plugin import GoogleSheetsPlugin
+                    self.google_sheets_plugin = GoogleSheetsPlugin()
+                    self.google_sheets_plugin.initialize_connection()
+                if not self.google_sheets_plugin.open_spreadsheet(url):
+                    messagebox.showerror("Ошибка", "Не удалось открыть таблицу по ссылке")
+                    return
+                sheets = self.google_sheets_plugin.list_worksheets()
+                if not sheets:
+                    messagebox.showerror("Ошибка", "Не удалось получить список листов")
+                    return
+                sheet_combo['values'] = sheets
+                sheet_var.set(sheets[0])
+                fetch_columns()  # сразу подгружаем столбцы для первого листа
+            except Exception as e:
+                messagebox.showerror("Ошибка", f"Ошибка загрузки листов: {e}")
+
+        def fetch_columns(*args):
+            sheet = sheet_var.get().strip()
+            if not sheet:
+                return
+            try:
+                data = self.google_sheets_plugin.download_data(sheet)
+                if not data:
+                    messagebox.showerror("Ошибка", "Лист пуст или не удалось загрузить данные")
+                    return
+                columns = list(data[0].keys()) if data else []
+                column_combo['values'] = columns
+                if columns:
+                    column_var.set(columns[0])
+            except Exception as e:
+                messagebox.showerror("Ошибка", f"Ошибка загрузки столбцов: {e}")
+
+        def load_data():
+            url = url_var.get().strip()
+            sheet = sheet_var.get().strip()
+            column = column_var.get().strip()
+            if not url or not sheet or not column:
+                messagebox.showwarning("Внимание", "Выберите все параметры!")
+                return
+            try:
+                data = self.google_sheets_plugin.download_data(sheet)
+                if not data:
+                    messagebox.showerror("Ошибка", "Не удалось загрузить данные с листа")
+                    return
+                # Преобразуем в DataFrame
+                df = pd.DataFrame(data)
+                self.table1_data = df
+                self.table1_path = f"Google Sheets: {sheet} ({url})"
+                self.table1_label.config(text=f"Google Sheets: {sheet}")
+                self.update_columns_list(1)
+                self.check_ready()
+                win.destroy()
+            except Exception as e:
+                messagebox.showerror("Ошибка", f"Ошибка загрузки данных: {e}")
+
+        ttk.Button(frame, text="Получить листы", command=fetch_sheets).grid(row=3, column=0, pady=10, sticky="ew")
+        ttk.Button(frame, text="Загрузить данные", command=load_data).grid(row=3, column=1, pady=10, sticky="ew")
+        sheet_combo.bind("<<ComboboxSelected>>", fetch_columns) 
