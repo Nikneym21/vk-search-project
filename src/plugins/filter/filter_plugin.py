@@ -4,6 +4,7 @@
 
 from typing import Dict, List, Any, Optional
 from datetime import datetime
+import asyncio
 
 from ...core.event_system import EventType
 from ..base_plugin import BasePlugin
@@ -246,3 +247,111 @@ class FilterPlugin(BasePlugin):
         
         self.log_info(f"Комплексная фильтрация: {len(posts)} -> {len(filtered)}")
         return filtered 
+
+    async def filter_posts_comprehensive_parallel(self, posts: List[Dict[str, Any]], keywords: List[str], 
+                                               exact_match: bool = True) -> List[Dict[str, Any]]:
+        """
+        Комплексная фильтрация с параллельной обработкой
+        """
+        if not posts:
+            return []
+        
+        self.log_info(f"🚀 Параллельная фильтрация {len(posts)} постов по {len(keywords)} ключам")
+        
+        # Создаем задачи для параллельной обработки
+        tasks = []
+        chunk_size = max(1, len(posts) // 10)  # Разбиваем на чанки для параллельной обработки
+        
+        for i in range(0, len(posts), chunk_size):
+            chunk = posts[i:i + chunk_size]
+            task = self._process_chunk_parallel(chunk, keywords, exact_match)
+            tasks.append(task)
+        
+        # Выполняем все задачи параллельно
+        results = await asyncio.gather(*tasks)
+        
+        # Объединяем результаты
+        filtered_posts = []
+        for result in results:
+            filtered_posts.extend(result)
+        
+        # Удаляем дубликаты
+        unique_posts = self.filter_unique_posts(filtered_posts)
+        
+        self.log_info(f"✅ Параллельная фильтрация завершена: {len(posts)} -> {len(unique_posts)}")
+        return unique_posts
+    
+    async def _process_chunk_parallel(self, chunk: List[Dict[str, Any]], keywords: List[str], 
+                                    exact_match: bool) -> List[Dict[str, Any]]:
+        """
+        Параллельная обработка чанка постов
+        """
+        filtered_chunk = []
+        
+        # Создаем задачи для каждого поста в чанке
+        post_tasks = []
+        for post in chunk:
+            task = self._process_single_post_parallel(post, keywords, exact_match)
+            post_tasks.append(task)
+        
+        # Выполняем обработку постов параллельно
+        results = await asyncio.gather(*post_tasks, return_exceptions=True)
+        
+        # Собираем результаты
+        for result in results:
+            if isinstance(result, dict) and result:  # Если пост прошел фильтрацию
+                filtered_chunk.append(result)
+            elif isinstance(result, Exception):
+                self.log_error(f"Ошибка обработки поста: {result}")
+        
+        return filtered_chunk
+    
+    async def _process_single_post_parallel(self, post: Dict[str, Any], keywords: List[str], 
+                                          exact_match: bool) -> Optional[Dict[str, Any]]:
+        """
+        Параллельная обработка одного поста
+        """
+        try:
+            # Получаем текст поста
+            text = self._extract_post_text(post)
+            if not text:
+                return None
+            
+            # Очищаем текст
+            cleaned_text = await self._clean_text_async(text)
+            
+            # Проверяем соответствие ключевым словам
+            for keyword in keywords:
+                if self._check_keyword_match(cleaned_text, keyword, exact_match):
+                    return post
+            
+            return None
+            
+        except Exception as e:
+            self.log_error(f"Ошибка обработки поста: {e}")
+            return None
+    
+    async def _clean_text_async(self, text: str) -> str:
+        """
+        Асинхронная очистка текста
+        """
+        # Получаем TextProcessingPlugin
+        plugin_manager = self.get_plugin_manager()
+        if plugin_manager:
+            text_plugin = plugin_manager.get_plugin('text_processing')
+            if text_plugin:
+                return text_plugin.clean_text_completely(text)
+        
+        # Fallback к базовой очистке
+        return self._basic_text_clean(text)
+    
+    def _basic_text_clean(self, text: str) -> str:
+        """
+        Базовая очистка текста (fallback)
+        """
+        import re
+        # Удаляем эмодзи
+        text = re.sub(r'[^\w\s]', ' ', text)
+        # Удаляем лишние пробелы
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text.lower() 

@@ -70,8 +70,13 @@ class PluginManager:
             logger.error(f"Неожиданная ошибка при загрузке плагина {plugin_name}: {e}")
     
     def get_plugin(self, name: str) -> Optional[BasePlugin]:
-        """Возвращает плагин по имени"""
+        """Получает плагин по имени"""
         return self.plugins.get(name)
+    
+    def get_logger(self):
+        """Получает логгер для плагинов"""
+        from loguru import logger
+        return logger
     
     def get_all_plugins(self) -> Dict[str, BasePlugin]:
         """Возвращает все загруженные плагины"""
@@ -107,30 +112,19 @@ class PluginManager:
             except Exception as e:
                 logger.error(f"Ошибка завершения плагина {name}: {e}")
     
-    async def coordinate_search_and_filter(self, 
-                                         keywords: List[str], 
-                                         start_date, 
-                                         end_date, 
-                                         exact_match: bool = True, 
-                                         minus_words: List[str] = None,
-                                         batch_size: int = 3) -> List[Dict[str, Any]]:
+    async def coordinate_search_and_filter(self, keywords: List[str], start_date: str, end_date: str, 
+                                        exact_match: bool = True, minus_words: List[str] = None) -> List[Dict[str, Any]]:
         """
-        Координирует поиск и фильтрацию между плагинами
+        Координация поиска и фильтрации с параллельной обработкой
+        """
+        import time
+        from datetime import datetime
         
-        Args:
-            keywords: Список ключевых фраз для поиска
-            start_date: Начальная дата (timestamp или строка)
-            end_date: Конечная дата (timestamp или строка)
-            exact_match: Точное совпадение
-            minus_words: Минус-слова
-            batch_size: Размер пакета запросов
-            
-        Returns:
-            Отфильтрованные и отформатированные результаты
-        """
+        start_time = time.time()
+        logger = self.get_logger()
+        
         try:
-            # 1. Выполняем поиск через VKSearchPlugin
-            logger.info(f"Координация поиска по {len(keywords)} ключевым фразам")
+            logger.info(f"🚀 Координация поиска и фильтрации для {len(keywords)} ключевых слов")
             
             # Получаем VKSearchPlugin
             vk_plugin = self.get_plugin('vk_search')
@@ -186,42 +180,28 @@ class PluginManager:
                 keyword_token_pairs.append((keyword, selected_token))
             
             logger.info(f"Создано {len(keyword_token_pairs)} пар (ключевое слово, токен) с ротацией")
-                
-            # Выполняем поиск
+            
+            # Выполняем поиск с параллельной фильтрацией
             raw_posts = await vk_plugin.mass_search_with_tokens(
-                keyword_token_pairs=keyword_token_pairs,
-                start_date=start_date,
-                end_date=end_date,
-                exact_match=exact_match,
-                minus_words=minus_words,
-                batch_size=batch_size
+                keyword_token_pairs, start_date, end_date, exact_match, minus_words
             )
             
-            logger.info(f"Получено {len(raw_posts)} постов от VK API")
+            logger.info(f"📊 Получено {len(raw_posts)} сырых постов от VK API")
             
-            # 2. Фильтруем результаты через FilterPlugin
+            # Параллельная фильтрация
             filter_plugin = self.get_plugin('filter')
             if not filter_plugin:
                 raise ValueError("FilterPlugin не найден")
-                
-            if keywords:
-                filtered_posts = filter_plugin.filter_posts_comprehensive(
-                    posts=raw_posts,
-                    keywords=keywords,
-                    exact_match=exact_match,
-                    use_text_cleaning=True,
-                    remove_duplicates=True
-                )
-            else:
-                # Если нет ключевых фраз, только удаляем дубликаты
-                filtered_posts = filter_plugin.filter_unique_posts(raw_posts)
             
-            logger.info(f"Отфильтровано {len(filtered_posts)} постов")
+            # Используем новую параллельную фильтрацию
+            filtered_posts = await filter_plugin.filter_posts_comprehensive_parallel(
+                raw_posts, keywords, exact_match
+            )
             
-            # 3. Форматируем результаты для отображения
-            formatted_results = self._format_search_results(filtered_posts)
+            execution_time = time.time() - start_time
+            logger.info(f"✅ Отфильтровано {len(filtered_posts)} постов за {execution_time:.2f} сек")
             
-            return formatted_results
+            return filtered_posts
             
         except Exception as e:
             logger.error(f"Ошибка координации поиска: {e}")

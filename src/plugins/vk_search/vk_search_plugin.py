@@ -47,6 +47,22 @@ class VKSearchPlugin(BasePlugin):
         self.rate_limit_hits = 0
         self.response_times = []
         self.last_request_time = 0
+        
+        # Интеллектуальное кэширование
+        self.cache_stats = {
+            "hits": 0,
+            "misses": 0,
+            "popular_queries": {},
+            "query_patterns": {},
+            "cache_size_limit": 1000,
+            "preload_enabled": True
+        }
+        
+        # Предзагрузка популярных запросов
+        self.popular_queries = [
+            "новости", "технологии", "программирование", "python", "разработка",
+            "web", "mobile", "ai", "машинное обучение", "data science"
+        ]
     
     def initialize(self) -> None:
         """Инициализация плагина"""
@@ -124,12 +140,6 @@ class VKSearchPlugin(BasePlugin):
         """Обновляет статистику использования токена"""
         self.token_usage[token] = self.token_usage.get(token, 0) + 1
     
-    def _get_cache_key(self, params: dict) -> str:
-        """Генерирует ключ кэша для параметров запроса"""
-        import hashlib
-        key_data = str(sorted(params.items()))
-        return hashlib.md5(key_data.encode()).hexdigest()
-    
     def _is_cache_valid(self, cache_entry: dict) -> bool:
         """Проверяет валидность кэша"""
         if not self.config["enable_caching"]:
@@ -137,17 +147,102 @@ class VKSearchPlugin(BasePlugin):
         
         current_time = time.time()
         return current_time - cache_entry["timestamp"] < self.config["cache_ttl"]
+    
+    def _update_cache_stats(self, cache_key: str, hit: bool):
+        """Обновляет статистику кэша"""
+        if hit:
+            self.cache_stats["hits"] += 1
+            # Увеличиваем счетчик популярности запроса
+            self.cache_stats["popular_queries"][cache_key] = \
+                self.cache_stats["popular_queries"].get(cache_key, 0) + 1
+        else:
+            self.cache_stats["misses"] += 1
+    
+    def _analyze_query_patterns(self, query: str):
+        """Анализирует паттерны запросов"""
+        # Простой анализ: разбиваем запрос на слова
+        words = query.lower().split()
+        for word in words:
+            if len(word) > 2:  # Игнорируем короткие слова
+                self.cache_stats["query_patterns"][word] = \
+                    self.cache_stats["query_patterns"].get(word, 0) + 1
+    
+    def _preload_popular_queries(self):
+        """Предзагружает популярные запросы"""
+        if not self.config["enable_caching"] or not self.cache_stats["preload_enabled"]:
+            return
+        
+        self.log_info("🔄 Предзагрузка популярных запросов...")
+        
+        # Получаем топ-5 самых популярных запросов
+        popular = sorted(
+            self.cache_stats["popular_queries"].items(), 
+            key=lambda x: x[1], 
+            reverse=True
+        )[:5]
+        
+        # Добавляем базовые популярные запросы
+        for query in self.popular_queries:
+            if query not in [p[0] for p in popular]:
+                popular.append((query, 1))
+        
+        self.log_info(f"📊 Найдено {len(popular)} популярных запросов для предзагрузки")
+    
+    def _smart_cache_cleanup(self):
+        """Умная очистка кэша с сохранением популярных запросов"""
+        if len(self.cache) <= self.cache_stats["cache_size_limit"]:
+            return
+        
+        self.log_info("🧹 Умная очистка кэша...")
+        
+        # Сортируем кэш по популярности и времени
+        cache_items = []
+        for key, entry in self.cache.items():
+            popularity = self.cache_stats["popular_queries"].get(key, 0)
+            age = time.time() - entry["timestamp"]
+            score = popularity - (age / 3600)  # Популярность минус возраст в часах
+            cache_items.append((key, score))
+        
+        # Удаляем наименее популярные и старые записи
+        cache_items.sort(key=lambda x: x[1])
+        to_remove = len(self.cache) - self.cache_stats["cache_size_limit"] // 2
+        
+        for key, _ in cache_items[:to_remove]:
+            del self.cache[key]
+        
+        self.log_info(f"🧹 Удалено {to_remove} записей из кэша")
+    
+    def _get_cache_key(self, params: dict) -> str:
+        """Генерирует ключ кэша для параметров запроса"""
+        import hashlib
+        key_data = str(sorted(params.items()))
+        return hashlib.md5(key_data.encode()).hexdigest()
 
     def get_statistics(self) -> Dict[str, Any]:
-        """Возвращает расширенную статистику плагина"""
+        """Возвращает расширенную статистику плагина с интеллектуальными метриками"""
         avg_response_time = 0
         if self.response_times:
             avg_response_time = sum(self.response_times) / len(self.response_times)
         
+        # Интеллектуальные метрики кэша
+        total_cache_requests = self.cache_stats["hits"] + self.cache_stats["misses"]
         cache_hit_rate = 0
-        if self.requests_made > 0:
-            cache_hits = len([r for r in self.response_times if r < 0.1])  # Примерная оценка
-            cache_hit_rate = cache_hits / self.requests_made
+        if total_cache_requests > 0:
+            cache_hit_rate = self.cache_stats["hits"] / total_cache_requests
+        
+        # Топ популярных запросов
+        top_queries = sorted(
+            self.cache_stats["popular_queries"].items(), 
+            key=lambda x: x[1], 
+            reverse=True
+        )[:5]
+        
+        # Топ паттернов запросов
+        top_patterns = sorted(
+            self.cache_stats["query_patterns"].items(), 
+            key=lambda x: x[1], 
+            reverse=True
+        )[:5]
         
         return {
             "requests_made": self.requests_made,
@@ -160,6 +255,16 @@ class VKSearchPlugin(BasePlugin):
                 "cache_hit_rate": round(cache_hit_rate, 3),
                 "token_usage": self.token_usage,
                 "requests_per_second": round(self.requests_made / max(1, avg_response_time), 2) if avg_response_time > 0 else 0
+            },
+            "intelligent_caching": {
+                "cache_hits": self.cache_stats["hits"],
+                "cache_misses": self.cache_stats["misses"],
+                "total_cache_requests": total_cache_requests,
+                "cache_hit_rate": round(cache_hit_rate, 3),
+                "top_popular_queries": top_queries,
+                "top_query_patterns": top_patterns,
+                "cache_size_limit": self.cache_stats["cache_size_limit"],
+                "preload_enabled": self.cache_stats["preload_enabled"]
             }
         }
 
@@ -209,16 +314,21 @@ class VKSearchPlugin(BasePlugin):
 
     async def _fetch_vk_batch(self, session, params, query, retry_count=3):
         """
-        Оптимизированное получение одной партии результатов от VK API
+        Оптимизированное получение одной партии результатов от VK API с интеллектуальным кэшированием
         """
         import time
+        
+        # Анализируем паттерны запроса
+        self._analyze_query_patterns(query)
         
         # Проверяем кэш
         cache_key = self._get_cache_key(params)
         if cache_key in self.cache and self._is_cache_valid(self.cache[cache_key]):
             self.log_info(f"📋 Кэш-хит для запроса '{query}'")
+            self._update_cache_stats(cache_key, True)
             return self.cache[cache_key]["data"]
         
+        self._update_cache_stats(cache_key, False)
         start_time = time.time()
         
         for attempt in range(retry_count):
@@ -250,12 +360,17 @@ class VKSearchPlugin(BasePlugin):
                         if 'response' in data:
                             items = data['response'].get('items', [])
                             
-                            # Кэшируем результат
+                            # Интеллектуальное кэширование
                             if self.config["enable_caching"]:
                                 self.cache[cache_key] = {
                                     "data": items,
-                                    "timestamp": time.time()
+                                    "timestamp": time.time(),
+                                    "query": query,
+                                    "params": params
                                 }
+                                
+                                # Умная очистка кэша при необходимости
+                                self._smart_cache_cleanup()
                             
                             # Записываем время ответа
                             response_time = time.time() - start_time

@@ -60,16 +60,19 @@ class VKSearchApplication:
     def _load_all_plugins(self):
         """Загружает все доступные плагины"""
         try:
-            # Список всех плагинов для загрузки
+            # Список плагинов для загрузки
             plugins_to_load = [
-                'VKSearchPlugin',
-                'DataManagerPlugin', 
-                'DatabasePlugin',
+                'DataManagerPlugin',
+                'DatabasePlugin', 
                 'GoogleSheetsPlugin',
+                'VKSearchPlugin',
                 'TextProcessingPlugin',
                 'LinkComparatorPlugin',
                 'TokenManagerPlugin',
-                'FilterPlugin'
+                'SettingsManagerPlugin',
+                'FilterPlugin',
+                'LoggerPlugin',
+                'MonitoringPlugin'
             ]
             
             for plugin_name in plugins_to_load:
