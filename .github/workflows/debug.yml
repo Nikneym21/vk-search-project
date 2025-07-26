@@ -1,0 +1,202 @@
+name: Debug and Performance
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'  # Каждый день в 2:00 UTC
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements/requirements.txt
+        pip install pytest pytest-asyncio memory-profiler psutil
+    
+    - name: Create test environment
+      run: |
+        mkdir -p data/results logs config
+        echo '{"test": true}' > data/interface_settings.json
+        echo '{"test": true}' > window_settings.json
+    
+    - name: Run debug tests
+      run: |
+        python -m pytest test/ -v -s --tb=short --maxfail=5
+        python -c "import src.main; print('Main module imports successfully')"
+    
+    - name: Memory profiling
+      run: |
+        python -m memory_profiler test/performance/test_performance_optimization.py || true
+    
+    - name: Check for memory leaks
+      run: |
+        python -c "
+        import gc
+        import sys
+        import src.core.plugin_manager as pm
+        
+        # Создаем менеджер плагинов
+        manager = pm.PluginManager()
+        
+        # Проверяем количество объектов
+        initial_count = len(gc.get_objects())
+        
+        # Инициализируем плагины
+        manager.initialize_plugins()
+        
+        # Проверяем после инициализации
+        after_init_count = len(gc.get_objects())
+        
+        # Очищаем
+        manager.shutdown()
+        gc.collect()
+        
+        # Финальная проверка
+        final_count = len(gc.get_objects())
+        
+        print(f'Initial objects: {initial_count}')
+        print(f'After init: {after_init_count}')
+        print(f'Final objects: {final_count}')
+        print(f'Memory leak: {final_count - initial_count}')
+        "
+
+  performance:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+    
+    - name: Install performance tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements/requirements.txt
+        pip install pytest-benchmark cProfile-to-pprof
+    
+    - name: Run performance benchmarks
+      run: |
+        python -m pytest test/performance/ -v --benchmark-only || true
+    
+    - name: Profile database operations
+      run: |
+        python -c "
+        import cProfile
+        import pstats
+        import io
+        from src.plugins.database.database_plugin import DatabasePlugin
+        
+        # Профилируем операции с БД
+        pr = cProfile.Profile()
+        pr.enable()
+        
+        db = DatabasePlugin()
+        db.initialize()
+        
+        # Симулируем операции
+        for i in range(100):
+            db.create_task(f'test_task_{i}', 'test_query')
+        
+        pr.disable()
+        
+        s = io.StringIO()
+        ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
+        ps.print_stats(20)
+        
+        with open('database_profile.txt', 'w') as f:
+            f.write(s.getvalue())
+        "
+    
+    - name: Upload performance report
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-report
+        path: |
+          database_profile.txt
+          .pytest_cache/
+        retention-days: 30
+
+  monitoring:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+    
+    - name: Install monitoring dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements/requirements.txt
+        pip install psutil
+    
+    - name: Run monitoring tests
+      run: |
+        python -c "
+        import psutil
+        import time
+        import src.plugins.monitoring.monitoring_plugin as mp
+        
+        print('=== System Monitoring Test ===')
+        print(f'CPU Usage: {psutil.cpu_percent()}%')
+        print(f'Memory Usage: {psutil.virtual_memory().percent}%')
+        print(f'Disk Usage: {psutil.disk_usage("/").percent}%')
+        
+        # Тестируем мониторинг плагин
+        try:
+            monitor = mp.MonitoringPlugin()
+            monitor.initialize()
+            print('Monitoring plugin initialized successfully')
+            monitor.shutdown()
+        except Exception as e:
+            print(f'Monitoring plugin error: {e}')
+        "
+    
+    - name: Check plugin health
+      run: |
+        python -c "
+        import sys
+        import os
+        sys.path.append('src')
+        
+        # Проверяем все плагины
+        plugins_to_check = [
+            'src.plugins.database.database_plugin',
+            'src.plugins.vk_search.vk_search_plugin',
+            'src.plugins.post_processor.post_processor_plugin',
+            'src.plugins.filter.filter_plugin',
+            'src.plugins.deduplication.deduplication_plugin',
+            'src.plugins.text_processing.text_processing_plugin',
+            'src.plugins.token_manager.token_manager_plugin',
+            'src.plugins.google_sheets.google_sheets_plugin',
+            'src.plugins.link_comparator.link_comparator_plugin',
+            'src.plugins.settings_manager.settings_manager_plugin',
+            'src.plugins.logger.logger_plugin',
+            'src.plugins.monitoring.monitoring_plugin'
+        ]
+        
+        for plugin in plugins_to_check:
+            try:
+                __import__(plugin)
+                print(f'✅ {plugin} - OK')
+            except Exception as e:
+                print(f'❌ {plugin} - ERROR: {e}')
+        " 

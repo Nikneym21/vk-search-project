@@ -1,0 +1,4 @@
+exclude_dirs: ['tests', 'test', '.venv', 'venv', 'env', '.env']
+skips: ['B101', 'B601']
+targets: ['src']
+recursive: true 
