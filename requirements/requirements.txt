@@ -17,7 +17,7 @@ gspread>=5.10.0
 oauth2client>=4.1.3
 
 # База данных
-sqlite3
+# sqlite3 - встроенный модуль Python, не требует установки
 
 # Логирование
 loguru>=0.7.0
@@ -45,7 +45,7 @@ safety>=2.3.0
 # Профилирование и мониторинг
 memory-profiler>=0.61.0
 psutil>=5.9.0
-cProfile-to-pprof>=0.1.0
+# cProfile-to-pprof>=0.1.0  # Проблемный пакет, убираем
 
 # Pre-commit hooks
 pre-commit>=3.6.0
@@ -57,6 +57,9 @@ lxml>=4.9.0
 
 # Обработка текста
 emoji>=2.2.0
+
+# Работа с временными зонами
+pytz>=2023.3
 
 # Работа с Excel
 openpyxl>=3.1.0

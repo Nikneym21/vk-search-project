@@ -4,4 +4,4 @@
 
 from .settings_manager_plugin import SettingsManagerPlugin
 
-__all__ = ['SettingsManagerPlugin'] 
+__all__ = ["SettingsManagerPlugin"]

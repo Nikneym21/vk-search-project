@@ -190,7 +190,7 @@ class TestVKSearchPlugin(unittest.TestCase):
                                 plugin.log_error(f"Ошибка поиска: {result}")
                         await asyncio.sleep(0.3)
                     # Используем FilterPlugin для фильтрации
-                    from src.plugins.filter.filter_plugin import FilterPlugin
+                    from src.plugins.post_processor.filter.filter_plugin import FilterPlugin
                     filter_plugin = FilterPlugin()
                     filter_plugin.initialize()
                     filtered = filter_plugin.filter_posts_by_keyword_with_text_cleaning(posts_for_keyword, keyword, exact_match=False)
@@ -324,7 +324,7 @@ class TestVKSearchPlugin(unittest.TestCase):
                                 plugin.log_error(f"Ошибка поиска: {result}")
                         await asyncio.sleep(0.3)
                     # Используем FilterPlugin для фильтрации
-                    from src.plugins.filter.filter_plugin import FilterPlugin
+                    from src.plugins.post_processor.filter.filter_plugin import FilterPlugin
                     filter_plugin = FilterPlugin()
                     filter_plugin.initialize()
                     filtered = filter_plugin.filter_posts_by_keyword_with_text_cleaning(posts_for_keyword, keyword, exact_match=False)
@@ -453,7 +453,7 @@ class TestVKSearchPlugin(unittest.TestCase):
                                 plugin.log_error(f"Ошибка поиска: {result}")
                         await asyncio.sleep(0.3)
                     # Используем FilterPlugin для фильтрации
-                    from src.plugins.filter.filter_plugin import FilterPlugin
+                    from src.plugins.post_processor.filter.filter_plugin import FilterPlugin
                     filter_plugin = FilterPlugin()
                     filter_plugin.initialize()
                     filtered = filter_plugin.filter_posts_by_keyword_with_text_cleaning(posts_for_keyword, keyword, exact_match=False)

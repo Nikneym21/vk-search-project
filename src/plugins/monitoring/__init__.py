@@ -4,4 +4,4 @@
 
 from .monitoring_plugin import MonitoringPlugin
 
-__all__ = ['MonitoringPlugin'] 
+__all__ = ["MonitoringPlugin"]

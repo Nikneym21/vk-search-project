@@ -2,14 +2,9 @@
 GUI модули для приложения
 """
 
-from .main_interface import MainInterface
 from .link_comparator_interface import LinkComparatorInterface
-from .vk_parser_interface import VKParserInterface
+from .main_interface import MainInterface
 from .settings_adapter import SettingsAdapter
+from .vk_parser_interface import VKParserInterface
 
-__all__ = [
-    'MainInterface',
-    'LinkComparatorInterface', 
-    'VKParserInterface',
-    'SettingsAdapter'
-] 
+__all__ = ["MainInterface", "LinkComparatorInterface", "VKParserInterface", "SettingsAdapter"]

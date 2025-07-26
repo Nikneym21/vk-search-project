@@ -1,4 +1,5 @@
-from typing import Callable, Dict, List, Any
+from typing import Any, Callable, Dict, List
+
 
 class EventType:
     PLUGIN_LOADED = "plugin_loaded"
@@ -6,6 +7,7 @@ class EventType:
     ERROR = "error"
     DATA_UPDATED = "data_updated"
     # Добавьте другие события по необходимости
+
 
 class EventSystem:
     def __init__(self):
@@ -40,5 +42,6 @@ class EventSystem:
         print(f"[EVENT emit] type={event_type}, data={data}, extra_args={args[2:]}, kwargs={kwargs}")
         self.emit_event(event_type, data)
 
+
 # Глобальный экземпляр для импортов
-event_system = EventSystem() 
+event_system = EventSystem()

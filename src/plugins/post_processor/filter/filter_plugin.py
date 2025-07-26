@@ -2,9 +2,8 @@
 Плагин для локальной фильтрации данных по ключевым фразам
 """
 
-from typing import Dict, List, Any, Optional
-from datetime import datetime
 import asyncio
+from typing import Any, Dict, List, Optional
 
 from src.core.event_system import EventType
 from src.plugins.base_plugin import BasePlugin
@@ -25,7 +24,7 @@ class FilterPlugin(BasePlugin):
             "enable_exact_match": True,
             "enable_unique_filtering": True,
             "min_text_length": 3,
-            "max_text_length": 10000
+            "max_text_length": 10000,
         }
 
         # Связи с другими плагинами
@@ -59,14 +58,11 @@ class FilterPlugin(BasePlugin):
 
     def get_statistics(self) -> Dict[str, Any]:
         """Возвращает статистику плагина"""
-        return {
-            "enabled": self.is_enabled(),
-            "config": self.get_config()
-        }
+        return {"enabled": self.is_enabled(), "config": self.get_config()}
 
-
-
-    def filter_posts_by_keyword(self, posts: List[Dict[str, Any]], keyword: str, exact_match: bool = True) -> List[Dict[str, Any]]:
+    def filter_posts_by_keyword(
+        self, posts: List[Dict[str, Any]], keyword: str, exact_match: bool = True
+    ) -> List[Dict[str, Any]]:
         """
         Фильтрация постов по ключевому слову (без очистки текста)
 
@@ -85,7 +81,7 @@ class FilterPlugin(BasePlugin):
         keyword_lower = keyword.lower()
 
         for post in posts:
-            text = str(post.get('text', '') or post.get('post_text', ''))
+            text = str(post.get("text", "") or post.get("post_text", ""))
             text_lower = text.lower()
 
             if exact_match:
@@ -101,7 +97,9 @@ class FilterPlugin(BasePlugin):
         self.log_info(f"Фильтрация по ключу '{keyword}': {len(posts)} -> {len(filtered)}")
         return filtered
 
-    def filter_posts_by_keyword_with_text_cleaning(self, posts: List[Dict[str, Any]], keyword: str, exact_match: bool = True) -> List[Dict[str, Any]]:
+    def filter_posts_by_keyword_with_text_cleaning(
+        self, posts: List[Dict[str, Any]], keyword: str, exact_match: bool = True
+    ) -> List[Dict[str, Any]]:
         """
         Фильтрация постов по ключевому слову с очисткой текста
 
@@ -117,27 +115,25 @@ class FilterPlugin(BasePlugin):
             return []
 
         try:
-            # Импортируем TextProcessingPlugin для очистки текста
-            from src.plugins.post_processor.text_processing.text_processing_plugin import TextProcessingPlugin
-            text_plugin = TextProcessingPlugin()
-            text_plugin.initialize()
+            # FilterPlugin больше не выполняет очистку текста
+            # Текст должен быть уже очищен TextProcessingPlugin в правильном порядке обработки
 
-            # Очищаем ключевое слово
-            keyword_clean = text_plugin.clean_text_completely(keyword)
+            # Используем ключевое слово как есть (очистка должна происходить на этапе text_processing)
+            keyword_clean = keyword.strip().lower()
 
             filtered = []
             for post in posts:
-                # Получаем текст поста
-                text = str(post.get('text', '') or post.get('post_text', ''))
+                # Получаем текст поста (должен быть уже очищен)
+                text = self._extract_post_text(post)
+                if not text:
+                    continue
 
-                # Очищаем текст поста
-                text_clean = text_plugin.clean_text_completely(text)
+                # Приводим к нижнему регистру для сравнения
+                text_lower = text.lower()
 
                 # Проверяем вхождение ключа
-                if keyword_clean in text_clean:
+                if keyword_clean in text_lower:
                     filtered.append(post)
-
-            text_plugin.shutdown()
 
             self.log_info(f"Фильтрация с очисткой текста по ключу '{keyword}': {len(posts)} -> {len(filtered)}")
             return filtered
@@ -147,8 +143,9 @@ class FilterPlugin(BasePlugin):
             # Fallback к простой фильтрации без очистки
             return self.filter_posts_by_keyword(posts, keyword, exact_match)
 
-    def filter_posts_by_multiple_keywords(self, posts: List[Dict[str, Any]], keywords: List[str],
-                                        exact_match: bool = True, use_text_cleaning: bool = True) -> List[Dict[str, Any]]:
+    def filter_posts_by_multiple_keywords(
+        self, posts: List[Dict[str, Any]], keywords: List[str], exact_match: bool = True, use_text_cleaning: bool = True
+    ) -> List[Dict[str, Any]]:
         """
         Фильтрация постов по нескольким ключевым словам
 
@@ -167,7 +164,7 @@ class FilterPlugin(BasePlugin):
         filtered = []
 
         for post in posts:
-            text = str(post.get('text', '') or post.get('post_text', ''))
+            str(post.get("text", "") or post.get("post_text", ""))
 
             for keyword in keywords:
                 if use_text_cleaning:
@@ -184,9 +181,14 @@ class FilterPlugin(BasePlugin):
         self.log_info(f"Фильтрация по {len(keywords)} ключам: {len(posts)} -> {len(filtered)}")
         return filtered
 
-    def filter_posts_comprehensive(self, posts: List[Dict[str, Any]], keywords: List[str] = None,
-                                 exact_match: bool = True, use_text_cleaning: bool = True,
-                                 remove_duplicates: bool = True) -> List[Dict[str, Any]]:
+    def filter_posts_comprehensive(
+        self,
+        posts: List[Dict[str, Any]],
+        keywords: List[str] = None,
+        exact_match: bool = True,
+        use_text_cleaning: bool = True,
+        remove_duplicates: bool = True,
+    ) -> List[Dict[str, Any]]:
         """
         Комплексная фильтрация постов по ключевым фразам
 
@@ -220,15 +222,20 @@ class FilterPlugin(BasePlugin):
         # 2. Удаление дубликатов
         if remove_duplicates and self.database_plugin:
             # Получаем DeduplicationPlugin через PluginManager
-            deduplication_plugin = self.database_plugin.plugin_manager.get_plugin('deduplication') if hasattr(self.database_plugin, 'plugin_manager') else None
+            deduplication_plugin = (
+                self.database_plugin.plugin_manager.get_plugin("deduplication")
+                if hasattr(self.database_plugin, "plugin_manager")
+                else None
+            )
             if deduplication_plugin:
                 filtered = deduplication_plugin.remove_duplicates_by_link_hash(filtered)
 
         self.log_info(f"Комплексная фильтрация: {len(posts)} -> {len(filtered)}")
         return filtered
 
-    async def filter_posts_comprehensive_parallel(self, posts: List[Dict[str, Any]], keywords: List[str],
-                                               exact_match: bool = True) -> List[Dict[str, Any]]:
+    async def filter_posts_comprehensive_parallel(
+        self, posts: List[Dict[str, Any]], keywords: List[str], exact_match: bool = True
+    ) -> List[Dict[str, Any]]:
         """
         Комплексная фильтрация с параллельной обработкой
         """
@@ -242,7 +249,7 @@ class FilterPlugin(BasePlugin):
         chunk_size = max(1, len(posts) // 10)  # Разбиваем на чанки для параллельной обработки
 
         for i in range(0, len(posts), chunk_size):
-            chunk = posts[i:i + chunk_size]
+            chunk = posts[i : i + chunk_size]
             task = self._process_chunk_parallel(chunk, keywords, exact_match)
             tasks.append(task)
 
@@ -256,7 +263,11 @@ class FilterPlugin(BasePlugin):
 
         # Удаляем дубликаты (используем DeduplicationPlugin)
         if self.database_plugin:
-            deduplication_plugin = self.database_plugin.plugin_manager.get_plugin('deduplication') if hasattr(self.database_plugin, 'plugin_manager') else None
+            deduplication_plugin = (
+                self.database_plugin.plugin_manager.get_plugin("deduplication")
+                if hasattr(self.database_plugin, "plugin_manager")
+                else None
+            )
             if deduplication_plugin:
                 unique_posts = deduplication_plugin.remove_duplicates_by_link_hash(filtered_posts)
             else:
@@ -267,8 +278,9 @@ class FilterPlugin(BasePlugin):
         self.log_info(f"✅ Параллельная фильтрация завершена: {len(posts)} -> {len(unique_posts)}")
         return unique_posts
 
-    async def _process_chunk_parallel(self, chunk: List[Dict[str, Any]], keywords: List[str],
-                                    exact_match: bool) -> List[Dict[str, Any]]:
+    async def _process_chunk_parallel(
+        self, chunk: List[Dict[str, Any]], keywords: List[str], exact_match: bool
+    ) -> List[Dict[str, Any]]:
         """
         Параллельная обработка чанка постов
         """
@@ -292,8 +304,9 @@ class FilterPlugin(BasePlugin):
 
         return filtered_chunk
 
-    async def _process_single_post_parallel(self, post: Dict[str, Any], keywords: List[str],
-                                          exact_match: bool) -> Optional[Dict[str, Any]]:
+    async def _process_single_post_parallel(
+        self, post: Dict[str, Any], keywords: List[str], exact_match: bool
+    ) -> Optional[Dict[str, Any]]:
         """
         Параллельная обработка одного поста
         """
@@ -304,7 +317,7 @@ class FilterPlugin(BasePlugin):
                 return None
 
             # Очищаем текст
-            cleaned_text = await self._clean_text_async(text)
+            cleaned_text = await self._process_text_for_filtering(text)
 
             # Проверяем соответствие ключевым словам
             for keyword in keywords:
@@ -317,30 +330,15 @@ class FilterPlugin(BasePlugin):
             self.log_error(f"Ошибка обработки поста: {e}")
             return None
 
-    async def _clean_text_async(self, text: str) -> str:
-        """
-        Асинхронная очистка текста
-        """
-        # Получаем TextProcessingPlugin
-        plugin_manager = self.get_plugin_manager()
-        if plugin_manager:
-            text_plugin = plugin_manager.get_plugin('text_processing')
-            if text_plugin:
-                return text_plugin.clean_text_completely(text)
+    # Методы очистки текста удалены - это ответственность TextProcessingPlugin
+    # FilterPlugin теперь работает только с уже очищенным текстом
 
-        # Fallback к базовой очистке
-        return self._basic_text_clean(text)
-
-    def _basic_text_clean(self, text: str) -> str:
+    async def _process_text_for_filtering(self, text: str) -> str:
         """
-        Базовая очистка текста (fallback)
+        Подготовка текста для фильтрации (только приведение к нижнему регистру)
+        Очистка текста должна происходить на этапе text_processing
         """
-        import re
-        # Удаляем эмодзи
-        text = re.sub(r'[^\w\s]', ' ', text)
-        # Удаляем лишние пробелы
-        text = re.sub(r'\s+', ' ', text).strip()
-        return text.lower()
+        return text.lower().strip() if text else ""
 
     def _extract_post_text(self, post: Dict[str, Any]) -> str:
         """
@@ -353,7 +351,7 @@ class FilterPlugin(BasePlugin):
             Текст поста или пустая строка
         """
         # Пробуем разные варианты ключей для текста
-        text_keys = ['text', 'message', 'content', 'body']
+        text_keys = ["text", "message", "content", "body"]
 
         for key in text_keys:
             if key in post and post[key]:
@@ -392,15 +390,14 @@ class FilterPlugin(BasePlugin):
 
             return False
 
-
-
     def set_database_plugin(self, database_plugin):
         """Устанавливает связь с плагином базы данных"""
         self.database_plugin = database_plugin
         self.log_info("DatabasePlugin подключен к FilterPlugin")
 
-    def filter_posts_by_keywords_fast(self, posts: List[Dict[str, Any]], keywords: List[str],
-                                    exact_match: bool = True) -> List[Dict[str, Any]]:
+    def filter_posts_by_keywords_fast(
+        self, posts: List[Dict[str, Any]], keywords: List[str], exact_match: bool = True
+    ) -> List[Dict[str, Any]]:
         """
         Быстрая фильтрация постов по ключевым словам (для работы с БД)
 
@@ -426,15 +423,16 @@ class FilterPlugin(BasePlugin):
             for keyword in keywords:
                 if self._check_keyword_match(text, keyword, exact_match):
                     # Добавляем информацию о найденных ключевых словах
-                    post['keywords_matched'] = post.get('keywords_matched', []) + [keyword]
+                    post["keywords_matched"] = post.get("keywords_matched", []) + [keyword]
                     filtered_posts.append(post)
                     break
 
         self.log_info(f"Быстрая фильтрация: {len(posts)} -> {len(filtered_posts)}")
         return filtered_posts
 
-    def filter_posts_from_database(self, task_id: int, keywords: List[str],
-                                 exact_match: bool = True) -> List[Dict[str, Any]]:
+    def filter_posts_from_database(
+        self, task_id: int, keywords: List[str], exact_match: bool = True
+    ) -> List[Dict[str, Any]]:
         """
         Фильтрация постов напрямую из базы данных
 
@@ -468,10 +466,7 @@ class FilterPlugin(BasePlugin):
             self.log_error(f"Ошибка фильтрации из БД: {e}")
             return []
 
-
-
-    def clean_by_parsing_parameters(self, task_id: int, keywords: List[str],
-                                  exact_match: bool = True) -> int:
+    def clean_by_parsing_parameters(self, task_id: int, keywords: List[str], exact_match: bool = True) -> int:
         """
         Очистка постов, не соответствующих параметрам парсинга
 
@@ -498,8 +493,8 @@ class FilterPlugin(BasePlugin):
             valid_posts = self.filter_posts_by_keywords_fast(posts, keywords, exact_match)
 
             # Находим посты для удаления
-            valid_ids = {post['id'] for post in valid_posts}
-            posts_to_remove = [post for post in posts if post['id'] not in valid_ids]
+            valid_ids = {post["id"] for post in valid_posts}
+            posts_to_remove = [post for post in posts if post["id"] not in valid_ids]
 
             if not posts_to_remove:
                 self.log_info("Нет постов для удаления")
@@ -510,7 +505,7 @@ class FilterPlugin(BasePlugin):
             removed_count = 0
 
             for post in posts_to_remove:
-                cursor.execute('DELETE FROM posts WHERE id = ?', (post['id'],))
+                cursor.execute("DELETE FROM posts WHERE id = ?", (post["id"],))
                 removed_count += 1
 
             self.database_plugin.connection.commit()

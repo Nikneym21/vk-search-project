@@ -1,7 +1,8 @@
-import os
-from loguru import logger
-from functools import wraps
 import inspect
+from functools import wraps
+
+from loguru import logger
+
 
 def setup_logger(log_file: str = None, level: str = "INFO"):
     """
@@ -20,6 +21,7 @@ def log_function_call(level: str = "DEBUG"):
     Декоратор для автоматического логирования вызова функции, её аргументов и результата.
     level: уровень логирования (DEBUG, INFO, WARNING, ERROR)
     """
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -34,5 +36,7 @@ def log_function_call(level: str = "DEBUG"):
             except Exception as e:
                 logger.exception(f"Ошибка в {func_name}: {e}")
                 raise
+
         return wrapper
-    return decorator 
+
+    return decorator

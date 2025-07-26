@@ -4,4 +4,4 @@
 
 from .filter_plugin import FilterPlugin
 
-__all__ = ['FilterPlugin'] 
+__all__ = ["FilterPlugin"]

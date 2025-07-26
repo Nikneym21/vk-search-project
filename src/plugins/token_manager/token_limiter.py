@@ -1,5 +1,6 @@
-import time
 import threading
+import time
+
 
 class TokenLimiter:
     def __init__(self, tokens, cooldown_seconds=60):
@@ -28,4 +29,4 @@ class TokenLimiter:
         with self.lock:
             expired = [t for t, until in self.blocked.items() if until < now]
             for t in expired:
-                del self.blocked[t] 
+                del self.blocked[t]
