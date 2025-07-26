@@ -73,3 +73,7 @@
 	27  libsystem_pthread.dylib             0x00007ff806ed9857 thread_start + 15
 )
 libc++abi: terminating due to uncaught exception of type NSException
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:301: UserWarning: resource_tracker: There appear to be 8 leaked semaphore objects to clean up at shutdown: {'/mp-52byocw0', '/mp-2dsh7nug', '/mp-1u7g2jdj', '/mp-kp62tizh', '/mp-ui9ngu73', '/mp-kb00i4ba', '/mp-ajx3vizt', '/mp-2bhyi06g'}
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:301: UserWarning: resource_tracker: There appear to be 8 leaked semaphore objects to clean up at shutdown: {'/mp-1kc7yf32', '/mp-mi5bxdz5', '/mp-ea0fx5wc', '/mp-eo9qd6hb', '/mp-c4iug0_q', '/mp-c1u8wnw4', '/mp-chw56zlv', '/mp-9t9wx_oc'}
+  warnings.warn(

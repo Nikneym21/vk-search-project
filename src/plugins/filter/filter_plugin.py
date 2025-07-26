@@ -27,6 +27,9 @@ class FilterPlugin(BasePlugin):
             "min_text_length": 3,
             "max_text_length": 10000
         }
+        
+        # Связи с другими плагинами
+        self.database_plugin = None
     
     def initialize(self) -> None:
         """Инициализация плагина"""
@@ -61,34 +64,7 @@ class FilterPlugin(BasePlugin):
             "config": self.get_config()
         }
 
-    def filter_unique_posts(self, posts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """
-        Фильтрация уникальных постов по (owner_id, post_id)
-        
-        Args:
-            posts: Список постов для фильтрации
-            
-        Returns:
-            Список уникальных постов
-        """
-        if not posts:
-            return []
-        
-        seen = set()
-        unique = []
-        
-        for post in posts:
-            owner_id = post.get('owner_id')
-            post_id = post.get('id') or post.get('post_id')
-            
-            if owner_id is not None and post_id is not None:
-                key = (owner_id, post_id)
-                if key not in seen:
-                    seen.add(key)
-                    unique.append(post)
-        
-        self.log_info(f"Фильтрация уникальных постов: {len(posts)} -> {len(unique)}")
-        return unique
+
 
     def filter_posts_by_keyword(self, posts: List[Dict[str, Any]], keyword: str, exact_match: bool = True) -> List[Dict[str, Any]]:
         """
@@ -242,8 +218,11 @@ class FilterPlugin(BasePlugin):
                 filtered = self.filter_posts_by_multiple_keywords(filtered, keywords, exact_match, use_text_cleaning)
         
         # 2. Удаление дубликатов
-        if remove_duplicates:
-            filtered = self.filter_unique_posts(filtered)
+        if remove_duplicates and self.database_plugin:
+            # Получаем DeduplicationPlugin через PluginManager
+            deduplication_plugin = self.database_plugin.plugin_manager.get_plugin('deduplication') if hasattr(self.database_plugin, 'plugin_manager') else None
+            if deduplication_plugin:
+                filtered = deduplication_plugin.remove_duplicates_by_link_hash(filtered)
         
         self.log_info(f"Комплексная фильтрация: {len(posts)} -> {len(filtered)}")
         return filtered 
@@ -275,8 +254,15 @@ class FilterPlugin(BasePlugin):
         for result in results:
             filtered_posts.extend(result)
         
-        # Удаляем дубликаты
-        unique_posts = self.filter_unique_posts(filtered_posts)
+        # Удаляем дубликаты (используем DeduplicationPlugin)
+        if self.database_plugin:
+            deduplication_plugin = self.database_plugin.plugin_manager.get_plugin('deduplication') if hasattr(self.database_plugin, 'plugin_manager') else None
+            if deduplication_plugin:
+                unique_posts = deduplication_plugin.remove_duplicates_by_link_hash(filtered_posts)
+            else:
+                unique_posts = filtered_posts
+        else:
+            unique_posts = filtered_posts
         
         self.log_info(f"✅ Параллельная фильтрация завершена: {len(posts)} -> {len(unique_posts)}")
         return unique_posts
@@ -354,4 +340,189 @@ class FilterPlugin(BasePlugin):
         text = re.sub(r'[^\w\s]', ' ', text)
         # Удаляем лишние пробелы
         text = re.sub(r'\s+', ' ', text).strip()
-        return text.lower() 
+        return text.lower()
+    
+    def _extract_post_text(self, post: Dict[str, Any]) -> str:
+        """
+        Извлекает текст из поста
+        
+        Args:
+            post: Словарь с данными поста
+            
+        Returns:
+            Текст поста или пустая строка
+        """
+        # Пробуем разные варианты ключей для текста
+        text_keys = ['text', 'message', 'content', 'body']
+        
+        for key in text_keys:
+            if key in post and post[key]:
+                return str(post[key])
+        
+        return ""
+    
+    def _check_keyword_match(self, text: str, keyword: str, exact_match: bool = True) -> bool:
+        """
+        Проверяет соответствие текста ключевому слову
+        
+        Args:
+            text: Текст для проверки
+            keyword: Ключевое слово
+            exact_match: Точное совпадение
+            
+        Returns:
+            True если найдено соответствие
+        """
+        if not text or not keyword:
+            return False
+        
+        text_lower = text.lower()
+        keyword_lower = keyword.lower()
+        
+        if exact_match:
+            return keyword_lower in text_lower
+        else:
+            # Частичное совпадение - проверяем каждое слово
+            text_words = text_lower.split()
+            keyword_words = keyword_lower.split()
+            
+            for kw_word in keyword_words:
+                if any(kw_word in word for word in text_words):
+                    return True
+            
+            return False
+    
+
+    
+    def set_database_plugin(self, database_plugin):
+        """Устанавливает связь с плагином базы данных"""
+        self.database_plugin = database_plugin
+        self.log_info("DatabasePlugin подключен к FilterPlugin")
+    
+    def filter_posts_by_keywords_fast(self, posts: List[Dict[str, Any]], keywords: List[str], 
+                                    exact_match: bool = True) -> List[Dict[str, Any]]:
+        """
+        Быстрая фильтрация постов по ключевым словам (для работы с БД)
+        
+        Args:
+            posts: Список постов для фильтрации
+            keywords: Список ключевых слов
+            exact_match: Точное совпадение
+            
+        Returns:
+            Отфильтрованные посты
+        """
+        if not posts or not keywords:
+            return posts
+        
+        filtered_posts = []
+        
+        for post in posts:
+            text = self._extract_post_text(post)
+            if not text:
+                continue
+            
+            # Проверяем соответствие хотя бы одному ключевому слову
+            for keyword in keywords:
+                if self._check_keyword_match(text, keyword, exact_match):
+                    # Добавляем информацию о найденных ключевых словах
+                    post['keywords_matched'] = post.get('keywords_matched', []) + [keyword]
+                    filtered_posts.append(post)
+                    break
+        
+        self.log_info(f"Быстрая фильтрация: {len(posts)} -> {len(filtered_posts)}")
+        return filtered_posts
+    
+    def filter_posts_from_database(self, task_id: int, keywords: List[str], 
+                                 exact_match: bool = True) -> List[Dict[str, Any]]:
+        """
+        Фильтрация постов напрямую из базы данных
+        
+        Args:
+            task_id: ID задачи
+            keywords: Список ключевых слов
+            exact_match: Точное совпадение
+            
+        Returns:
+            Отфильтрованные посты
+        """
+        if not self.database_plugin:
+            self.log_error("DatabasePlugin не подключен")
+            return []
+        
+        try:
+            # Получаем посты из БД
+            posts = self.database_plugin.get_task_posts(task_id)
+            
+            if not posts:
+                self.log_warning(f"Нет постов для задачи {task_id}")
+                return []
+            
+            # Фильтруем посты
+            filtered_posts = self.filter_posts_by_keywords_fast(posts, keywords, exact_match)
+            
+            self.log_info(f"Фильтрация из БД: {len(posts)} -> {len(filtered_posts)}")
+            return filtered_posts
+            
+        except Exception as e:
+            self.log_error(f"Ошибка фильтрации из БД: {e}")
+            return []
+    
+
+    
+    def clean_by_parsing_parameters(self, task_id: int, keywords: List[str], 
+                                  exact_match: bool = True) -> int:
+        """
+        Очистка постов, не соответствующих параметрам парсинга
+        
+        Args:
+            task_id: ID задачи
+            keywords: Ключевые слова для проверки
+            exact_match: Точное совпадение
+            
+        Returns:
+            Количество удаленных постов
+        """
+        if not self.database_plugin:
+            self.log_error("DatabasePlugin не подключен")
+            return 0
+        
+        try:
+            # Получаем все посты задачи
+            posts = self.database_plugin.get_task_posts(task_id)
+            
+            if not posts:
+                return 0
+            
+            # Фильтруем посты по параметрам
+            valid_posts = self.filter_posts_by_keywords_fast(posts, keywords, exact_match)
+            
+            # Находим посты для удаления
+            valid_ids = {post['id'] for post in valid_posts}
+            posts_to_remove = [post for post in posts if post['id'] not in valid_ids]
+            
+            if not posts_to_remove:
+                self.log_info("Нет постов для удаления")
+                return 0
+            
+            # Удаляем несоответствующие посты
+            cursor = self.database_plugin.connection.cursor()
+            removed_count = 0
+            
+            for post in posts_to_remove:
+                cursor.execute('DELETE FROM posts WHERE id = ?', (post['id'],))
+                removed_count += 1
+            
+            self.database_plugin.connection.commit()
+            
+            # Обновляем статистику задачи
+            self.database_plugin._update_task_statistics(task_id)
+            
+            self.log_info(f"Удалено {removed_count} постов, не соответствующих параметрам")
+            return removed_count
+            
+        except Exception as e:
+            self.log_error(f"Ошибка очистки по параметрам: {e}")
+            return 0
+    
+ 

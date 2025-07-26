@@ -102,6 +102,69 @@ class PluginManager:
                 logger.info(f"Плагин инициализирован: {name}")
             except Exception as e:
                 logger.error(f"Ошибка инициализации плагина {name}: {e}")
+        
+        # Устанавливаем зависимости между плагинами
+        self.setup_plugin_dependencies()
+    
+    def setup_plugin_dependencies(self):
+        """Устанавливает зависимости между плагинами"""
+        logger.info("🔗 Настройка зависимостей между плагинами...")
+        
+        # FilterPlugin -> DatabasePlugin
+        filter_plugin = self.get_plugin('filter')
+        database_plugin = self.get_plugin('database')
+        
+        if filter_plugin and database_plugin:
+            if hasattr(filter_plugin, 'set_database_plugin'):
+                filter_plugin.set_database_plugin(database_plugin)
+                logger.info("✅ FilterPlugin подключен к DatabasePlugin")
+            else:
+                logger.warning("FilterPlugin не имеет метода set_database_plugin")
+        
+        # DeduplicationPlugin -> DatabasePlugin
+        deduplication_plugin = self.get_plugin('deduplication')
+        
+        if deduplication_plugin and database_plugin:
+            if hasattr(deduplication_plugin, 'set_database_plugin'):
+                deduplication_plugin.set_database_plugin(database_plugin)
+                logger.info("✅ DeduplicationPlugin подключен к DatabasePlugin")
+            else:
+                logger.warning("DeduplicationPlugin не имеет метода set_database_plugin")
+        
+        # PostProcessorPlugin -> FilterPlugin, DeduplicationPlugin, DatabasePlugin
+        post_processor_plugin = self.get_plugin('post_processor')
+        
+        if post_processor_plugin:
+            if filter_plugin and hasattr(post_processor_plugin, 'set_filter_plugin'):
+                post_processor_plugin.set_filter_plugin(filter_plugin)
+                logger.info("✅ PostProcessorPlugin подключен к FilterPlugin")
+            
+            if deduplication_plugin and hasattr(post_processor_plugin, 'set_deduplication_plugin'):
+                post_processor_plugin.set_deduplication_plugin(deduplication_plugin)
+                logger.info("✅ PostProcessorPlugin подключен к DeduplicationPlugin")
+            
+            if database_plugin and hasattr(post_processor_plugin, 'set_database_plugin'):
+                post_processor_plugin.set_database_plugin(database_plugin)
+                logger.info("✅ PostProcessorPlugin подключен к DatabasePlugin")
+        
+        # VKSearchPlugin -> TokenManagerPlugin
+        vk_plugin = self.get_plugin('vk_search')
+        token_manager = self.get_plugin('token_manager')
+        
+        if vk_plugin and token_manager:
+            if hasattr(vk_plugin, 'set_token_manager'):
+                vk_plugin.set_token_manager(token_manager)
+                logger.info("✅ VKSearchPlugin подключен к TokenManagerPlugin")
+            else:
+                logger.warning("VKSearchPlugin не имеет метода set_token_manager")
+        
+        # DatabasePlugin -> FilterPlugin (обратная связь)
+        if database_plugin and filter_plugin:
+            if hasattr(database_plugin, 'set_filter_plugin'):
+                database_plugin.set_filter_plugin(filter_plugin)
+                logger.info("✅ DatabasePlugin подключен к FilterPlugin")
+        
+        logger.info("🔗 Настройка зависимостей завершена")
     
     def shutdown_plugins(self) -> None:
         """Завершает работу всех плагинов"""
@@ -111,6 +174,35 @@ class PluginManager:
                 logger.info(f"Плагин завершен: {name}")
             except Exception as e:
                 logger.error(f"Ошибка завершения плагина {name}: {e}")
+    
+    def get_plugin_status(self) -> Dict[str, str]:
+        """Получает статус всех плагинов"""
+        status = {}
+        for name, plugin in self.plugins.items():
+            try:
+                if hasattr(plugin, 'is_initialized'):
+                    status[name] = "✅ Инициализирован" if plugin.is_initialized() else "❌ Не инициализирован"
+                else:
+                    status[name] = "✅ Загружен"
+            except Exception as e:
+                status[name] = f"❌ Ошибка: {e}"
+        return status
+    
+    def validate_plugin_dependencies(self) -> Dict[str, List[str]]:
+        """Проверяет зависимости между плагинами"""
+        dependencies = {}
+        
+        # Проверяем необходимые плагины
+        required_plugins = ['database', 'filter', 'vk_search', 'token_manager']
+        
+        for plugin_name in required_plugins:
+            plugin = self.get_plugin(plugin_name)
+            if plugin:
+                dependencies[plugin_name] = ["✅ Найден"]
+            else:
+                dependencies[plugin_name] = ["❌ Не найден"]
+        
+        return dependencies
     
     async def coordinate_search_and_filter(self, keywords: List[str], start_date: str, end_date: str, 
                                         exact_match: bool = True, minus_words: List[str] = None) -> List[Dict[str, Any]]:

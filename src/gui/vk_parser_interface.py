@@ -36,7 +36,7 @@ class TokenPool:
             return token
 
 class VKParserInterface:
-    def __init__(self, parent_frame, settings_adapter=None):
+    def __init__(self, parent_frame, plugin_manager=None, settings_adapter=None):
         self.parent_frame = parent_frame
         self.root = parent_frame.winfo_toplevel()  # Получаем корневое окно
         
@@ -64,19 +64,31 @@ class VKParserInterface:
         else:
             self.settings_adapter = settings_adapter
             self.settings_plugin = getattr(settings_adapter, 'settings_plugin', None)
-        # Инициализируем PluginManager и TokenManagerPlugin
-        from src.core.plugin_manager import PluginManager
-        self.plugin_manager = PluginManager()
-        self.plugin_manager.load_plugins()
-        self.plugin_manager.initialize_plugins()
+        
+        # Используем переданный PluginManager (обязательно)
+        if plugin_manager:
+            self.plugin_manager = plugin_manager
+            print("VK Parser: Используется переданный PluginManager")
+        else:
+            raise RuntimeError("VKParserInterface требует PluginManager для правильной архитектуры")
+        
+        # Получаем плагины через PluginManager
         self.token_manager = self.plugin_manager.get_plugin('token_manager')
         if not self.token_manager:
             raise RuntimeError("TokenManagerPlugin не инициализирован через PluginManager")
+        
         self.token_limiter = TokenLimiter(self.token_manager.list_vk_tokens(), cooldown_seconds=60)
+        
         # Инициализируем VKSearchPlugin через PluginManager
         self.vk_search_plugin = self.plugin_manager.get_plugin('vk_search')
         if self.vk_search_plugin and hasattr(self.vk_search_plugin, 'initialize'):
             self.vk_search_plugin.initialize()
+        
+        # Получаем дополнительные плагины
+        self.database_plugin = self.plugin_manager.get_plugin('database')
+        self.filter_plugin = self.plugin_manager.get_plugin('filter')
+        
+        print("VK Parser: Все плагины получены через PluginManager")
         
         # Настройка интерфейса
         self.setup_ui()
@@ -817,7 +829,11 @@ class VKParserInterface:
                     )
                 else:
                     # Если нет ключевых фраз, только удаляем дубликаты
-                    filtered_posts = filter_plugin.filter_unique_posts(posts)
+                    deduplication_plugin = self.plugin_manager.get_plugin('deduplication')
+                    if deduplication_plugin:
+                        filtered_posts = deduplication_plugin.remove_duplicates_by_link_hash(posts)
+                    else:
+                        filtered_posts = posts
                 
                 # Форматируем результаты для отображения
                 formatted_results = []
