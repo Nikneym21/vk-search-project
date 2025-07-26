@@ -9,8 +9,8 @@ import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 
-from ..base_plugin import BasePlugin
-from ...core.event_system import EventType
+from src.plugins.base_plugin import BasePlugin
+from src.core.event_system import EventType
 
 
 class MonitoringPlugin(BasePlugin):

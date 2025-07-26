@@ -15,7 +15,7 @@ from datetime import datetime
 import glob
 import pandas as pd
 from src.plugins.vk_search.vk_search_plugin import VKSearchPlugin
-from src.plugins.text_processing.text_processing_plugin import TextProcessingPlugin
+from src.plugins.post_processor.text_processing.text_processing_plugin import TextProcessingPlugin
 
 # Добавляем путь к src для импорта плагинов
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
@@ -24,52 +24,52 @@ TIMEZONE_OFFSET = -7  # Владивосток -> Москва
 
 class TestVKSearchPlugin(unittest.TestCase):
     """Тесты для VKSearchPlugin"""
-    
+
     def setUp(self):
         """Инициализация перед каждым тестом"""
         self.plugin = VKSearchPlugin()
         self.plugin.config["access_token"] = "test_token"
         self.plugin.initialize()
-    
+
     def tearDown(self):
         """Очистка после каждого теста"""
         self.plugin.shutdown()
-    
+
     def test_plugin_initialization(self):
         """Тест инициализации плагина"""
         self.assertTrue(self.plugin.is_enabled())
         self.assertEqual(self.plugin.name, "VKSearchPlugin")
         self.assertEqual(self.plugin.version, "1.0.0")
-    
+
     def test_config_validation(self):
         """Тест валидации конфигурации"""
         # С валидным токеном
         self.assertTrue(self.plugin.validate_config())
-        
+
         # Без токена
         self.plugin.config["access_token"] = None
         self.assertFalse(self.plugin.validate_config())
-        
+
         # Восстанавливаем токен
         self.plugin.config["access_token"] = "test_token"
         self.assertTrue(self.plugin.validate_config())
-    
+
     def test_required_config_keys(self):
         """Тест обязательных ключей конфигурации"""
         required_keys = self.plugin.get_required_config_keys()
         self.assertIn("access_token", required_keys)
-    
+
     def test_rate_limit_config(self):
         """Тест конфигурации rate limit"""
         self.assertIn("request_delay", self.plugin.config)
         self.assertIn("max_requests_per_second", self.plugin.config)
         self.assertIn("timeout", self.plugin.config)
-        
+
         # Проверяем, что значения разумные
         self.assertGreater(self.plugin.config["request_delay"], 0)
         self.assertGreater(self.plugin.config["max_requests_per_second"], 0)
         self.assertGreater(self.plugin.config["timeout"], 0)
-    
+
     def test_statistics(self):
         """Тест получения статистики плагина"""
         stats = self.plugin.get_statistics()
@@ -77,14 +77,14 @@ class TestVKSearchPlugin(unittest.TestCase):
         self.assertIn("enabled", stats)
         self.assertIn("config", stats)
         self.assertTrue(stats["enabled"])
-    
+
     def test_parse_datetime(self):
         """Тест парсинга даты"""
         # Тест валидной даты
         timestamp = self.plugin._parse_datetime("25.07.2025 15:30")
         self.assertIsInstance(timestamp, int)
         self.assertGreater(timestamp, 0)
-        
+
         # Тест невалидной даты
         with self.assertRaises(ValueError):
             self.plugin._parse_datetime("invalid_date")
@@ -646,4 +646,4 @@ class TestVKSearchPlugin(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main() 
+    unittest.main()

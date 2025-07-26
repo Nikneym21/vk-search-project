@@ -21,7 +21,7 @@ test: ## Запуск тестов
 	pytest test/ -v --cov=src --cov-report=html --cov-report=term-missing
 
 test-fast: ## Быстрые тесты
-	pytest test/ -v --tb=short
+	pytest test/ -v --tb=short --no-cov
 
 test-coverage: ## Тесты с покрытием
 	pytest test/ -v --cov=src --cov-report=html --cov-report=xml

@@ -2,8 +2,8 @@ import os
 import time
 from collections import defaultdict, deque
 from loguru import logger
-from ...core.event_system import event_system, EventType
-from ..base_plugin import BasePlugin
+from src.core.event_system import event_system, EventType
+from src.plugins.base_plugin import BasePlugin
 from datetime import datetime
 
 class LoggerPlugin(BasePlugin):

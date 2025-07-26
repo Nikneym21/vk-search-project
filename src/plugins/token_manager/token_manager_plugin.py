@@ -9,8 +9,8 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 import hashlib
 
-from ...core.event_system import EventType
-from ..base_plugin import BasePlugin
+from src.core.event_system import EventType
+from src.plugins.base_plugin import BasePlugin
 
 
 class TokenManagerPlugin(BasePlugin):

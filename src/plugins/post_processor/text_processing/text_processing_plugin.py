@@ -6,8 +6,8 @@ import re
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 
-from ...core.event_system import EventType
-from ..base_plugin import BasePlugin
+from src.core.event_system import EventType
+from src.plugins.base_plugin import BasePlugin
 
 
 class TextProcessingPlugin(BasePlugin):

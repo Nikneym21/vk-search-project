@@ -11,7 +11,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import emoji
 from typing import Optional, List, Dict, Any
 from src.plugins.google_sheets.google_sheets_plugin import GoogleSheetsPlugin
-from src.plugins.text_processing.text_processing_plugin import TextProcessingPlugin
+from src.plugins.post_processor.text_processing.text_processing_plugin import TextProcessingPlugin
 import threading
 import asyncio
 import time
@@ -21,7 +21,7 @@ import pytz
 from src.plugins.vk_search.vk_search_plugin import VKSearchPlugin
 from src.plugins.vk_search.vk_time_utils import to_vk_timestamp, from_vk_timestamp
 from src.plugins.token_manager.token_limiter import TokenLimiter
-from src.plugins.stats_plugin import StatsPlugin
+# StatsPlugin был удален, функциональность перенесена в DatabasePlugin
 
 
 class TokenPool:
@@ -39,18 +39,18 @@ class VKParserInterface:
     def __init__(self, parent_frame, plugin_manager=None, settings_adapter=None):
         self.parent_frame = parent_frame
         self.root = parent_frame.winfo_toplevel()  # Получаем корневое окно
-        
+
         # Инициализируем переменные
         self.token_var = tk.StringVar()
         self.vk_api_wrapper = None
         self.db = None
-        
+
         # Google Sheets plugin
         self.google_sheets_plugin = self._init_google_sheets_plugin()
-        
+
         # Text Processing plugin
         self.text_processing_plugin = TextProcessingPlugin()
-        
+
         # Создаем адаптер настроек если не передан
         if settings_adapter is None:
             from .settings_adapter import SettingsAdapter
@@ -64,41 +64,41 @@ class VKParserInterface:
         else:
             self.settings_adapter = settings_adapter
             self.settings_plugin = getattr(settings_adapter, 'settings_plugin', None)
-        
+
         # Используем переданный PluginManager (обязательно)
         if plugin_manager:
             self.plugin_manager = plugin_manager
             print("VK Parser: Используется переданный PluginManager")
         else:
             raise RuntimeError("VKParserInterface требует PluginManager для правильной архитектуры")
-        
+
         # Получаем плагины через PluginManager
         self.token_manager = self.plugin_manager.get_plugin('token_manager')
         if not self.token_manager:
             raise RuntimeError("TokenManagerPlugin не инициализирован через PluginManager")
-        
+
         self.token_limiter = TokenLimiter(self.token_manager.list_vk_tokens(), cooldown_seconds=60)
-        
+
         # Инициализируем VKSearchPlugin через PluginManager
         self.vk_search_plugin = self.plugin_manager.get_plugin('vk_search')
         if self.vk_search_plugin and hasattr(self.vk_search_plugin, 'initialize'):
             self.vk_search_plugin.initialize()
-        
+
         # Получаем дополнительные плагины
         self.database_plugin = self.plugin_manager.get_plugin('database')
         self.filter_plugin = self.plugin_manager.get_plugin('filter')
-        
+
         print("VK Parser: Все плагины получены через PluginManager")
-        
+
         # Настройка интерфейса
         self.setup_ui()
-        
+
         # Загружаем сохраненные данные
         self.load_saved_token()
         self.load_sheets_url()
         self.load_sheets_range_settings()
         self._load_tasks_from_results_folder()  # <--- добавляем автозагрузку задач
-        
+
         # Автоматическое подключение токенов при запуске
         self.root.after(500, self.auto_connect_tokens)
         # Автоматическая проверка токена при запуске
@@ -132,162 +132,162 @@ class VKParserInterface:
         # Главный фрейм для парсера ВК
         main_frame = ttk.Frame(self.parent_frame)
         main_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
-        
+
         # Создаем PanedWindow для возможности изменения размеров панелей мышкой
         self.paned_window = ttk.PanedWindow(main_frame, orient="horizontal")
         self.paned_window.pack(fill="both", expand=True)
-        
+
         # Привязываем событие изменения позиции разделителя
         self.paned_window.bind("<ButtonRelease-1>", self.on_paned_window_change)
-        
+
         # Левая панель - параметры поиска (делаем шире)
         left_frame = ttk.Frame(self.paned_window)
         self.paned_window.add(left_frame, weight=3)  # Левая панель получает 75% пространства
-        
+
         # Создаем canvas с прокруткой для левой панели
         left_canvas = tk.Canvas(left_frame, bg='#2b2b2b', highlightthickness=0, height=600, width=500)
         left_scrollbar = ttk.Scrollbar(left_frame, orient="vertical", command=left_canvas.yview)
         left_scrollable_frame = ttk.Frame(left_canvas)
-        
+
         left_scrollable_frame.bind(
             "<Configure>",
             lambda e: left_canvas.configure(scrollregion=left_canvas.bbox("all"))
         )
-        
+
         left_canvas.create_window((0, 0), window=left_scrollable_frame, anchor="nw")
         left_canvas.configure(yscrollcommand=left_scrollbar.set)
-        
+
         # Размещаем canvas и scrollbar
         left_canvas.grid(row=0, column=0, sticky="nsew")
         left_scrollbar.grid(row=0, column=1, sticky="ns")
-        
+
         # Настройка весов для прокрутки
         left_frame.grid_rowconfigure(0, weight=1)
         left_frame.grid_columnconfigure(0, weight=1)
-        
+
         # Статус подключения к ВК
         self.connection_status = ttk.Label(left_scrollable_frame, text="Статус: Проверка подключения...", foreground="orange", font=("Arial", 9))
         self.connection_status.grid(row=0, column=0, sticky="w", pady=(0, 2))
         # Статус подключения к Google Sheets
         self.gsheets_status = ttk.Label(left_scrollable_frame, text="Google Sheets: ...", foreground="orange", font=("Arial", 9))
         self.gsheets_status.grid(row=1, column=0, sticky="w", pady=(0, 10))
-        
+
         # Кнопка 'Начать поиск' в отдельном контейнере
         search_frame = ttk.Frame(left_scrollable_frame)
         search_frame.grid(row=2, column=0, sticky="w", pady=(10, 15), padx=5)
         ttk.Button(search_frame, text="НАЧАТЬ ПОИСК", command=self.start_vk_search, width=24).pack(side="left", padx=(0, 5))
-        
+
         # Ключевые фразы
         ttk.Label(left_scrollable_frame, text="Ключевые фразы:", font=("Arial", 11, "bold")).grid(row=3, column=0, sticky="w", pady=(10, 2))
         ttk.Label(left_scrollable_frame, text="По одной ключевой фразе в строке.", font=("Arial", 9)).grid(row=4, column=0, sticky="w", pady=(0, 2))
-        
+
         self.keywords_text = tk.Text(left_scrollable_frame, height=8, width=55)
         self.keywords_text.grid(row=5, column=0, sticky="ew", pady=(0, 8))
         self.keywords_text.bind("<KeyRelease>", self._on_keywords_changed)
-        
+
         # Период поиска
         ttk.Label(left_scrollable_frame, text="Период поиска новостей (обязательный параметр):", font=("Arial", 11, "bold")).grid(row=6, column=0, sticky="w", pady=(0, 2))
-        
+
         # Правила
         rules_frame = ttk.Frame(left_scrollable_frame)
         rules_frame.grid(row=7, column=0, sticky="w", pady=(0, 5))
         ttk.Label(rules_frame, text="• поиск возможен по новостям не старше 3-х лет", font=("Arial", 9)).grid(row=0, column=0, sticky="w")
         ttk.Label(rules_frame, text="• максимальный период поиска - 1 год", font=("Arial", 9)).grid(row=1, column=0, sticky="w")
-        
+
         # Даты и время
         dates_frame = ttk.Frame(left_scrollable_frame)
         dates_frame.grid(row=8, column=0, sticky="w", pady=(0, 5))
-        
+
         # Первая дата с временем
         ttk.Label(dates_frame, text="С:", font=("Arial", 9)).grid(row=0, column=0, sticky="w")
         self.start_date_var = tk.StringVar(value="18.07.2025")
         self.start_date_entry = ttk.Entry(dates_frame, textvariable=self.start_date_var, width=12)
         self.start_date_entry.grid(row=0, column=1, padx=(3, 0))
         ttk.Button(dates_frame, text="×", width=2, command=lambda: self.start_date_var.set("")).grid(row=0, column=2, padx=(3, 0))
-        
+
         ttk.Label(dates_frame, text="время:", font=("Arial", 9)).grid(row=0, column=3, sticky="w", padx=(8, 0))
         self.start_time_var = tk.StringVar(value="07:00")
         self.start_time_entry = ttk.Entry(dates_frame, textvariable=self.start_time_var, width=8)
         self.start_time_entry.grid(row=0, column=4, padx=(3, 0))
-        
+
         # Вторая дата с временем
         ttk.Label(dates_frame, text="По:", font=("Arial", 9)).grid(row=1, column=0, sticky="w", pady=(3, 0))
         self.end_date_var = tk.StringVar(value="19.07.2025")
         self.end_date_entry = ttk.Entry(dates_frame, textvariable=self.end_date_var, width=12)
         self.end_date_entry.grid(row=1, column=1, padx=(3, 0), pady=(3, 0))
         ttk.Button(dates_frame, text="×", width=2, command=lambda: self.end_date_var.set("")).grid(row=1, column=2, padx=(3, 0), pady=(3, 0))
-        
+
         ttk.Label(dates_frame, text="время:", font=("Arial", 9)).grid(row=1, column=3, sticky="w", padx=(8, 0), pady=(3, 0))
         self.end_time_var = tk.StringVar(value="06:00")
         self.end_time_entry = ttk.Entry(dates_frame, textvariable=self.end_time_var, width=8)
         self.end_time_entry.grid(row=1, column=4, padx=(3, 0), pady=(3, 0))
-        
+
         # Быстрый выбор периодов
         quick_dates_frame = ttk.Frame(left_scrollable_frame)
         quick_dates_frame.grid(row=9, column=0, sticky="w", pady=(0, 8))
         ttk.Label(quick_dates_frame, text="За месяц, неделю, три дня, день", font=("Arial", 9)).grid(row=0, column=0, sticky="w")
-        
+
         # Точное вхождение
         self.exact_match_var = tk.BooleanVar(value=True)
         exact_match_check = ttk.Checkbutton(left_scrollable_frame, text="Точное вхождение поисковой фразы", variable=self.exact_match_var)
         exact_match_check.grid(row=10, column=0, sticky="w", pady=(0, 8))
-        
+
         # Минус слова
         ttk.Label(left_scrollable_frame, text="Минус слова:", font=("Arial", 11, "bold")).grid(row=11, column=0, sticky="w", pady=(0, 2))
         ttk.Label(left_scrollable_frame, text="По одному минус слову/фразе в строке.", font=("Arial", 9)).grid(row=12, column=0, sticky="w", pady=(0, 2))
-        
+
         self.minus_words_text = tk.Text(left_scrollable_frame, height=3, width=55)
         self.minus_words_text.grid(row=13, column=0, sticky="ew", pady=(0, 8))
-        
+
         # Вложения
         ttk.Label(left_scrollable_frame, text="Вложения:", font=("Arial", 11, "bold")).grid(row=14, column=0, sticky="w", pady=(0, 2))
         self.attachments_var = tk.StringVar(value="Без разницы")
         attachments_combo = ttk.Combobox(left_scrollable_frame, textvariable=self.attachments_var, state="readonly", width=25)
         attachments_combo['values'] = ["Без разницы", "Фото", "Видео", "Без вложения"]
         attachments_combo.grid(row=15, column=0, sticky="w", pady=(0, 10))
-        
+
         # Кнопка загрузки из Google Sheets
         ttk.Label(left_scrollable_frame, text="Автоматическая загрузка:", font=("Arial", 11, "bold")).grid(row=16, column=0, sticky="w", pady=(10, 2))
-        
+
         # Поле ввода ссылки на Google Sheets
         ttk.Label(left_scrollable_frame, text="Ссылка на Google Sheets:", font=("Arial", 9)).grid(row=17, column=0, sticky="w", pady=(0, 2))
         self.sheets_url_var = tk.StringVar()
         sheets_url_entry = ttk.Entry(left_scrollable_frame, textvariable=self.sheets_url_var, width=55)
         sheets_url_entry.grid(row=18, column=0, sticky="ew", pady=(0, 5))
-        
+
         # Привязываем событие изменения ссылки для автоматического сохранения
         self.sheets_url_var.trace("w", lambda *args: self.save_sheets_url())
-        
+
         # Настройки диапазона
         range_frame = ttk.LabelFrame(left_scrollable_frame, text="Настройки диапазона", padding="5")
         range_frame.grid(row=19, column=0, sticky="ew", pady=(0, 5))
-        
+
         # Диапазон листов по датам
         ttk.Label(range_frame, text="Диапазон листов:", font=("Arial", 9)).grid(row=0, column=0, sticky="w", pady=(0, 2))
-        
+
         sheets_range_frame = ttk.Frame(range_frame)
         sheets_range_frame.grid(row=0, column=1, sticky="w", padx=(5, 0), pady=(0, 2))
-        
+
         ttk.Label(sheets_range_frame, text="от:", font=("Arial", 9)).pack(side="left")
         self.sheet_from_var = tk.StringVar()
         self.sheet_from_combo = ttk.Combobox(sheets_range_frame, textvariable=self.sheet_from_var, width=12, state="readonly")
         self.sheet_from_combo.pack(side="left", padx=(3, 5))
-        
+
         ttk.Label(sheets_range_frame, text="до:", font=("Arial", 9)).pack(side="left")
         self.sheet_to_var = tk.StringVar()
         self.sheet_to_combo = ttk.Combobox(sheets_range_frame, textvariable=self.sheet_to_var, width=12, state="readonly")
         self.sheet_to_combo.pack(side="left", padx=(3, 0))
-        
+
         # Кнопка обновления списка листов
-        ttk.Button(range_frame, text="Обновить список листов", 
+        ttk.Button(range_frame, text="Обновить список листов",
                   command=self.update_sheets_list, width=20).grid(row=1, column=0, columnspan=2, pady=(5, 0))
-        
+
         # Диапазон ячеек
         ttk.Label(range_frame, text="Диапазон ячеек:", font=("Arial", 9)).grid(row=2, column=0, sticky="w", pady=(5, 2))
         self.cell_range_var = tk.StringVar(value="A:Z")
         cell_range_entry = ttk.Entry(range_frame, textvariable=self.cell_range_var, width=20)
         cell_range_entry.grid(row=2, column=1, sticky="w", padx=(5, 0), pady=(5, 2))
-        
+
         # Привязываем настройки к автосохранению
         if self.settings_adapter:
             # Привязываем переменные к настройкам
@@ -297,11 +297,11 @@ class VKParserInterface:
             self.settings_adapter.bind_variable_to_setting(self.sheet_to_var, "sheets", "sheet_to")
             self.settings_adapter.bind_variable_to_setting(self.exact_match_var, "parser", "exact_match")
             self.settings_adapter.bind_variable_to_setting(self.attachments_var, "parser", "attachments")
-            
+
             # Привязываем текстовые виджеты к настройкам
             self.settings_adapter.bind_text_widget_to_setting(self.keywords_text, "parser", "keywords")
             self.settings_adapter.bind_text_widget_to_setting(self.minus_words_text, "parser", "minus_words")
-            
+
             # Привязываем даты к настройкам
             self.settings_adapter.bind_variable_to_setting(self.start_date_var, "parser", "start_date")
             self.settings_adapter.bind_variable_to_setting(self.start_time_var, "parser", "start_time")
@@ -312,31 +312,31 @@ class VKParserInterface:
             self.cell_range_var.trace("w", lambda *args: self.save_sheets_range_settings())
             self.sheet_from_var.trace("w", lambda *args: self.save_sheets_range_settings())
             self.sheet_to_var.trace("w", lambda *args: self.save_sheets_range_settings())
-            
+
             self.start_date_var.trace("w", lambda *args: self.save_window_settings())
             self.start_time_var.trace("w", lambda *args: self.save_window_settings())
             self.end_date_var.trace("w", lambda *args: self.save_window_settings())
             self.end_time_var.trace("w", lambda *args: self.save_window_settings())
             self.exact_match_var.trace("w", lambda *args: self.save_window_settings())
             self.attachments_var.trace("w", lambda *args: self.save_window_settings())
-            
+
             self.keywords_text.bind("<KeyRelease>", lambda event: self.save_window_settings())
             self.minus_words_text.bind("<KeyRelease>", lambda event: self.save_window_settings())
-        
+
         # Подсказка
-        ttk.Label(range_frame, text="Примеры: A:Z, A1:D100, Sheet1!A:Z", 
+        ttk.Label(range_frame, text="Примеры: A:Z, A1:D100, Sheet1!A:Z",
                  font=("Arial", 8), foreground="gray").grid(row=3, column=0, columnspan=2, sticky="w", pady=(2, 0))
-        
+
         sheets_frame = ttk.Frame(left_scrollable_frame)
         sheets_frame.grid(row=20, column=0, sticky="w", pady=(0, 10))
-        
-        ttk.Button(sheets_frame, text="Загрузить из Google Sheets", 
+
+        ttk.Button(sheets_frame, text="Загрузить из Google Sheets",
                   command=self.load_from_google_sheets).pack(side="left", padx=(0, 5))
-        
+
         # Статус загрузки
         self.sheets_status = ttk.Label(left_scrollable_frame, text="", font=("Arial", 9))
         self.sheets_status.grid(row=21, column=0, sticky="w", pady=(0, 10))
-        
+
         # Строка прогресса поиска
         self.progress_label = ttk.Label(left_scrollable_frame, text="", font=("Arial", 9), foreground="blue")
         self.progress_label.grid(row=22, column=0, sticky="w", pady=(0, 5))
@@ -344,19 +344,19 @@ class VKParserInterface:
         self.progress_var = tk.DoubleVar(value=0)
         self.progress_bar = ttk.Progressbar(left_scrollable_frame, variable=self.progress_var, maximum=100, length=350)
         self.progress_bar.grid(row=23, column=0, sticky="ew", pady=(0, 10))
-        
+
         # Правая панель - история и результаты (делаем уже)
         right_frame = ttk.Frame(self.paned_window)
         self.paned_window.add(right_frame, weight=1)  # Правая панель получает 25% пространства
-        
+
         # Вкладки истории
         history_notebook = ttk.Notebook(right_frame)
         history_notebook.pack(fill="both", expand=True)
-        
+
         # Вкладка "Все"
         all_frame = ttk.Frame(history_notebook)
         history_notebook.add(all_frame, text="Все")
-        
+
         # Список задач с прокруткой
         history_frame = ttk.Frame(all_frame)
         history_frame.pack(fill="both", expand=True, pady=(0, 10))
@@ -373,27 +373,27 @@ class VKParserInterface:
         self.tasks_tree.column("si", width=80)
         self.tasks_tree.column("views", width=100)
         self.tasks_tree.column("status", width=80)
-        
+
         # Добавляем прокрутку для таблицы истории
         history_scrollbar_y = ttk.Scrollbar(history_frame, orient="vertical", command=self.tasks_tree.yview)
         history_scrollbar_x = ttk.Scrollbar(history_frame, orient="horizontal", command=self.tasks_tree.xview)
         self.tasks_tree.configure(yscrollcommand=history_scrollbar_y.set, xscrollcommand=history_scrollbar_x.set)
-        
+
         # Размещаем таблицу истории и скроллбары
         self.tasks_tree.pack(side="left", fill="both", expand=True)
         history_scrollbar_y.pack(side="right", fill="y")
         history_scrollbar_x.pack(side="bottom", fill="x")
-        
+
         # Привязываем двойной клик для открытия файла
         self.tasks_tree.bind("<Double-1>", self.open_task_file)
-        
+
         # Таблица результатов поиска
         ttk.Label(right_frame, text="Результаты поиска:", font=("Arial", 11, "bold")).pack(anchor="w", pady=(0, 5))
-        
+
         # Создаем фрейм для таблицы результатов с прокруткой
         results_frame = ttk.Frame(right_frame)
         results_frame.pack(fill="both", expand=True)
-        
+
         self.results_tree = ttk.Treeview(results_frame, columns=("link", "text", "type", "author", "author_link", "date", "likes", "comments", "reposts", "views"), show="headings", height=10)
         self.results_tree.heading("link", text="Ссылка")
         self.results_tree.heading("text", text="Текст")
@@ -405,7 +405,7 @@ class VKParserInterface:
         self.results_tree.heading("comments", text="Комментариев")
         self.results_tree.heading("reposts", text="Репостов")
         self.results_tree.heading("views", text="Просмотров")
-        
+
         # Устанавливаем ширину колонок
         self.results_tree.column("link", width=150)
         self.results_tree.column("text", width=200)
@@ -417,27 +417,27 @@ class VKParserInterface:
         self.results_tree.column("comments", width=100)
         self.results_tree.column("reposts", width=80)
         self.results_tree.column("views", width=80)
-        
+
         # Добавляем прокрутку для таблицы результатов
         results_scrollbar_y = ttk.Scrollbar(results_frame, orient="vertical", command=self.results_tree.yview)
         results_scrollbar_x = ttk.Scrollbar(results_frame, orient="horizontal", command=self.results_tree.xview)
         self.results_tree.configure(yscrollcommand=results_scrollbar_y.set, xscrollcommand=results_scrollbar_x.set)
-        
+
         # Размещаем таблицу результатов и скроллбары
         self.results_tree.pack(side="left", fill="both", expand=True)
         results_scrollbar_y.pack(side="right", fill="y")
         results_scrollbar_x.pack(side="bottom", fill="x")
-        
+
         # Кнопка "Загрузить еще"
         ttk.Button(all_frame, text="ЗАГРУЗИТЬ ЕЩЕ", command=self.load_more_tasks).pack(pady=(0, 10))
-        
+
         # Информация о истории
         info_frame = ttk.Frame(all_frame)
         info_frame.pack(fill="x", pady=(0, 10))
-        ttk.Label(info_frame, text="История задач хранится 30 дней. Для неограниченного хранения установите флаг ★", 
+        ttk.Label(info_frame, text="История задач хранится 30 дней. Для неограниченного хранения установите флаг ★",
                  foreground="orange").pack(anchor="w")
         ttk.Label(info_frame, text="Что означают статусы задач >", foreground="blue", cursor="hand2").pack(anchor="w")
-        
+
         # Кнопка сохранения результатов
         # Удалить старую кнопку сохранения результатов
         # self.save_results_button = ttk.Button(right_frame, text="Сохранить результаты", command=self.save_vk_results)
@@ -445,13 +445,13 @@ class VKParserInterface:
         # Оставить только новую кнопку экспорта
         self.export_results_button = ttk.Button(right_frame, text="Экспортировать результаты", command=self._export_current_results)
         self.export_results_button.pack(side="bottom", fill="x", pady=(5, 0))
-        
+
         # Настройка весов
         right_frame.grid_rowconfigure(0, weight=1)
         right_frame.grid_columnconfigure(0, weight=1)
         self.parent_frame.grid_rowconfigure(0, weight=1)
         self.parent_frame.grid_columnconfigure(0, weight=1)
-    
+
     def load_saved_token(self):
         """Загрузка сохраненного токена через TokenManagerPlugin"""
         try:
@@ -462,7 +462,7 @@ class VKParserInterface:
                     self.token_var.set(token)
                     print("Токен VK загружен через TokenManagerPlugin")
                     return
-            
+
             # Fallback к файлу если плагин недоступен
             token_file = "config/vk_token.txt"
             if os.path.exists(token_file):
@@ -479,7 +479,7 @@ class VKParserInterface:
                             break
         except Exception as e:
             print(f"Ошибка загрузки токена: {e}")
-    
+
     def save_token_to_manager(self, token: str):
         """Сохраняет токен в TokenManagerPlugin"""
         try:
@@ -490,7 +490,7 @@ class VKParserInterface:
         except Exception as e:
             print(f"Ошибка сохранения токена в плагин: {e}")
         return False
-    
+
     def auto_check_token(self):
         """Автоматическая проверка токена при запуске"""
         try:
@@ -500,7 +500,7 @@ class VKParserInterface:
                 import requests
                 test_url = f"https://api.vk.com/method/users.get?access_token={token}&v=5.131"
                 response = requests.get(test_url, timeout=10)
-                
+
                 if response.status_code == 200:
                     data = response.json()
                     if 'error' not in data:
@@ -523,7 +523,7 @@ class VKParserInterface:
             self.connection_status.config(text="Статус: Ошибка проверки", foreground="red")
             print(f"❌ Ошибка проверки токена: {e}")
             return False
-    
+
     def load_sheets_url(self):
         """Загрузка URL Google Sheets"""
         try:
@@ -540,7 +540,7 @@ class VKParserInterface:
                             self.sheets_url_var.set(url)
         except Exception as e:
             print(f"Ошибка загрузки URL: {str(e)}")
-    
+
     def load_sheets_range_settings(self):
         """Загрузка настроек диапазона Google Sheets"""
         try:
@@ -548,7 +548,7 @@ class VKParserInterface:
                 cell_range = self.settings_adapter.get_setting("sheets", "cell_range", "A:Z")
                 sheet_from = self.settings_adapter.get_setting("sheets", "sheet_from", "")
                 sheet_to = self.settings_adapter.get_setting("sheets", "sheet_to", "")
-                
+
                 if cell_range:
                     self.cell_range_var.set(cell_range)
                 if sheet_from:
@@ -563,7 +563,7 @@ class VKParserInterface:
                         # Здесь можно добавить загрузку настроек диапазона
         except Exception as e:
             print(f"Ошибка загрузки настроек: {str(e)}")
-    
+
     def start_vk_search(self):
         """Запуск асинхронного поиска в ВК (теперь с преобразованием дат и времени через vk_time_utils)"""
         try:
@@ -792,11 +792,11 @@ class VKParserInterface:
             if hasattr(self, 'plugin_manager') and self.plugin_manager:
                 # Если у нас есть PluginManager, используем его координацию
                 import asyncio
-                
+
                 # Создаем новую event loop для асинхронного вызова
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                
+
                 try:
                     # Вызываем координацию через PluginManager
                     results = loop.run_until_complete(
@@ -817,7 +817,7 @@ class VKParserInterface:
                 from src.plugins.filter.filter_plugin import FilterPlugin
                 filter_plugin = FilterPlugin()
                 filter_plugin.initialize()
-                
+
                 # Фильтруем по ключевым фразам и удаляем дубликаты
                 if keywords:
                     filtered_posts = filter_plugin.filter_posts_comprehensive(
@@ -834,7 +834,7 @@ class VKParserInterface:
                         filtered_posts = deduplication_plugin.remove_duplicates_by_link_hash(posts)
                     else:
                         filtered_posts = posts
-                
+
                 # Форматируем результаты для отображения
                 formatted_results = []
                 for post in filtered_posts:
@@ -843,32 +843,32 @@ class VKParserInterface:
                     post_id = post.get('id', 0)
                     text = post.get('text', '')
                     date = post.get('date', 0)
-                    
+
                     # Форматируем дату
                     if date:
                         dt = datetime.fromtimestamp(date)
                         formatted_date = dt.strftime("%H:%M %d.%m.%Y")
                     else:
                         formatted_date = ""
-                    
+
                     # Получаем статистику
                     likes = post.get('likes', {})
                     comments = post.get('comments', {})
                     reposts = post.get('reposts', {})
                     views = post.get('views', {})
-                    
+
                     # Извлекаем значения
                     likes_count = likes.get('count', 0) if isinstance(likes, dict) else likes
                     comments_count = comments.get('count', 0) if isinstance(comments, dict) else comments
                     reposts_count = reposts.get('count', 0) if isinstance(reposts, dict) else reposts
                     views_count = views.get('count', 0) if isinstance(views, dict) else views
-                    
+
                     # Формируем ссылку
                     if owner_id < 0:
                         author_link = f"https://vk.com/club{abs(owner_id)}"
                     else:
                         author_link = f"https://vk.com/id{owner_id}"
-                    
+
                     formatted_post = {
                         "link": f"https://vk.com/wall{owner_id}_{post_id}",
                         "text": text,
@@ -882,10 +882,10 @@ class VKParserInterface:
                         "views": views_count
                     }
                     formatted_results.append(formatted_post)
-                
+
                 filter_plugin.shutdown()
                 return formatted_results
-            
+
         except Exception as e:
             print(f"Ошибка фильтрации и форматирования результатов: {e}")
             # В случае ошибки возвращаем исходные посты без фильтрации
@@ -894,7 +894,7 @@ class VKParserInterface:
     def _set_progress(self, text):
         self.progress_label.config(text=text)
         self.progress_label.update_idletasks()
-    
+
     def save_window_settings(self):
         """Сохранение настроек парсера"""
         try:
@@ -910,7 +910,7 @@ class VKParserInterface:
                 "vk_token": self.token_var.get(),
                 "last_saved": datetime.now().isoformat()
             }
-            
+
             if self.settings_adapter:
                 self.settings_adapter.save_parser_settings(settings)
             else:
@@ -918,10 +918,10 @@ class VKParserInterface:
                 os.makedirs("data", exist_ok=True)
                 with open("data/settings.json", "w", encoding="utf-8") as f:
                     json.dump(settings, f, indent=2, ensure_ascii=False)
-                
+
         except Exception as e:
             print(f"Ошибка сохранения настроек: {str(e)}")
-    
+
     def update_sheets_list(self):
         """Обновление списка листов Google Sheets"""
         try:
@@ -950,7 +950,7 @@ class VKParserInterface:
             messagebox.showinfo("Информация", f"Список листов обновлен: {', '.join(worksheets)}")
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось обновить список листов: {str(e)}")
-    
+
     def load_from_google_sheets(self):
         """Загрузка данных из Google Sheets и очистка через TextProcessingPlugin"""
         try:
@@ -985,11 +985,11 @@ class VKParserInterface:
             # Вставляем в поле ключевых фраз
             self.keywords_text.delete("1.0", tk.END)
             self.keywords_text.insert("1.0", "\n".join(cleaned_texts))
-            
+
             messagebox.showinfo("Успех", f"Загружено и очищено {len(cleaned_texts)} ключевых фраз из листов: {', '.join(processed_sheets)}")
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось загрузить данные: {str(e)}")
-    
+
     def save_sheets_url(self):
         """Сохранение URL Google Sheets"""
         try:
@@ -999,7 +999,7 @@ class VKParserInterface:
                     f.write(url)
         except Exception as e:
             print(f"Ошибка сохранения URL: {str(e)}")
-    
+
     def save_sheets_range_settings(self):
         """Сохранение настроек диапазона Google Sheets"""
         try:
@@ -1009,7 +1009,7 @@ class VKParserInterface:
                 "sheet_to": self.sheet_to_var.get(),
                 "url": self.sheets_url_var.get()
             }
-            
+
             if self.settings_adapter:
                 self.settings_adapter.save_sheets_settings(settings)
             else:
@@ -1017,10 +1017,10 @@ class VKParserInterface:
                 os.makedirs("data", exist_ok=True)
                 with open("data/sheets_range_settings.json", "w", encoding="utf-8") as f:
                     json.dump(settings, f, indent=2, ensure_ascii=False)
-                
+
         except Exception as e:
             print(f"Ошибка сохранения настроек диапазона: {str(e)}")
-    
+
     def load_more_tasks(self):
         """Загрузка дополнительных задач"""
         try:
@@ -1028,7 +1028,7 @@ class VKParserInterface:
             messagebox.showinfo("Информация", "Дополнительные задачи загружены")
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось загрузить задачи: {str(e)}")
-    
+
     def open_task_file(self, event):
         # Двойной клик — открывает окно настроек задачи через DataManagerPlugin
         item_id = self.tasks_tree.identify_row(event.y)
@@ -1109,14 +1109,14 @@ class VKParserInterface:
             threading.Thread(target=self._run_async_search_thread_safe, args=(keywords, keywords, start_ts, end_ts, exact_match, minus_words, token, start_date, start_time, end_date, end_time), daemon=True).start()
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось повторно запустить задачу: {str(e)}")
-    
+
     def display_results_in_treeview(self, df):
         """Отображение результатов в Treeview"""
         try:
             # Очищаем предыдущие результаты
             for item in self.results_tree.get_children():
                 self.results_tree.delete(item)
-            
+
             # Добавляем новые результаты
             for index, row in df.iterrows():
                 self.results_tree.insert("", "end", values=(
@@ -1132,7 +1132,7 @@ class VKParserInterface:
                     row.get('views', '')
                 ))
         except Exception as e:
-            messagebox.showerror("Ошибка", f"Не удалось отобразить результаты: {str(e)}") 
+            messagebox.showerror("Ошибка", f"Не удалось отобразить результаты: {str(e)}")
 
     def _display_results_from_csv(self, filepath):
         """Загружает CSV и отображает результаты в Treeview"""
@@ -1146,17 +1146,17 @@ class VKParserInterface:
         """Автоматическое подключение всех токенов при запуске"""
         try:
             print("🔄 Автоподключение токенов...")
-            
+
             if not self.token_manager:
                 print("❌ TokenManager недоступен")
                 return
-            
+
             # Подключаем VK токен
             vk_token = self.token_manager.get_token("vk")
             if vk_token:
                 self.token_var.set(vk_token)
                 print("✅ VK токен подключен")
-                
+
                 # Проверяем валидность
                 if self.token_manager._is_token_valid("vk"):
                     self.connection_status.config(text="Статус: Подключено", foreground="green")
@@ -1168,26 +1168,26 @@ class VKParserInterface:
                 # Пытаемся загрузить из файла
                 self._load_token_from_file()
                 print("📁 VK токен загружен из файла")
-            
+
             # Подключаем Google Sheets токен
             sheets_token = self.token_manager.get_token("google_sheets")
             if sheets_token:
                 print("✅ Google Sheets токен подключен")
             else:
                 print("ℹ️ Google Sheets токен не найден")
-            
+
             # Подключаем другие токены если есть
             all_tokens = self.token_manager.list_tokens()
             for token_info in all_tokens:
                 service = token_info.get("service", "")
                 if service not in ["vk", "google_sheets"]:
                     print(f"✅ Токен {service} подключен")
-            
+
             print(f"🎯 Всего подключено токенов: {len(all_tokens)}")
-            
+
         except Exception as e:
             print(f"❌ Ошибка автоподключения токенов: {e}")
-    
+
     def _load_token_from_file(self):
         """Загружает токен из файла и сохраняет в менеджер"""
         try:
@@ -1205,7 +1205,7 @@ class VKParserInterface:
                             print("📁 Токен загружен из файла и сохранен в менеджер")
                             break
         except Exception as e:
-            print(f"❌ Ошибка загрузки токена из файла: {e}") 
+            print(f"❌ Ошибка загрузки токена из файла: {e}")
 
     def auto_connect_google_sheets(self):
         """Автоматическое подключение Google Sheets при запуске"""
@@ -1214,7 +1214,7 @@ class VKParserInterface:
                 print("❌ GoogleSheetsPlugin недоступен")
                 self.gsheets_status.config(text="Google Sheets: Плагин недоступен", foreground="red")
                 return
-            
+
             # Пробуем инициализировать соединение
             connected = self.google_sheets_plugin.initialize_connection()
             if connected:
@@ -1225,7 +1225,7 @@ class VKParserInterface:
                 print("❌ Ошибка подключения к Google Sheets API")
         except Exception as e:
             self.gsheets_status.config(text="Google Sheets: Ошибка", foreground="red")
-            print(f"❌ Ошибка автоподключения Google Sheets: {e}") 
+            print(f"❌ Ошибка автоподключения Google Sheets: {e}")
 
     def _get_utc_timestamps(self, start_date, start_time, end_date, end_time, only_date=False):
         # Упрощённая версия: используем to_vk_timestamp для преобразования
@@ -1240,7 +1240,7 @@ class VKParserInterface:
             return start_ts, end_ts
         except Exception as e:
             print(f"[VKParser] Ошибка преобразования времени: {e}")
-            return None, None 
+            return None, None
 
     def on_paned_window_change(self, event):
         """Обработка изменения позиции разделителя панелей (заглушка)"""
@@ -1249,7 +1249,7 @@ class VKParserInterface:
     def _on_keywords_changed(self, event=None):
         if hasattr(self, 'settings_adapter') and self.settings_adapter:
             keywords = self.keywords_text.get("1.0", tk.END).strip()
-            self.settings_adapter.set_setting("window", "keywords", keywords) 
+            self.settings_adapter.set_setting("window", "keywords", keywords)
 
     def _load_tasks_from_results_folder(self):
         """Загружает все задачи через DataManagerPlugin и обновляет таблицу задач."""
@@ -1263,10 +1263,10 @@ class VKParserInterface:
         print(f"[DEBUG] Найдено задач: {len(tasks)}")
         if tasks:
             print(f"[DEBUG] Первая задача: {tasks[0]}")
-        
+
         # Сортируем задачи по дате/времени в обратном порядке (новые сверху)
         sorted_tasks = sorted(tasks, key=lambda x: x.get('datetime', ''), reverse=True)
-        
+
         for meta in sorted_tasks:
             try:
                 dt = meta.get('datetime', '')
